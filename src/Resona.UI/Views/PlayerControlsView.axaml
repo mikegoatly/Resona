@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:Resona.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+             x:Class="Resona.UI.Views.PlayerControlsView">
+	<Design.DataContext>
+		<vm:PlayerControlsViewModel/>
+	</Design.DataContext>
+
+	<Grid>
+		<StackPanel VerticalAlignment="Center" 
+					Orientation="Horizontal" 
+					HorizontalAlignment="Center">
+			<Button Classes="primary circle"
+				Command="{Binding MovePreviousCommand}">
+				<icon:Icon
+					Value="fa fa-backward" />
+			</Button>
+
+			<Button Classes="primary circle"
+					Command="{Binding PlayPauseCommand}">
+				<icon:Icon
+					Value="{Binding PlayButtonIcon}" />
+			</Button>
+			
+			<Button Classes="primary circle"
+				Command="{Binding MoveNextCommand}">
+				<icon:Icon
+					Value="fa fa-forward" />
+			</Button>
+		</StackPanel>
+	</Grid>
+
+</UserControl>

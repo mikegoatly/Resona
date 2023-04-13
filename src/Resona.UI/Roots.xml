@@ -1,0 +1,6 @@
+﻿<linker>
+	<!-- Can be removed if CompiledBinding and no reflection are used -->
+	<assembly fullname="Audibobble" preserve="All" />
+	<assembly fullname="Resona.UI" preserve="All" />
+	<assembly fullname="Avalonia.Themes.Fluent" preserve="All" />
+</linker>

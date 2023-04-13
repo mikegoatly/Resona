@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:Resona.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+			 x:Name="Root"
+			 xmlns:local="using:Resona.UI.Views"
+             x:Class="Resona.UI.Views.LibraryView">
+	<Design.DataContext>
+		<vm:LibraryViewModel />
+	</Design.DataContext>
+
+	<ScrollViewer MaxWidth="800"
+			 Margin="50,20,0,100">
+	<ItemsRepeater Items="{Binding AudioContent^}"
+			 Background="Transparent"
+				   >
+		<ItemsRepeater.Layout>
+			<UniformGridLayout 
+				MaximumRowsOrColumns="2"
+				Orientation="Horizontal" />
+		</ItemsRepeater.Layout>
+		<ItemsRepeater.ItemTemplate>
+			<DataTemplate>
+				<Grid
+					Margin="0,0,0,5"
+					Width="350"
+					Background="Transparent">
+					<i:Interaction.Behaviors>
+						<ia:EventTriggerBehavior EventName="Tapped">
+							<ia:InvokeCommandAction Command="{Binding DataContext.AudioContentSelected, ElementName=Root}"
+														   CommandParameter="{Binding}"/>
+						</ia:EventTriggerBehavior>
+					</i:Interaction.Behaviors>
+
+					<Image Source="{Binding Cover^}" HorizontalAlignment="Stretch" Height="120"
+						   Width="200"
+						   Stretch="UniformToFill" VerticalAlignment="Top"
+						   Opacity="0.7"/>
+					<Border VerticalAlignment="Center"
+						HorizontalAlignment="Center"
+							CornerRadius="5"
+							BorderBrush="#7555"
+							BorderThickness="2"
+							Background="#BFFF"
+							Padding="5,0">
+						<TextBlock
+							TextWrapping="Wrap"
+							TextAlignment="Center"
+							Foreground="Black"
+							 Text="{Binding Name}" />
+					</Border>
+				</Grid>
+			</DataTemplate>
+		</ItemsRepeater.ItemTemplate>
+	</ItemsRepeater>
+	</ScrollViewer>
+</UserControl>

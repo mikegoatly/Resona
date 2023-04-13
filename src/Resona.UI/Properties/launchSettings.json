@@ -1,0 +1,18 @@
+{
+  "profiles": {
+    "Resona.UI": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "Profile 1": {
+      "commandName": "Project",
+      "commandLineArgs": "--drm",
+      "remoteDebugEnabled": true,
+      "authenticationMode": "None",
+      "remoteDebugMachine": "dev"
+    }
+  }
+}

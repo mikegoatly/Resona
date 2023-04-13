@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<AssemblyName>Resona</AssemblyName>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<AvaloniaResource Include="Assets\**" />
+		<AvaloniaResource Remove="Assets\acme.woff2" />
+		<None Remove=".gitignore" />
+		<None Remove="Assets\acme.woff2" />
+		<None Remove="Fonts\Acme-Regular.ttf" />
+		<None Remove="Images\audiobooks.png" />
+		<None Remove="Images\music.png" />
+		<None Remove="Images\sleep.png" />
+		<None Remove="Roots.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AvaloniaResource Include="Images\audiobooks.png">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</AvaloniaResource>
+		<AvaloniaResource Include="Images\music.png">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</AvaloniaResource>
+		<AvaloniaResource Include="Images\sleep.png">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</AvaloniaResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Roots.xml" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.0.0-preview6" />
+		<PackageReference Include="Avalonia.LinuxFramebuffer" Version="11.0.0-preview6" />
+		<PackageReference Include="Avalonia.Themes.Simple" Version="11.0.0-preview6" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview6" />
+		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
+		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.0-preview6" />
+		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
+		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.5.0-preview6" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview6" />
+		<PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="14.6.8" />
+		<PackageReference Include="Splat.Serilog" Version="14.6.8" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Fonts\Acme-Regular.ttf" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Resona.Services\Resona.Services.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PlayerControlsView.axaml.cs">
+			<DependentUpon>PlayerControlsView.axaml</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-arm' or '$(RuntimeIdentifier)'==''">
+		<Content Include="Bass\linux_arm\**">
+			<Link>%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'==''">
+		<Content Include="Bass\win_x64\**">
+			<Link>%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+</Project>
