@@ -22,12 +22,12 @@ namespace Resona.UI.ViewModels
         public AudioSelectionViewModel(RoutingState router, IScreen hostScreen)
             : base(router, hostScreen, "audio-kind-selection")
         {
-            AudioKindSelected = ReactiveCommand.CreateFromObservable(
+            this.AudioKindSelected = ReactiveCommand.CreateFromObservable(
                 (AudioKind audioKind) =>
                 {
                     var viewModel = Locator.Current.GetRequiredService<LibraryViewModel>();
                     viewModel.Kind = audioKind;
-                    return Router.Navigate.Execute(viewModel);
+                    return this.Router.Navigate.Execute(viewModel);
                 }
             );
         }

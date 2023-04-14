@@ -9,7 +9,7 @@ namespace Resona.UI.Views
     {
         public AudioSelectionView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         private void InitializeComponent()

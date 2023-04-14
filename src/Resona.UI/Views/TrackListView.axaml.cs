@@ -8,7 +8,7 @@ namespace Resona.UI.Views
     {
         public TrackListView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

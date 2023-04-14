@@ -9,8 +9,8 @@ namespace Resona.Persistence
 {
     public class ResonaDb : DbContext
     {
-        private static readonly ILogger _logger = Log.Logger.ForContext<ResonaDb>();
-        private static bool _initialized;
+        private static readonly ILogger logger = Log.Logger.ForContext<ResonaDb>();
+        private static bool initialized;
 
         public DbSet<AlbumRaw> Albums { get; set; }
         public DbSet<SongRaw> Songs { get; set; }
@@ -18,7 +18,7 @@ namespace Resona.Persistence
         [Conditional("DEBUG")]
         public static void Reset()
         {
-            _initialized = false;
+            initialized = false;
             using var context = new ResonaDb();
             context.Database.EnsureDeleted();
 
@@ -27,7 +27,7 @@ namespace Resona.Persistence
 
         public static void Initialize()
         {
-            if (_initialized)
+            if (initialized)
             {
                 return;
             }
@@ -40,10 +40,10 @@ namespace Resona.Persistence
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An error occurred migrating the database");
+                logger.Error(ex, "An error occurred migrating the database");
             }
 
-            _initialized = true;
+            initialized = true;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -54,7 +54,7 @@ namespace Resona.Persistence
 
             var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "resona.db");
 
-            _logger.Information("Configuring database: {Path}", dbPath);
+            logger.Information("Configuring database: {Path}", dbPath);
 
             var connectionString = new SqliteConnectionStringBuilder()
             {

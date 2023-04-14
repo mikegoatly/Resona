@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Serilog;
+﻿using Serilog;
 
 namespace Resona.Services.Bluetooth
 {
     public abstract class BluetoothServiceBase : IBluetoothService, IDisposable
     {
-        private readonly Timer _scanTimeout;
-        private readonly ILogger _logger;
+        private readonly Timer scanTimeout;
+        private readonly ILogger logger;
 
         public event EventHandler<BluetoothDevice>? BluetoothDeviceDiscovered;
         public event EventHandler<BluetoothDevice>? BluetoothDeviceConnected;
@@ -18,47 +13,47 @@ namespace Resona.Services.Bluetooth
 
         public BluetoothServiceBase(ILogger logger)
         {
-            _scanTimeout = new Timer(ScanTimeoutTicked, null, Timeout.Infinite, Timeout.Infinite);
-            _logger = logger;
+            this.scanTimeout = new Timer(this.ScanTimeoutTicked, null, Timeout.Infinite, Timeout.Infinite);
+            this.logger = logger;
         }
 
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-            Dispose(true);
+            this.Dispose(true);
         }
 
         protected void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _scanTimeout?.Dispose();
+                this.scanTimeout?.Dispose();
             }
         }
 
         protected void OnStartScanning()
         {
-            _logger.Information("Starting scanning...");
+            this.logger.Information("Starting scanning...");
 
-            _scanTimeout.Change(30000, Timeout.Infinite);
+            this.scanTimeout.Change(30000, Timeout.Infinite);
         }
 
         protected void OnStopScanning()
         {
-            _logger.Information("Stopping scanning...");
-            _scanTimeout.Change(Timeout.Infinite, Timeout.Infinite);
+            this.logger.Information("Stopping scanning...");
+            this.scanTimeout.Change(Timeout.Infinite, Timeout.Infinite);
             ScanningStopped?.Invoke(this, EventArgs.Empty);
         }
 
         protected void OnDeviceDiscovered(BluetoothDevice device)
         {
-            _logger.Information("New device discovered: {Name} [{Mac}]", device.Name, device.Address);
+            this.logger.Information("New device discovered: {Name} [{Mac}]", device.Name, device.Address);
             BluetoothDeviceDiscovered?.Invoke(this, device);
         }
 
         protected void OnDeviceConnected(BluetoothDevice device)
         {
-            _logger.Information("Device connected: {Name} [{Mac}]", device.Name, device.Address);
+            this.logger.Information("Device connected: {Name} [{Mac}]", device.Name, device.Address);
             BluetoothDeviceConnected?.Invoke(this, device);
         }
 
@@ -66,11 +61,11 @@ namespace Resona.Services.Bluetooth
         {
             try
             {
-                await StopScanningAsync(default);
+                await this.StopScanningAsync(default);
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Error stopping scanning");
+                this.logger.Error(ex, "Error stopping scanning");
             }
         }
 

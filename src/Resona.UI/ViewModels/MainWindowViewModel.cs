@@ -11,7 +11,7 @@ namespace Resona.UI.ViewModels
 {
     public class MainWindowViewModel : ReactiveObject, IScreen
     {
-        private static readonly Serilog.ILogger _logger = Log.ForContext<MainWindowViewModel>();
+        private static readonly Serilog.ILogger logger = Log.ForContext<MainWindowViewModel>();
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
@@ -23,17 +23,17 @@ namespace Resona.UI.ViewModels
 
         public MainWindowViewModel(RoutingState router)
         {
-            _logger.Debug("Constructing view model");
+            logger.Debug("Constructing view model");
 
-            Router = router;
+            this.Router = router;
 
-            GoHome = ReactiveCommand.CreateFromObservable(
+            this.GoHome = ReactiveCommand.CreateFromObservable(
                 () =>
                 {
-                    _logger.Debug("Navigating home");
+                    logger.Debug("Navigating home");
 
                     var viewModel = Locator.Current.GetRequiredService<AudioSelectionViewModel>();
-                    return Router.Navigate.Execute(viewModel);
+                    return this.Router.Navigate.Execute(viewModel);
                 }
             );
         }
@@ -45,6 +45,6 @@ namespace Resona.UI.ViewModels
 
 
         // The command that navigates a user back.
-        public ReactiveCommand<Unit, IRoutableViewModel?> GoBack => Router.NavigateBack;
+        public ReactiveCommand<Unit, IRoutableViewModel?> GoBack => this.Router.NavigateBack;
     }
 }

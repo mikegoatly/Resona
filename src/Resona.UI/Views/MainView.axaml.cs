@@ -16,8 +16,8 @@ namespace Resona.UI.Views
             Log.Information("Main view starting");
 
             AvaloniaXamlLoader.Load(this);
-            ViewModel = Locator.Current.GetService<MainWindowViewModel>();
-            ViewModel!.GoHome.Execute();
+            this.ViewModel = Locator.Current.GetService<MainWindowViewModel>();
+            this.ViewModel!.GoHome.Execute();
         }
     }
 }

@@ -14,27 +14,27 @@ namespace Resona.UI.ViewModels
 {
     public class LibraryViewModel : RoutableViewModelBase
     {
-        private AudioKind _kind;
-        private Task<List<AudioContentViewModel>>? _audioContent;
-        private readonly IAudioProvider _audioProvider;
+        private AudioKind kind;
+        private Task<List<AudioContentViewModel>>? audioContent;
+        private readonly IAudioProvider audioProvider;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public LibraryViewModel()
         : this(null!, null!, new FakeAudioProvider())
         {
-            AudioContent = Task.FromResult(
+            this.AudioContent = Task.FromResult(
                 new List<AudioContentViewModel>
                 {
                     new AudioContentViewModel(
                         new AudioContent(AudioKind.Audiobook, "Some book", "Me", 0, Array.Empty<AudioTrack>()),
-                        _audioProvider),
+                        this.audioProvider),
                      new AudioContentViewModel(
                         new AudioContent(AudioKind.Audiobook, "Another book", "Me", 1, Array.Empty<AudioTrack>()),
-                        _audioProvider),
+                        this.audioProvider),
                       new AudioContentViewModel(
                         new AudioContent(AudioKind.Audiobook, "Last book", "Me", 2, Array.Empty<AudioTrack>()),
-                        _audioProvider)
+                        this.audioProvider)
                 });
         }
 #endif
@@ -46,38 +46,38 @@ namespace Resona.UI.ViewModels
                 .Where(x => x != AudioKind.Unspecified)
                 .Subscribe(x =>
                 {
-                    AudioContent = GetAudioContent(x);
+                    this.AudioContent = this.GetAudioContent(x);
                 });
 
-            _audioProvider = audioProvider;
+            this.audioProvider = audioProvider;
 
-            AudioContentSelected = ReactiveCommand.CreateFromObservable(
+            this.AudioContentSelected = ReactiveCommand.CreateFromObservable(
                 (AudioContentViewModel audioContent) => Observable.FromAsync(
                     async () =>
                     {
                         var viewModel = Locator.Current.GetRequiredService<TrackListViewModel>();
                         await viewModel.SetAudioContentAsync(audioContent.Model.AudioKind, audioContent.Model.Name, default);
-                        return Router.Navigate.Execute(viewModel);
+                        return this.Router.Navigate.Execute(viewModel);
                     }));
         }
 
         private async Task<List<AudioContentViewModel>> GetAudioContent(AudioKind kind)
         {
-            var audio = await _audioProvider.GetAllAsync(kind, default);
-            return audio.Select(x => new AudioContentViewModel(x, _audioProvider))
+            var audio = await this.audioProvider.GetAllAsync(kind, default);
+            return audio.Select(x => new AudioContentViewModel(x, this.audioProvider))
                 .ToList();
         }
 
         public Task<List<AudioContentViewModel>>? AudioContent
         {
-            get => _audioContent;
-            protected set => this.RaiseAndSetIfChanged(ref _audioContent, value);
+            get => this.audioContent;
+            protected set => this.RaiseAndSetIfChanged(ref this.audioContent, value);
         }
 
         public AudioKind Kind
         {
-            get => _kind;
-            internal set => this.RaiseAndSetIfChanged(ref _kind, value);
+            get => this.kind;
+            internal set => this.RaiseAndSetIfChanged(ref this.kind, value);
         }
 
         public ReactiveCommand<AudioContentViewModel, IObservable<IRoutableViewModel>> AudioContentSelected { get; }

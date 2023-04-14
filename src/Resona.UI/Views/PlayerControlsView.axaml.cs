@@ -10,8 +10,8 @@ namespace Resona.UI.Views
     {
         public PlayerControlsView()
         {
-            InitializeComponent();
-            ViewModel = Locator.Current.GetService<PlayerControlsViewModel>();
+            this.InitializeComponent();
+            this.ViewModel = Locator.Current.GetService<PlayerControlsViewModel>();
         }
     }
 }

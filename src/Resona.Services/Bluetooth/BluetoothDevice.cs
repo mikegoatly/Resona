@@ -4,9 +4,9 @@
     {
         public BluetoothDevice(string name, string address, bool connected = false)
         {
-            Name = name;
-            Address = address;
-            Connected = connected;
+            this.Name = name;
+            this.Address = address;
+            this.Connected = connected;
         }
 
         public string Name { get; }

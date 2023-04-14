@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using TagLib;
+﻿using TagLib;
 
 namespace Resona.Services.Libraries
 {
@@ -12,25 +6,25 @@ namespace Resona.Services.Libraries
 
     internal class AudioCache
     {
-        private IDictionary<string, CachedAudioContent>? _cache;
-        private readonly DirectoryInfo _rootDirectory;
-        private readonly AudioKind _audioKind;
-        private readonly FileSystemWatcher? _fileWatcher;
+        private IDictionary<string, CachedAudioContent>? cache;
+        private readonly DirectoryInfo rootDirectory;
+        private readonly AudioKind audioKind;
+        private readonly FileSystemWatcher? fileWatcher;
 
         public AudioCache(string rootDirectory, AudioKind audioKind)
         {
-            _rootDirectory = new DirectoryInfo(rootDirectory);
-            _audioKind = audioKind;
+            this.rootDirectory = new DirectoryInfo(rootDirectory);
+            this.audioKind = audioKind;
 
-            if (_rootDirectory.Exists)
+            if (this.rootDirectory.Exists)
             {
-                _fileWatcher = new FileSystemWatcher(_rootDirectory.FullName);
-                _fileWatcher.Changed += FilesChanged;
-                _fileWatcher.Deleted += FilesChanged;
-                _fileWatcher.Created += FilesChanged;
-                _fileWatcher.Renamed += FilesChanged;
-                _fileWatcher.IncludeSubdirectories = true;
-                _fileWatcher.EnableRaisingEvents = true;
+                this.fileWatcher = new FileSystemWatcher(this.rootDirectory.FullName);
+                this.fileWatcher.Changed += this.FilesChanged;
+                this.fileWatcher.Deleted += this.FilesChanged;
+                this.fileWatcher.Created += this.FilesChanged;
+                this.fileWatcher.Renamed += this.FilesChanged;
+                this.fileWatcher.IncludeSubdirectories = true;
+                this.fileWatcher.EnableRaisingEvents = true;
             }
         }
 
@@ -62,9 +56,9 @@ namespace Resona.Services.Libraries
 
         public async Task<IDictionary<string, CachedAudioContent>> GetAsync(CancellationToken cancellationToken)
         {
-            _cache ??= _rootDirectory.Exists
+            this.cache ??= this.rootDirectory.Exists
                     ? await Task.Run(
-                        () => (from d in _rootDirectory.EnumerateDirectories()
+                        () => (from d in this.rootDirectory.EnumerateDirectories()
                                 .Select((d, bookIndex) => (directory: d, bookIndex))
                                orderby d.directory.Name
                                let bookTitle = d.directory.Name
@@ -78,7 +72,7 @@ namespace Resona.Services.Libraries
                                select new CachedAudioContent(
                                    d.directory,
                                    new AudioContent(
-                                     _audioKind,
+                                     this.audioKind,
                                      d.directory.Name,
                                      files[0].Artist,
                                      d.bookIndex,
@@ -87,12 +81,12 @@ namespace Resona.Services.Libraries
                         cancellationToken)
                     : (IDictionary<string, CachedAudioContent>)new Dictionary<string, CachedAudioContent>();
 
-            return _cache;
+            return this.cache;
         }
 
         private void FilesChanged(object sender, FileSystemEventArgs e)
         {
-            _cache = null;
+            this.cache = null;
         }
     }
 }

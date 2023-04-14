@@ -11,21 +11,21 @@ namespace Resona.UI.ViewModels
 {
     public class AudioContentViewModel : ReactiveObject, IDisposable
     {
-        private readonly Lazy<Task<Bitmap>> _cover;
-        private readonly IAudioProvider _audioProvider;
+        private readonly Lazy<Task<Bitmap>> cover;
+        private readonly IAudioProvider audioProvider;
 
         public AudioContentViewModel(AudioContent audio, IAudioProvider audioProvider)
         {
-            _cover = new Lazy<Task<Bitmap>>(() => Task.Run(() => LoadCover()));
-            Model = audio;
-            _audioProvider = audioProvider;
+            this.cover = new Lazy<Task<Bitmap>>(() => Task.Run(() => this.LoadCover()));
+            this.Model = audio;
+            this.audioProvider = audioProvider;
         }
 
         private async Task<Bitmap> LoadCover()
         {
-            using var imageStream = await _audioProvider.GetImageStreamAsync(
-                Model.AudioKind,
-                Model.Name,
+            using var imageStream = await this.audioProvider.GetImageStreamAsync(
+                this.Model.AudioKind,
+                this.Model.Name,
                 default);
 
             return Bitmap.DecodeToWidth(imageStream, 200);
@@ -33,21 +33,21 @@ namespace Resona.UI.ViewModels
 
         public void Dispose()
         {
-            if (_cover.IsValueCreated)
+            if (this.cover.IsValueCreated)
             {
-                if (_cover.Value.IsCompletedSuccessfully)
+                if (this.cover.Value.IsCompletedSuccessfully)
                 {
-                    _cover.Value.Result.Dispose();
+                    this.cover.Value.Result.Dispose();
                 }
 
-                _cover.Value.Dispose();
+                this.cover.Value.Dispose();
             }
         }
 
-        public string Name => Model.Name;
-        public string? Artist => Model.Artist;
+        public string Name => this.Model.Name;
+        public string? Artist => this.Model.Artist;
 
-        public Task<Bitmap> Cover => _cover.Value;
+        public Task<Bitmap> Cover => this.cover.Value;
 
         public AudioContent Model { get; }
     }

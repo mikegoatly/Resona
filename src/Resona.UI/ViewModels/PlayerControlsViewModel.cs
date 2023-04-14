@@ -11,11 +11,11 @@ namespace Resona.UI.ViewModels
 {
     public class PlayerControlsViewModel : RoutableViewModelBase
     {
-        private bool _canMoveNext;
-        private bool _canMovePrevious;
-        private bool _isPlaying;
+        private bool canMoveNext;
+        private bool canMovePrevious;
+        private bool isPlaying;
 
-        private readonly IPlayerService _playerService;
+        private readonly IPlayerService playerService;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
@@ -28,41 +28,41 @@ namespace Resona.UI.ViewModels
         public PlayerControlsViewModel(RoutingState router, IScreen hostScreen, IPlayerService playerService)
             : base(router, hostScreen, "player")
         {
-            _playerService = playerService;
+            this.playerService = playerService;
 
-            PlayPauseCommand = ReactiveCommand.Create(_playerService.TogglePause);
+            this.PlayPauseCommand = ReactiveCommand.Create(this.playerService.TogglePause);
 
-            MovePreviousCommand = ReactiveCommand.Create(
-                _playerService.Previous,
+            this.MovePreviousCommand = ReactiveCommand.Create(
+                this.playerService.Previous,
                 this.WhenAnyValue(x => x.CanMovePrevious, x => x == true));
 
-            MoveNextCommand = ReactiveCommand.Create(
-                _playerService.Next,
+            this.MoveNextCommand = ReactiveCommand.Create(
+                this.playerService.Next,
                 this.WhenAnyValue(x => x.CanMoveNext, x => x == true));
 
             Observable.FromEvent<(AudioContent, AudioTrack)>(
-                handler => _playerService.ChapterPlaying += handler,
-                handler => _playerService.ChapterPlaying -= handler)
+                handler => this.playerService.ChapterPlaying += handler,
+                handler => this.playerService.ChapterPlaying -= handler)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => UpdatePlayingTrack(x.Item1, x.Item2));
+                .Subscribe(x => this.UpdatePlayingTrack());
 
             Observable.FromEvent(
-                handler => _playerService.PlaybackStateChanged += handler,
-                handler => _playerService.PlaybackStateChanged -= handler)
+                handler => this.playerService.PlaybackStateChanged += handler,
+                handler => this.playerService.PlaybackStateChanged -= handler)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => UpdatePlayerState());
+                .Subscribe(_ => this.UpdatePlayerState());
         }
 
         private void UpdatePlayerState()
         {
-            CanMoveNext = _playerService.HasNextTrack;
-            CanMovePrevious = _playerService.HasPreviousTrack;
-            IsPlaying = _playerService.Paused == false;
+            this.CanMoveNext = this.playerService.HasNextTrack;
+            this.CanMovePrevious = this.playerService.HasPreviousTrack;
+            this.IsPlaying = this.playerService.Paused == false;
         }
 
-        private void UpdatePlayingTrack(AudioContent content, AudioTrack track)
+        private void UpdatePlayingTrack()
         {
-            UpdatePlayerState();
+            this.UpdatePlayerState();
         }
 
         public ReactiveCommand<Unit, Unit> MovePreviousCommand { get; private set; }
@@ -71,27 +71,27 @@ namespace Resona.UI.ViewModels
 
         public bool CanMoveNext
         {
-            get => _canMoveNext;
-            set => this.RaiseAndSetIfChanged(ref _canMoveNext, value);
+            get => this.canMoveNext;
+            set => this.RaiseAndSetIfChanged(ref this.canMoveNext, value);
         }
 
         public bool CanMovePrevious
         {
-            get => _canMovePrevious;
-            set => this.RaiseAndSetIfChanged(ref _canMovePrevious, value);
+            get => this.canMovePrevious;
+            set => this.RaiseAndSetIfChanged(ref this.canMovePrevious, value);
         }
 
         public bool IsPlaying
         {
-            get => _isPlaying;
+            get => this.isPlaying;
             set
             {
-                this.RaiseAndSetIfChanged(ref _isPlaying, value);
-                this.RaisePropertyChanged(nameof(PlayButtonIcon));
+                this.RaiseAndSetIfChanged(ref this.isPlaying, value);
+                this.RaisePropertyChanged(nameof(this.PlayButtonIcon));
             }
         }
 
-        public string PlayButtonIcon => $"fa fa-{(IsPlaying ? "pause" : "play")}";
+        public string PlayButtonIcon => $"fa fa-{(this.IsPlaying ? "pause" : "play")}";
 
         // Command to play/pause the current track
         public ReactiveCommand<Unit, Unit> PlayPauseCommand { get; private set; }

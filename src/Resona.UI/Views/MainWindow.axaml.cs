@@ -6,7 +6,7 @@ namespace Resona.UI.Views
     {
         public MainWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

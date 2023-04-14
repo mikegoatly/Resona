@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 
 using Resona.Services.Configuration;
 
@@ -23,11 +16,11 @@ namespace Resona.Services.Libraries
 
     public class AudioProvider : IAudioProvider
     {
-        private readonly Dictionary<AudioKind, AudioCache> _caches;
+        private readonly Dictionary<AudioKind, AudioCache> caches;
 
         public AudioProvider(IOptions<AudiobookConfiguration> configuration)
         {
-            _caches = new Dictionary<AudioKind, AudioCache>()
+            this.caches = new Dictionary<AudioKind, AudioCache>()
             {
                 { AudioKind.Audiobook, new AudioCache(configuration.Value.AudiobookPath, AudioKind.Audiobook) },
                 { AudioKind.Music, new AudioCache(configuration.Value.MusicPath, AudioKind.Music) },
@@ -37,24 +30,24 @@ namespace Resona.Services.Libraries
 
         public async Task<IEnumerable<AudioContent>> GetAllAsync(AudioKind kind, CancellationToken cancellationToken)
         {
-            var audiobooks = await GetFromCacheAsync(kind, cancellationToken);
+            var audiobooks = await this.GetFromCacheAsync(kind, cancellationToken);
             return audiobooks.Values.Select(c => c.AudioContent).ToList();
         }
 
         public async Task<AudioContent> GetByTitleAsync(AudioKind kind, string title, CancellationToken cancellationToken)
         {
-            var containers = await GetFromCacheAsync(kind, cancellationToken);
+            var containers = await this.GetFromCacheAsync(kind, cancellationToken);
             return containers[title].AudioContent;
         }
 
         private async Task<IDictionary<string, CachedAudioContent>> GetFromCacheAsync(AudioKind kind, CancellationToken cancellationToken)
         {
-            return await _caches[kind].GetAsync(cancellationToken);
+            return await this.caches[kind].GetAsync(cancellationToken);
         }
 
         public async Task<Stream> GetImageStreamAsync(AudioKind kind, string title, CancellationToken cancellationToken)
         {
-            var audio = await GetCachedAudioContentAsync(kind, title, cancellationToken);
+            var audio = await this.GetCachedAudioContentAsync(kind, title, cancellationToken);
             var imageFile = new FileInfo(Path.Combine(audio.Directory.FullName, "image.jpg"));
             if (imageFile.Exists)
             {
@@ -73,13 +66,13 @@ namespace Resona.Services.Libraries
 
         private async Task<CachedAudioContent> GetCachedAudioContentAsync(AudioKind kind, string title, CancellationToken cancellationToken)
         {
-            var containers = await GetFromCacheAsync(kind, cancellationToken);
+            var containers = await this.GetFromCacheAsync(kind, cancellationToken);
             return containers[title];
         }
 
         public async Task<Stream> GetAudioStreamAsync(AudioKind kind, string title, int trackIndex, CancellationToken cancellationToken)
         {
-            var audio = await GetCachedAudioContentAsync(kind, title, cancellationToken);
+            var audio = await this.GetCachedAudioContentAsync(kind, title, cancellationToken);
             var tracks = audio.AudioContent.Tracks;
             if (trackIndex < 0 || trackIndex >= tracks.Count)
             {

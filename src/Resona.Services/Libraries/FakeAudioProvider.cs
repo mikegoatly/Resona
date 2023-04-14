@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Resona.Services.Libraries
+﻿namespace Resona.Services.Libraries
 {
 #if DEBUG
     public class FakeAudioProvider : IAudioProvider

@@ -4,10 +4,10 @@
     {
         public AudioDevice(int id, string? mac, string name, AudioDeviceKind kind)
         {
-            Id = id;
-            Mac = mac;
-            Name = name;
-            Kind = kind;
+            this.Id = id;
+            this.Mac = mac;
+            this.Name = name;
+            this.Kind = kind;
         }
 
         public int Id { get; }

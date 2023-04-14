@@ -17,18 +17,18 @@ namespace Resona.UI.ViewModels
 {
     public class TrackListViewModel : RoutableViewModelBase, IDisposable
     {
-        private Task<Bitmap>? _cover;
-        private readonly IAudioProvider _audioProvider;
-        private readonly IPlayerService _playerService;
-        private AudioContent? _model;
-        private IReadOnlyList<AudioTrackViewModel>? _tracks;
+        private Task<Bitmap>? cover;
+        private readonly IAudioProvider audioProvider;
+        private readonly IPlayerService playerService;
+        private AudioContent? model;
+        private IReadOnlyList<AudioTrackViewModel>? tracks;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public TrackListViewModel()
             : this(null!, null!, new FakeAudioProvider(), new FakePlayerService())
         {
-            SetAudioContentAsync(
+            this.SetAudioContentAsync(
                 AudioKind.Audiobook,
                 "Test",
                 default).GetAwaiter().GetResult();
@@ -42,83 +42,83 @@ namespace Resona.UI.ViewModels
             IPlayerService playerService)
             : base(router, hostScreen, "track-list")
         {
-            PlayTrack = ReactiveCommand.Create<AudioTrackViewModel>(OnPlayTrack);
-            _audioProvider = audioProvider;
-            _playerService = playerService;
+            this.PlayTrack = ReactiveCommand.Create<AudioTrackViewModel>(this.OnPlayTrack);
+            this.audioProvider = audioProvider;
+            this.playerService = playerService;
         }
 
         public async Task SetAudioContentAsync(AudioKind kind, string title, CancellationToken cancellationToken)
         {
-            _model = await _audioProvider.GetByTitleAsync(kind, title, cancellationToken);
-            Tracks = _model.Tracks.Select(
-                t => new AudioTrackViewModel(t, _playerService.Current?.Content == _model))
+            this.model = await this.audioProvider.GetByTitleAsync(kind, title, cancellationToken);
+            this.Tracks = this.model.Tracks.Select(
+                t => new AudioTrackViewModel(t, this.playerService.Current?.Content == this.model))
                 .ToList();
 
             Observable.FromEvent<(AudioContent, AudioTrack)>(
-                handler => _playerService.ChapterPlaying += handler,
-                handler => _playerService.ChapterPlaying -= handler)
+                handler => this.playerService.ChapterPlaying += handler,
+                handler => this.playerService.ChapterPlaying -= handler)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => OnChapterPlaying(x.Item1, x.Item2));
+                .Subscribe(x => this.OnChapterPlaying(x.Item1, x.Item2));
 
-            Cover = LoadCoverAsync(kind, title, cancellationToken);
+            this.Cover = this.LoadCoverAsync(kind, title, cancellationToken);
 
-            this.RaisePropertyChanged(nameof(Name));
-            this.RaisePropertyChanged(nameof(Artist));
-            this.RaisePropertyChanged(nameof(IsPlaying));
+            this.RaisePropertyChanged(nameof(this.Name));
+            this.RaisePropertyChanged(nameof(this.Artist));
+            this.RaisePropertyChanged(nameof(this.IsPlaying));
         }
 
         private void OnChapterPlaying(AudioContent content, AudioTrack playingTrack)
         {
-            if (content == _model && Tracks != null)
+            if (content == this.model && this.Tracks != null)
             {
-                foreach (var track in Tracks)
+                foreach (var track in this.Tracks)
                 {
                     track.IsPlaying = track.Model.TrackNumber == playingTrack.TrackNumber;
                 }
             }
         }
 
-        public string Name => _model?.Name ?? string.Empty;
-        public string? Artist => _model?.Artist;
-        public bool IsPlaying => _model == _playerService.Current?.Content;
+        public string Name => this.model?.Name ?? string.Empty;
+        public string? Artist => this.model?.Artist;
+        public bool IsPlaying => this.model == this.playerService.Current?.Content;
 
         public IReadOnlyList<AudioTrackViewModel>? Tracks
         {
-            get => _tracks;
-            set => this.RaiseAndSetIfChanged(ref _tracks, value);
+            get => this.tracks;
+            set => this.RaiseAndSetIfChanged(ref this.tracks, value);
         }
 
         public Task<Bitmap>? Cover
         {
-            get => _cover;
-            set => this.RaiseAndSetIfChanged(ref _cover, value);
+            get => this.cover;
+            set => this.RaiseAndSetIfChanged(ref this.cover, value);
         }
 
         public ReactiveCommand<AudioTrackViewModel, Unit> PlayTrack { get; private set; }
 
         private void OnPlayTrack(AudioTrackViewModel track)
         {
-            if (_model != null)
+            if (this.model != null)
             {
-                _playerService.Play(_model, track.Model, 0);
+                this.playerService.Play(this.model, track.Model, 0);
             }
         }
 
         public void Dispose()
         {
-            if (_cover?.IsCompletedSuccessfully == true)
+            if (this.cover?.IsCompletedSuccessfully == true)
             {
-                _cover.Result.Dispose();
+                this.cover.Result.Dispose();
             }
 
-            _cover?.Dispose();
+            this.cover?.Dispose();
 
             GC.SuppressFinalize(this);
         }
 
         private async Task<Bitmap> LoadCoverAsync(AudioKind audioKind, string title, CancellationToken cancellationToken)
         {
-            using var imageStream = await _audioProvider.GetImageStreamAsync(
+            using var imageStream = await this.audioProvider.GetImageStreamAsync(
                 audioKind,
                 title,
                 cancellationToken);

@@ -6,9 +6,9 @@ namespace Resona.UI.ViewModels
     {
         public RoutableViewModelBase(RoutingState router, IScreen hostScreen, string urlPathSegment)
         {
-            Router = router;
-            HostScreen = hostScreen;
-            UrlPathSegment = urlPathSegment;
+            this.Router = router;
+            this.HostScreen = hostScreen;
+            this.UrlPathSegment = urlPathSegment;
         }
 
         public string? UrlPathSegment { get; }

@@ -1,6 +1,4 @@
-﻿using System;
-
-using ManagedBass;
+﻿using ManagedBass;
 
 using Resona.Services.Libraries;
 
@@ -26,11 +24,11 @@ namespace Resona.Services.Audio
 
     public class PlayerService : IDisposable, IPlayerService
     {
-        private static readonly ILogger _logger = Log.ForContext<PlayerService>();
+        private static readonly ILogger logger = Log.ForContext<PlayerService>();
 
-        private bool _initialized;
-        private int _currentStream;
-        private double _channelLength;
+        private bool initialized;
+        private int currentStream;
+        private double channelLength;
 
         public Action<(AudioContent, AudioTrack)>? ChapterPlaying { get; set; }
         public Action? PlaybackStateChanged { get; set; }
@@ -43,67 +41,67 @@ namespace Resona.Services.Audio
             }
 
             chapter ??= audiobook.Tracks[0];
-            Current = (audiobook, chapter);
+            this.Current = (audiobook, chapter);
 
-            DisposeCurrentPlayer();
+            this.DisposeCurrentPlayer();
 
             try
             {
-                if (!_initialized)
+                if (!this.initialized)
                 {
                     if (Bass.Init())
                     {
-                        _initialized = true;
+                        this.initialized = true;
                     }
                 }
 
-                if (_initialized)
+                if (this.initialized)
                 {
-                    _logger.Information("Starting stream for {FileName}", chapter.FileName);
+                    logger.Information("Starting stream for {FileName}", chapter.FileName);
 
-                    _currentStream = Bass.CreateStream(chapter.FileName);
+                    this.currentStream = Bass.CreateStream(chapter.FileName);
 
-                    if (_currentStream != 0)
+                    if (this.currentStream != 0)
                     {
-                        _channelLength = Bass.ChannelGetLength(_currentStream);
-                        var positionInBytes = (long)(_channelLength * position);
-                        _logger.Debug("Setting initial position to {PositionInBytes} ({PositionAsPercent}%)", positionInBytes, position);
+                        this.channelLength = Bass.ChannelGetLength(this.currentStream);
+                        var positionInBytes = (long)(this.channelLength * position);
+                        logger.Debug("Setting initial position to {PositionInBytes} ({PositionAsPercent}%)", positionInBytes, position);
 
-                        Bass.ChannelSetPosition(_currentStream, positionInBytes);
+                        Bass.ChannelSetPosition(this.currentStream, positionInBytes);
 
-                        _logger.Debug("Setting end sync");
+                        logger.Debug("Setting end sync");
 
-                        Bass.ChannelSetSync(_currentStream, SyncFlags.End, 0L, PlaybackEnded);
+                        Bass.ChannelSetSync(this.currentStream, SyncFlags.End, 0L, this.PlaybackEnded);
 
-                        if (Paused == false)
+                        if (this.Paused == false)
                         {
-                            _logger.Debug("Starting playback");
+                            logger.Debug("Starting playback");
 
-                            Bass.ChannelPlay(_currentStream);
+                            Bass.ChannelPlay(this.currentStream);
 
-                            _logger.Information("Playback started");
+                            logger.Information("Playback started");
                         }
                         else
                         {
-                            _logger.Debug("Player was paused - not starting playback");
+                            logger.Debug("Player was paused - not starting playback");
                         }
 
-                        OnChapterPlaying();
+                        this.OnChapterPlaying();
                     }
                     else
                     {
                         var error = Bass.LastError;
-                        _logger.Error($"Error starting stream: {error}");
+                        logger.Error($"Error starting stream: {error}");
                     }
                 }
                 else
                 {
-                    _logger.Error($"Unable to initialized BASS");
+                    logger.Error($"Unable to initialized BASS");
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Error initiating playback");
+                logger.Error(ex, "Error initiating playback");
                 throw;
             }
         }
@@ -111,47 +109,47 @@ namespace Resona.Services.Audio
         private void PlaybackEnded(int Handle, int Channel, int Data, nint User)
         {
             // Automatically start playing the next chapter, if available.
-            Next();
+            this.Next();
         }
 
-        public double Position => _currentStream == 0 ? 0 : Bass.ChannelGetPosition(_currentStream) / _channelLength;
+        public double Position => this.currentStream == 0 ? 0 : Bass.ChannelGetPosition(this.currentStream) / this.channelLength;
         public bool Paused { get; private set; }
-        public bool HasPreviousTrack => Current?.Track.TrackIndex > 0;
-        public bool HasNextTrack => Current?.Track.TrackIndex < Current?.Content.Tracks.Count - 1;
+        public bool HasPreviousTrack => this.Current?.Track.TrackIndex > 0;
+        public bool HasNextTrack => this.Current?.Track.TrackIndex < this.Current?.Content.Tracks.Count - 1;
 
         public (AudioContent Content, AudioTrack Track)? Current { get; private set; }
 
         public void TogglePause()
         {
-            if (_currentStream != 0)
+            if (this.currentStream != 0)
             {
-                if (Paused)
+                if (this.Paused)
                 {
-                    _logger.Information("Resuming playback");
-                    Bass.ChannelPlay(_currentStream);
+                    logger.Information("Resuming playback");
+                    Bass.ChannelPlay(this.currentStream);
                 }
                 else
                 {
-                    _logger.Information("Pausing playback");
-                    Bass.ChannelPause(_currentStream);
+                    logger.Information("Pausing playback");
+                    Bass.ChannelPause(this.currentStream);
                 }
 
-                Paused = !Paused;
+                this.Paused = !this.Paused;
 
-                PlaybackStateChanged?.Invoke();
+                this.PlaybackStateChanged?.Invoke();
             }
         }
 
         public void Previous()
         {
-            if (HasPreviousTrack)
+            if (this.HasPreviousTrack)
             {
-                if (Current != null)
+                if (this.Current != null)
                 {
-                    _logger.Information("Moving to previous track");
+                    logger.Information("Moving to previous track");
 
-                    var (content, track) = Current.GetValueOrDefault();
-                    Play(
+                    var (content, track) = this.Current.GetValueOrDefault();
+                    this.Play(
                         content,
                         content.Tracks[track.TrackIndex - 1],
                         0D);
@@ -161,15 +159,15 @@ namespace Resona.Services.Audio
 
         public void Next()
         {
-            if (HasNextTrack)
+            if (this.HasNextTrack)
             {
-                if (Current != null)
+                if (this.Current != null)
                 {
-                    _logger.Information("Moving to next track");
+                    logger.Information("Moving to next track");
 
-                    var (content, track) = Current.GetValueOrDefault();
+                    var (content, track) = this.Current.GetValueOrDefault();
 
-                    Play(
+                    this.Play(
                         content,
                         content.Tracks[track.TrackIndex + 1],
                         0D);
@@ -179,21 +177,21 @@ namespace Resona.Services.Audio
 
         private void OnChapterPlaying()
         {
-            if (Current != null)
+            if (this.Current != null)
             {
-                var (content, track) = Current.GetValueOrDefault();
-                ChapterPlaying?.Invoke((content, track));
+                var (content, track) = this.Current.GetValueOrDefault();
+                this.ChapterPlaying?.Invoke((content, track));
             }
         }
 
         public void Dispose()
         {
-            DisposeCurrentPlayer();
+            this.DisposeCurrentPlayer();
 
-            if (_initialized)
+            if (this.initialized)
             {
                 Bass.Free();
-                _initialized = false;
+                this.initialized = false;
             }
 
             GC.SuppressFinalize(this);
@@ -201,12 +199,12 @@ namespace Resona.Services.Audio
 
         private void DisposeCurrentPlayer()
         {
-            if (_currentStream != 0)
+            if (this.currentStream != 0)
             {
-                _logger.Debug("Stopping channel");
-                Bass.ChannelStop(_currentStream);
-                _logger.Debug("Freeing stream");
-                Bass.StreamFree(_currentStream);
+                logger.Debug("Stopping channel");
+                Bass.ChannelStop(this.currentStream);
+                logger.Debug("Freeing stream");
+                Bass.StreamFree(this.currentStream);
             }
         }
     }

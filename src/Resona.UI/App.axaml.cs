@@ -15,11 +15,11 @@ namespace Resona.UI
 
         public override void OnFrameworkInitializationCompleted()
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow();
             }
-            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+            else if (this.ApplicationLifetime is ISingleViewApplicationLifetime singleView)
             {
                 singleView.MainView = new MainSingleView();
             }
