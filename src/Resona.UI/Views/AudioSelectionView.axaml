@@ -31,24 +31,24 @@
 							<Transitions>
 								<DoubleTransition Property="Width" Duration="0:0:0.1" />
 								<DoubleTransition Property="Height" Duration="0:0:0.1" />
-								<ThicknessTransition Property="Margin" Duration="0:0:0.1" />
+								<ThicknessTransition Property="Margin" Duration="0:0:0.1"/>
 							</Transitions>
 						</Image.Transitions>
 						<Image.Styles>
 							<Style Selector="Button > Image">
-								<Setter Property="Width" Value="150" />
-								<Setter Property="Height" Value="150" />
-								<Setter Property="Margin" Value="25" />
-							</Style>
-							<Style Selector="Button:pointerover > Image">
-								<Setter Property="Width" Value="160" />
-								<Setter Property="Height" Value="160" />
+								<Setter Property="Width" Value="280" />
+								<Setter Property="Height" Value="280" />
 								<Setter Property="Margin" Value="20" />
 							</Style>
+							<Style Selector="Button:pointerover > Image">
+								<Setter Property="Width" Value="320" />
+								<Setter Property="Height" Value="320" />
+								<Setter Property="Margin" Value="0" />
+							</Style>
 							<Style Selector="Button:pressed > Image">
-								<Setter Property="Width" Value="200" />
-								<Setter Property="Height" Value="200" />
-								<Setter Property="Margin" Value="0"/>
+								<Setter Property="Width" Value="180" />
+								<Setter Property="Height" Value="180" />
+								<Setter Property="Margin" Value="70"/>
 							</Style>
 						</Image.Styles>
 					</Image>
