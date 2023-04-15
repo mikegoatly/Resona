@@ -17,7 +17,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<TreatWarningsAsErrors>FalsTruee</TreatWarningsAsErrors>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -49,7 +49,6 @@
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.0.0-preview6" />
 		<PackageReference Include="Avalonia.LinuxFramebuffer" Version="11.0.0-preview6" />
-		<PackageReference Include="Avalonia.Themes.Simple" Version="11.0.0-preview6" />
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview6" />
 		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
