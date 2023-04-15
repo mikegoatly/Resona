@@ -22,7 +22,7 @@ namespace Resona.UI.ViewModels
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public LibraryViewModel()
-        : this(null!, null!, new FakeAudioProvider(), new FakeAlbumImageProvider())
+        : this(null!, null!, new FakeAudioProvider(), new FakeAlbumImageProvider(), new FakeLibrarySyncer())
         {
             this.AudioContent = Task.FromResult(
                 new List<AudioContentViewModel>
@@ -40,7 +40,12 @@ namespace Resona.UI.ViewModels
         }
 #endif
 
-        public LibraryViewModel(RoutingState router, IScreen hostScreen, IAudioProvider audioProvider, IAlbumImageProvider imageProvider)
+        public LibraryViewModel(
+            RoutingState router,
+            IScreen hostScreen,
+            IAudioProvider audioProvider,
+            IAlbumImageProvider imageProvider,
+            ILibrarySyncer librarySyncer)
                 : base(router, hostScreen, "library")
         {
             this.WhenAnyValue(x => x.Kind)
@@ -49,6 +54,12 @@ namespace Resona.UI.ViewModels
                 {
                     this.AudioContent = this.GetAudioContent(x);
                 });
+
+            Observable.FromEvent<AudioKind>(
+                x => librarySyncer.LibraryChanged += x,
+                x => librarySyncer.LibraryChanged -= x)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.OnLibraryChanged);
 
             this.audioProvider = audioProvider;
             this.imageProvider = imageProvider;
@@ -60,6 +71,14 @@ namespace Resona.UI.ViewModels
                         await viewModel.SetAudioContentAsync(audioContent.Model.Id, default);
                         return this.Router.Navigate.Execute(viewModel);
                     }));
+        }
+
+        private void OnLibraryChanged(AudioKind kind)
+        {
+            if (kind == this.kind)
+            {
+                this.AudioContent = this.GetAudioContent(kind);
+            }
         }
 
         private async Task<List<AudioContentViewModel>> GetAudioContent(AudioKind kind)

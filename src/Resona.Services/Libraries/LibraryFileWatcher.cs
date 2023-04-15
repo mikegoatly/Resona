@@ -1,4 +1,6 @@
-﻿namespace Resona.Services.Libraries
+﻿using Serilog;
+
+namespace Resona.Services.Libraries
 {
     public interface ILibraryFileWatcher
     {
@@ -9,6 +11,7 @@
 
     public class LibraryFileWatcher : ILibraryFileWatcher
     {
+        private static readonly ILogger logger = Log.ForContext<LibraryFileWatcher>();
         private readonly Timer notificationTimer;
         private readonly List<FileSystemWatcher> watchers = new();
 
@@ -44,23 +47,23 @@
                 fileWatcher.Renamed += this.OnFilesChanged;
                 fileWatcher.IncludeSubdirectories = true;
                 fileWatcher.EnableRaisingEvents = true;
+
+                this.watchers.Add(fileWatcher);
             }
         }
 
         private void FireNotification(object? state)
         {
+            logger.Information("Raising changes detected notification");
             this.ChangesDetected?.Invoke();
         }
 
         private void OnFilesChanged(object sender, FileSystemEventArgs e)
         {
+            logger.Debug("File changed: {Action} - {FilePath}", e.ChangeType, e.FullPath);
+
             // Debounce a change detection by resetting the notification timer for 5 seconds in the future
             this.notificationTimer.Change(5000, Timeout.Infinite);
-        }
-
-        public void Initialize(IReadOnlyList<string> directories)
-        {
-            throw new NotImplementedException();
         }
     }
 }

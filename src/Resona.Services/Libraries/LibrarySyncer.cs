@@ -12,6 +12,8 @@ namespace Resona.Services.Libraries
 {
     public interface ILibrarySyncer
     {
+        Action<AudioKind>? LibraryChanged { get; set; }
+
         void StartSync();
     }
 
@@ -42,6 +44,8 @@ namespace Resona.Services.Libraries
 
             this.thumbnailProvider = thumbnailProvider;
         }
+
+        public Action<AudioKind>? LibraryChanged { get; set; }
 
         public void StartSync()
         {
@@ -98,8 +102,13 @@ namespace Resona.Services.Libraries
                         continue;
                     }
 
-                    this.SynchronizeAlbums(directory, kind, dataContext);
-                    this.DeleteObsoleteAlbums(directory, kind, dataContext);
+                    var changesDetected = this.SynchronizeAlbums(directory, kind, dataContext);
+                    changesDetected |= this.DeleteObsoleteAlbums(directory, kind, dataContext);
+
+                    if (changesDetected)
+                    {
+                        this.LibraryChanged?.Invoke((AudioKind)kind);
+                    }
                 }
 
                 if (this.requiresResync)
@@ -112,29 +121,37 @@ namespace Resona.Services.Libraries
             Log.Information("Database synchronization complete");
         }
 
-        private void SynchronizeAlbums(DirectoryInfo directory, AlbumKind kind, ResonaDb dataContext)
+        private bool SynchronizeAlbums(DirectoryInfo directory, AlbumKind kind, ResonaDb dataContext)
         {
-            // Iterate through the folders in the given path and check to see if the we have a record of each in the database as an album
-            // Create an album record if it doesn't exist, then loop through all the mp3 files and check to see if the track record exists.
-            // If not, create the record and add it to the album.
+            var changesDetected = false;
+
             var albumDirectories = directory.GetDirectories();
             foreach (var albumDirectory in albumDirectories)
             {
                 var albumName = albumDirectory.Name;
                 var album = dataContext.Albums.FirstOrDefault(a => a.Path == albumDirectory.FullName);
+                var isNewAlbum = false;
                 if (album == null)
                 {
                     album = CreateAlbum(albumDirectory, albumName, kind);
-
                     dataContext.Albums.Add(album);
+                    isNewAlbum = true;
+                    changesDetected = true;
                 }
 
-                SynchronizeTracks(dataContext, albumDirectory, album);
+                changesDetected |= SynchronizeTracks(dataContext, albumDirectory, album);
 
                 if (album.Tracks.Count == 0)
                 {
                     // The directory has no tracks; don't include it in the database
                     dataContext.Albums.Remove(album);
+
+                    if (isNewAlbum == false)
+                    {
+                        // In this case, we're deleting a folder that was previously tracked.
+                        logger.Debug("Previously tracked album is now empty: {AlbumPath}", album.Path);
+                        changesDetected = true;
+                    }
                 }
                 else
                 {
@@ -143,6 +160,8 @@ namespace Resona.Services.Libraries
             }
 
             dataContext.SaveChanges();
+
+            return changesDetected;
         }
 
         private static AlbumRaw CreateAlbum(DirectoryInfo albumDirectory, string albumName, AlbumKind kind)
@@ -156,7 +175,7 @@ namespace Resona.Services.Libraries
             };
         }
 
-        private void DeleteObsoleteAlbums(DirectoryInfo directory, AlbumKind kind, ResonaDb dataContext)
+        private bool DeleteObsoleteAlbums(DirectoryInfo directory, AlbumKind kind, ResonaDb dataContext)
         {
             var persistedAlbumInfo = dataContext.Albums
                 .Where(x => x.Kind == kind)
@@ -173,35 +192,46 @@ namespace Resona.Services.Libraries
                 logger.Information("Found {Count} album(s) to remove from database: {ObsoleteAlbumPaths}", obsoleteAlbums.Count, obsoleteAlbums.Select(x => x.Path).ToList());
                 var obsoleteAlbumIds = obsoleteAlbums.Select(x => x.AlbumId).ToList();
                 dataContext.Albums.Where(x => obsoleteAlbumIds.Contains(x.AlbumId)).ExecuteDelete();
+                return true;
             }
+
+            return false;
         }
 
-        private static void SynchronizeTracks(ResonaDb dataContext, DirectoryInfo directory, AlbumRaw album)
+        private static bool SynchronizeTracks(ResonaDb dataContext, DirectoryInfo directory, AlbumRaw album)
         {
+            var changesDetected = false;
+
             var existingFiles = dataContext.Tracks.Where(x => x.AlbumId == album.AlbumId)
                 .ToDictionary(x => x.FileName, StringComparer.OrdinalIgnoreCase);
 
             foreach (var file in directory.GetFiles("*.mp3"))
             {
                 existingFiles.TryGetValue(file.Name, out var track);
-                CreateOrUpdateTrack(album, track, file);
+                changesDetected |= CreateOrUpdateTrack(album, track, file);
             }
+
+            return changesDetected;
         }
 
-        private static void CreateOrUpdateTrack(AlbumRaw album, TrackRaw? track, FileInfo file)
+        private static bool CreateOrUpdateTrack(AlbumRaw album, TrackRaw? track, FileInfo file)
         {
             if (track == null)
             {
                 track = CreateTrack(album, file);
                 album.Tracks.Add(track);
+                return true;
             }
             else
             {
                 if (track.LastModifiedUtc != file.LastWriteTimeUtc)
                 {
                     UpdateTrack(album, track, file);
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private static void UpdateTrack(AlbumRaw album, TrackRaw track, FileInfo file)
