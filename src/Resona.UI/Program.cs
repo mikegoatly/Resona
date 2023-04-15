@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -18,6 +19,7 @@ using Resona.Services.Configuration;
 using Resona.UI.ViewModels;
 
 using Serilog;
+using Serilog.Events;
 
 using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
@@ -33,12 +35,7 @@ namespace Resona.UI
         [STAThread]
         public static int Main(string[] args)
         {
-            const string homePath = "/home/pi/";
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File($"{homePath}logs/resona.log", rollingInterval: RollingInterval.Day)
-                .CreateLogger();
+            ConfigureLogger();
 
             var services = new ServiceCollection();
             services.AddResonaServices();
@@ -47,10 +44,11 @@ namespace Resona.UI
             services.AddOptions()
                 .Configure<AudiobookConfiguration>(x =>
                 {
-                    x.AudiobookPath = $"{homePath}audiobooks";
-                    x.MusicPath = $"{homePath}music";
-                    x.SleepPath = $"{homePath}sleep";
+                    x.AudiobookPath = Settings.Default.AudiobooksFolder;
+                    x.MusicPath = Settings.Default.MusicFolder;
+                    x.SleepPath = Settings.Default.SleepFolder;
                 });
+
             services.AddSingleton((s) => new RoutingState());
             services.UseMicrosoftDependencyResolver();
             Locator.CurrentMutable.UseSerilogFullLogger();
@@ -74,6 +72,31 @@ namespace Resona.UI
 
             Log.Information("Starting in desktop mode");
             return builder.StartWithClassicDesktopLifetime(args);
+        }
+
+        private static void ConfigureLogger()
+        {
+            var parsedLogLevel = Enum.TryParse<LogEventLevel>(Settings.Default.LogLevel, out var logLevel);
+            if (!parsedLogLevel)
+            {
+                logLevel = LogEventLevel.Warning;
+            }
+
+            var logDir = Path.GetDirectoryName(Settings.Default.LogFile) ?? "/home/pi/logs";
+            if (!Directory.Exists(logDir))
+            {
+                Directory.CreateDirectory(logDir);
+            }
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Is(logLevel)
+                .WriteTo.File(Settings.Default.LogFile, rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            if (!parsedLogLevel)
+            {
+                Log.ForContext<App>().Error("Unable to parse log level {LogLevel} - defaulting to Warning", Settings.Default.LogLevel);
+            }
         }
 
         private static void SilenceConsole()

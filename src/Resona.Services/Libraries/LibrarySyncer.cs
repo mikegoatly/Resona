@@ -98,8 +98,8 @@ namespace Resona.Services.Libraries
                     var directory = new DirectoryInfo(path);
                     if (!directory.Exists)
                     {
-                        logger.Warning("The path {Path} does not exist", path);
-                        continue;
+                        logger.Information("Creating {Path}", path);
+                        directory.Create();
                     }
 
                     var changesDetected = this.SynchronizeAlbums(directory, kind, dataContext);
