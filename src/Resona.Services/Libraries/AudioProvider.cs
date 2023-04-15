@@ -1,94 +1,71 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
 
-using Resona.Services.Configuration;
-
-using TagLib;
+using Resona.Persistence;
 
 namespace Resona.Services.Libraries
 {
+    public record AudioContentSummary(int Id, AudioKind AudioKind, string Name, string? Artist, string? ThumbnailFile);
+
+    public record AudioContent(int Id, AudioKind AudioKind, string Name, string? Artist, string? ThumbnailFile, IReadOnlyList<AudioTrack> Tracks)
+        : AudioContentSummary(Id, AudioKind, Name, Artist, ThumbnailFile);
+
+    public record AudioTrack(string FilePath, string Title, string? Artist, int TrackIndex);
+
     public interface IAudioProvider
     {
-        Task<IEnumerable<AudioContent>> GetAllAsync(AudioKind kind, CancellationToken cancellationToken);
-        Task<Stream> GetAudioStreamAsync(AudioKind kind, string title, int chapterIndex, CancellationToken cancellationToken);
-        Task<AudioContent> GetByTitleAsync(AudioKind kind, string title, CancellationToken cancellationToken);
-        Task<Stream> GetImageStreamAsync(AudioKind kind, string title, CancellationToken cancellationToken);
+        Task<IReadOnlyList<AudioContentSummary>> GetAllAsync(AudioKind kind, CancellationToken cancellationToken);
+        Task<AudioContent> GetByIdAsync(int id, CancellationToken cancellationToken);
     }
 
     public class AudioProvider : IAudioProvider
     {
-        private readonly Dictionary<AudioKind, AudioCache> caches;
-
-        public AudioProvider(IOptions<AudiobookConfiguration> configuration)
+        public AudioProvider()
         {
-            this.caches = new Dictionary<AudioKind, AudioCache>()
-            {
-                { AudioKind.Audiobook, new AudioCache(configuration.Value.AudiobookPath, AudioKind.Audiobook) },
-                { AudioKind.Music, new AudioCache(configuration.Value.MusicPath, AudioKind.Music) },
-                { AudioKind.Sleep, new AudioCache(configuration.Value.SleepPath, AudioKind.Sleep) }
-            };
         }
 
-        public async Task<IEnumerable<AudioContent>> GetAllAsync(AudioKind kind, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<AudioContentSummary>> GetAllAsync(AudioKind kind, CancellationToken cancellationToken)
         {
-            var audiobooks = await this.GetFromCacheAsync(kind, cancellationToken);
-            return audiobooks.Values.Select(c => c.AudioContent).ToList();
+            using var dataContext = new ResonaDb();
+
+            return await dataContext.Albums
+                .Where(x => x.Kind == (AlbumKind)kind)
+                .OrderBy(x => x.Name)
+                .Select(x => new AudioContentSummary(x.AlbumId, kind, x.Name, x.Artist, x.ThumbnailFile))
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<AudioContent> GetByTitleAsync(AudioKind kind, string title, CancellationToken cancellationToken)
+        public async Task<AudioContent> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var containers = await this.GetFromCacheAsync(kind, cancellationToken);
-            return containers[title].AudioContent;
-        }
+            using var dataContext = new ResonaDb();
 
-        private async Task<IDictionary<string, CachedAudioContent>> GetFromCacheAsync(AudioKind kind, CancellationToken cancellationToken)
-        {
-            return await this.caches[kind].GetAsync(cancellationToken);
-        }
+            var album = (await dataContext.Albums
+                .AsNoTracking()
+                .Include(x => x.Tracks)
+                .Where(x => x.AlbumId == id)
+                .ToListAsync(cancellationToken))
+                .Select(
+                    album => new AudioContent(
+                        album.AlbumId,
+                        (AudioKind)album.Kind,
+                        album.Name,
+                        album.Artist,
+                        album.ThumbnailFile,
+                        album.Tracks
+                            // Tracks should appear in track number order
+                            .OrderBy(track => track.TrackNumber)
+                            // If tracks don't have a track number, we'll use the insertion order as it's likely
+                            // to be alphabetical (e.g. 01 - Track 1.mp3, 02 - Track 2.mp3, etc.)
+                            .ThenBy(track => track.TrackId)
+                            .Select(
+                                (track, index) => new AudioTrack(
+                                    Path.Combine(album.Path, track.FileName),
+                                    track.Name,
+                                    track.Artist,
+                                    index))
+                            .ToList()))
+                .FirstOrDefault();
 
-        public async Task<Stream> GetImageStreamAsync(AudioKind kind, string title, CancellationToken cancellationToken)
-        {
-            var audio = await this.GetCachedAudioContentAsync(kind, title, cancellationToken);
-            var imageFile = new FileInfo(Path.Combine(audio.Directory.FullName, "image.jpg"));
-            if (imageFile.Exists)
-            {
-                return imageFile.OpenRead();
-            }
-            else
-            {
-                var trackInfo = GetTrackFileInfo(0, audio);
-                var tagFile = TagLib.File.Create(trackInfo.FullName);
-                var tags = tagFile.GetTag(TagTypes.Id3v2, false);
-
-                var pictureData = tags.Pictures.FirstOrDefault();
-                return pictureData != null ? new MemoryStream(pictureData.Data.Data) : (Stream)new MemoryStream();
-            }
-        }
-
-        private async Task<CachedAudioContent> GetCachedAudioContentAsync(AudioKind kind, string title, CancellationToken cancellationToken)
-        {
-            var containers = await this.GetFromCacheAsync(kind, cancellationToken);
-            return containers[title];
-        }
-
-        public async Task<Stream> GetAudioStreamAsync(AudioKind kind, string title, int trackIndex, CancellationToken cancellationToken)
-        {
-            var audio = await this.GetCachedAudioContentAsync(kind, title, cancellationToken);
-            var tracks = audio.AudioContent.Tracks;
-            if (trackIndex < 0 || trackIndex >= tracks.Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(trackIndex));
-            }
-
-            var fileInfo = GetTrackFileInfo(trackIndex, audio);
-
-            return fileInfo.OpenRead();
-        }
-
-        private static FileInfo GetTrackFileInfo(int trackIndex, CachedAudioContent audio)
-        {
-            var track = audio.AudioContent.Tracks[trackIndex];
-            var trackInfo = new FileInfo(Path.Combine(audio.Directory.FullName, track.FileName));
-            return trackInfo;
+            return album ?? throw new ResonaException($"Can't find album with id {id}");
         }
     }
 }

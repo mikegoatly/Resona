@@ -33,9 +33,11 @@ namespace Resona.UI
         [STAThread]
         public static int Main(string[] args)
         {
+            const string homePath = "/home/pi/";
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.File("/home/pi/logs/resona.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File($"{homePath}logs/resona.log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             var services = new ServiceCollection();
@@ -45,16 +47,20 @@ namespace Resona.UI
             services.AddOptions()
                 .Configure<AudiobookConfiguration>(x =>
                 {
-                    x.AudiobookPath = "/home/pi/audiobooks";
-                    x.MusicPath = "/home/pi/music";
-                    x.SleepPath = "/home/pi/sleep";
+                    x.AudiobookPath = $"{homePath}audiobooks";
+                    x.MusicPath = $"{homePath}music";
+                    x.SleepPath = $"{homePath}sleep";
                 });
             services.AddSingleton((s) => new RoutingState());
             services.UseMicrosoftDependencyResolver();
             Locator.CurrentMutable.UseSerilogFullLogger();
 
             // Initialize the DB - this will perform any required migrations
-            ResonaDb.Initialize();
+            if (ResonaDb.Initialize() == false)
+            {
+                Log.Warning("Resetting the database");
+                ResonaDb.Reset();
+            }
 
             Log.Information("Building app");
 

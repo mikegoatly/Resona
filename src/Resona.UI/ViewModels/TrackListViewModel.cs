@@ -19,6 +19,7 @@ namespace Resona.UI.ViewModels
     {
         private Task<Bitmap>? cover;
         private readonly IAudioProvider audioProvider;
+        private readonly IAlbumImageProvider imageProvider;
         private readonly IPlayerService playerService;
         private AudioContent? model;
         private IReadOnlyList<AudioTrackViewModel>? tracks;
@@ -26,12 +27,9 @@ namespace Resona.UI.ViewModels
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public TrackListViewModel()
-            : this(null!, null!, new FakeAudioProvider(), new FakePlayerService())
+            : this(null!, null!, new FakeAudioProvider(), new FakeAlbumImageProvider(), new FakePlayerService())
         {
-            this.SetAudioContentAsync(
-                AudioKind.Audiobook,
-                "Test",
-                default).GetAwaiter().GetResult();
+            this.SetAudioContentAsync(1, default).GetAwaiter().GetResult();
         }
 #endif
 
@@ -39,17 +37,19 @@ namespace Resona.UI.ViewModels
             RoutingState router,
             IScreen hostScreen,
             IAudioProvider audioProvider,
+            IAlbumImageProvider imageProvider,
             IPlayerService playerService)
             : base(router, hostScreen, "track-list")
         {
             this.PlayTrack = ReactiveCommand.Create<AudioTrackViewModel>(this.OnPlayTrack);
             this.audioProvider = audioProvider;
+            this.imageProvider = imageProvider;
             this.playerService = playerService;
         }
 
-        public async Task SetAudioContentAsync(AudioKind kind, string title, CancellationToken cancellationToken)
+        public async Task SetAudioContentAsync(int id, CancellationToken cancellationToken)
         {
-            this.model = await this.audioProvider.GetByTitleAsync(kind, title, cancellationToken);
+            this.model = await this.audioProvider.GetByIdAsync(id, cancellationToken);
             this.Tracks = this.model.Tracks.Select(
                 t => new AudioTrackViewModel(t, this.playerService.Current?.Content == this.model))
                 .ToList();
@@ -60,7 +60,7 @@ namespace Resona.UI.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.OnChapterPlaying(x.Item1, x.Item2));
 
-            this.Cover = this.LoadCoverAsync(kind, title, cancellationToken);
+            this.Cover = this.LoadCoverAsync(this.model, cancellationToken);
 
             this.RaisePropertyChanged(nameof(this.Name));
             this.RaisePropertyChanged(nameof(this.Artist));
@@ -73,7 +73,7 @@ namespace Resona.UI.ViewModels
             {
                 foreach (var track in this.Tracks)
                 {
-                    track.IsPlaying = track.Model.TrackNumber == playingTrack.TrackNumber;
+                    track.IsPlaying = track.Model.TrackIndex == playingTrack.TrackIndex;
                 }
             }
         }
@@ -116,14 +116,15 @@ namespace Resona.UI.ViewModels
             GC.SuppressFinalize(this);
         }
 
-        private async Task<Bitmap> LoadCoverAsync(AudioKind audioKind, string title, CancellationToken cancellationToken)
+        private async Task<Bitmap> LoadCoverAsync(AudioContent model, CancellationToken cancellationToken)
         {
-            using var imageStream = await this.audioProvider.GetImageStreamAsync(
-                audioKind,
-                title,
-                cancellationToken);
+            return await Task.Run(
+                () =>
+                {
+                    using var imageStream = this.imageProvider.GetImageStream(model);
 
-            return Bitmap.DecodeToWidth(imageStream, 500);
+                    return Bitmap.DecodeToWidth(imageStream, 500);
+                }, cancellationToken);
         }
     }
 }

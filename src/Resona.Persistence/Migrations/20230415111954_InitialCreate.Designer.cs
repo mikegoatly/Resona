@@ -11,7 +11,7 @@ using Resona.Persistence;
 namespace Resona.Persistence.Migrations
 {
     [DbContext(typeof(ResonaDb))]
-    [Migration("20230413075842_InitialCreate")]
+    [Migration("20230415111954_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,9 +27,11 @@ namespace Resona.Persistence.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Artist")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -41,26 +43,39 @@ namespace Resona.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ThumbnailFile")
+                        .HasMaxLength(350)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("AlbumId");
+
+                    b.HasIndex("Kind", "Name");
 
                     b.ToTable("Album");
                 });
 
-            modelBuilder.Entity("Resona.Persistence.SongRaw", b =>
+            modelBuilder.Entity("Resona.Persistence.TrackRaw", b =>
                 {
-                    b.Property<int>("SongId")
+                    b.Property<int>("TrackId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("AlbumId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Artist")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("LastModifiedLocal")
+                    b.Property<DateTime>("LastModifiedUtc")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -68,17 +83,20 @@ namespace Resona.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.HasKey("SongId");
+                    b.Property<uint>("TrackNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TrackId");
 
                     b.HasIndex("AlbumId");
 
-                    b.ToTable("Song");
+                    b.ToTable("Track");
                 });
 
-            modelBuilder.Entity("Resona.Persistence.SongRaw", b =>
+            modelBuilder.Entity("Resona.Persistence.TrackRaw", b =>
                 {
                     b.HasOne("Resona.Persistence.AlbumRaw", "Album")
-                        .WithMany("Songs")
+                        .WithMany("Tracks")
                         .HasForeignKey("AlbumId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -88,7 +106,7 @@ namespace Resona.Persistence.Migrations
 
             modelBuilder.Entity("Resona.Persistence.AlbumRaw", b =>
                 {
-                    b.Navigation("Songs");
+                    b.Navigation("Tracks");
                 });
 #pragma warning restore 612, 618
         }

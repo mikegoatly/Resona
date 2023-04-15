@@ -57,9 +57,9 @@ namespace Resona.Services.Audio
 
                 if (this.initialized)
                 {
-                    logger.Information("Starting stream for {FileName}", chapter.FileName);
+                    logger.Information("Starting stream for {FileName}", chapter.FilePath);
 
-                    this.currentStream = Bass.CreateStream(chapter.FileName);
+                    this.currentStream = Bass.CreateStream(chapter.FilePath);
 
                     if (this.currentStream != 0)
                     {

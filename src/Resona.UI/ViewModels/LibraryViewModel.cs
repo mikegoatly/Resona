@@ -17,29 +17,30 @@ namespace Resona.UI.ViewModels
         private AudioKind kind;
         private Task<List<AudioContentViewModel>>? audioContent;
         private readonly IAudioProvider audioProvider;
+        private readonly IAlbumImageProvider imageProvider;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public LibraryViewModel()
-        : this(null!, null!, new FakeAudioProvider())
+        : this(null!, null!, new FakeAudioProvider(), new FakeAlbumImageProvider())
         {
             this.AudioContent = Task.FromResult(
                 new List<AudioContentViewModel>
                 {
                     new AudioContentViewModel(
-                        new AudioContent(AudioKind.Audiobook, "Some book", "Me", 0, Array.Empty<AudioTrack>()),
-                        this.audioProvider),
+                        new AudioContentSummary(1, AudioKind.Audiobook, "Some book", "Me", null),
+                        this.imageProvider),
                      new AudioContentViewModel(
-                        new AudioContent(AudioKind.Audiobook, "Another book", "Me", 1, Array.Empty<AudioTrack>()),
-                        this.audioProvider),
+                        new AudioContentSummary(2, AudioKind.Audiobook, "Another book", "Me", null),
+                        this.imageProvider),
                       new AudioContentViewModel(
-                        new AudioContent(AudioKind.Audiobook, "Last book", "Me", 2, Array.Empty<AudioTrack>()),
-                        this.audioProvider)
+                        new AudioContentSummary(3, AudioKind.Audiobook, "Last book", "Me", null),
+                        this.imageProvider)
                 });
         }
 #endif
 
-        public LibraryViewModel(RoutingState router, IScreen hostScreen, IAudioProvider audioProvider)
+        public LibraryViewModel(RoutingState router, IScreen hostScreen, IAudioProvider audioProvider, IAlbumImageProvider imageProvider)
                 : base(router, hostScreen, "library")
         {
             this.WhenAnyValue(x => x.Kind)
@@ -50,13 +51,13 @@ namespace Resona.UI.ViewModels
                 });
 
             this.audioProvider = audioProvider;
-
+            this.imageProvider = imageProvider;
             this.AudioContentSelected = ReactiveCommand.CreateFromObservable(
                 (AudioContentViewModel audioContent) => Observable.FromAsync(
                     async () =>
                     {
                         var viewModel = Locator.Current.GetRequiredService<TrackListViewModel>();
-                        await viewModel.SetAudioContentAsync(audioContent.Model.AudioKind, audioContent.Model.Name, default);
+                        await viewModel.SetAudioContentAsync(audioContent.Model.Id, default);
                         return this.Router.Navigate.Execute(viewModel);
                     }));
         }
@@ -64,7 +65,7 @@ namespace Resona.UI.ViewModels
         private async Task<List<AudioContentViewModel>> GetAudioContent(AudioKind kind)
         {
             var audio = await this.audioProvider.GetAllAsync(kind, default);
-            return audio.Select(x => new AudioContentViewModel(x, this.audioProvider))
+            return audio.Select(x => new AudioContentViewModel(x, this.imageProvider))
                 .ToList();
         }
 

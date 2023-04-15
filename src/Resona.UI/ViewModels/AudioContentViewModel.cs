@@ -12,21 +12,18 @@ namespace Resona.UI.ViewModels
     public class AudioContentViewModel : ReactiveObject, IDisposable
     {
         private readonly Lazy<Task<Bitmap>> cover;
-        private readonly IAudioProvider audioProvider;
+        private readonly IAlbumImageProvider imageProvider;
 
-        public AudioContentViewModel(AudioContent audio, IAudioProvider audioProvider)
+        public AudioContentViewModel(AudioContentSummary audio, IAlbumImageProvider imageProvider)
         {
             this.cover = new Lazy<Task<Bitmap>>(() => Task.Run(() => this.LoadCover()));
             this.Model = audio;
-            this.audioProvider = audioProvider;
+            this.imageProvider = imageProvider;
         }
 
-        private async Task<Bitmap> LoadCover()
+        private Bitmap LoadCover()
         {
-            using var imageStream = await this.audioProvider.GetImageStreamAsync(
-                this.Model.AudioKind,
-                this.Model.Name,
-                default);
+            using var imageStream = this.imageProvider.GetImageStream(this.Model);
 
             return Bitmap.DecodeToWidth(imageStream, 200);
         }
@@ -49,6 +46,6 @@ namespace Resona.UI.ViewModels
 
         public Task<Bitmap> Cover => this.cover.Value;
 
-        public AudioContent Model { get; }
+        public AudioContentSummary Model { get; }
     }
 }

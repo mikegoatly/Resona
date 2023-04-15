@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Resona.Persistence
 {
-    [Table("Song")]
-    public class SongRaw
+    [Table("Track")]
+    public class TrackRaw
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int SongId { get; set; }
+        public int TrackId { get; set; }
 
         [MaxLength(100)]
         public required string Name { get; set; }
@@ -15,8 +15,17 @@ namespace Resona.Persistence
         [MaxLength(100)]
         public required string FileName { get; set; }
 
-        public required DateTimeOffset LastModifiedLocal { get; set; }
+        [MaxLength(100)]
+        public string? Artist { get; set; }
 
+        public uint TrackNumber { get; set; }
+
+        public required DateTime LastModifiedUtc { get; set; }
+
+        [ForeignKey(nameof(AlbumId))]
         public virtual required AlbumRaw Album { get; set; }
+
+        public int AlbumId { get; set; }
+        public TimeSpan? Duration { get; set; }
     }
 }

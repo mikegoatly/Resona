@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 using Serilog;
@@ -13,9 +11,8 @@ namespace Resona.Persistence
         private static bool initialized;
 
         public DbSet<AlbumRaw> Albums { get; set; }
-        public DbSet<SongRaw> Songs { get; set; }
+        public DbSet<TrackRaw> Tracks { get; set; }
 
-        [Conditional("DEBUG")]
         public static void Reset()
         {
             initialized = false;
@@ -25,25 +22,26 @@ namespace Resona.Persistence
             Initialize();
         }
 
-        public static void Initialize()
+        public static bool Initialize()
         {
             if (initialized)
             {
-                return;
+                return true;
             }
 
+            initialized = true;
             using var context = new ResonaDb();
 
             try
             {
                 context.Database.Migrate();
+                return true;
             }
             catch (Exception ex)
             {
                 logger.Error(ex, "An error occurred migrating the database");
+                return false;
             }
-
-            initialized = true;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -53,8 +51,6 @@ namespace Resona.Persistence
 #endif
 
             var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "resona.db");
-
-            logger.Information("Configuring database: {Path}", dbPath);
 
             var connectionString = new SqliteConnectionStringBuilder()
             {

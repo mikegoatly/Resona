@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -16,9 +17,11 @@ namespace Resona.Persistence.Migrations
                 {
                     AlbumId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Kind = table.Column<int>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Path = table.Column<string>(type: "TEXT", maxLength: 250, nullable: false),
-                    Artist = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
+                    Artist = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    ThumbnailFile = table.Column<string>(type: "TEXT", maxLength: 350, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -26,21 +29,24 @@ namespace Resona.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Song",
+                name: "Track",
                 columns: table => new
                 {
-                    SongId = table.Column<int>(type: "INTEGER", nullable: false)
+                    TrackId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     FileName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    LastModifiedLocal = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    AlbumId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Artist = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    TrackNumber = table.Column<uint>(type: "INTEGER", nullable: false),
+                    LastModifiedUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    AlbumId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Duration = table.Column<TimeSpan>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Song", x => x.SongId);
+                    table.PrimaryKey("PK_Track", x => x.TrackId);
                     table.ForeignKey(
-                        name: "FK_Song_Album_AlbumId",
+                        name: "FK_Track_Album_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Album",
                         principalColumn: "AlbumId",
@@ -48,8 +54,13 @@ namespace Resona.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Song_AlbumId",
-                table: "Song",
+                name: "IX_Album_Kind_Name",
+                table: "Album",
+                columns: new[] { "Kind", "Name" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Track_AlbumId",
+                table: "Track",
                 column: "AlbumId");
         }
 
@@ -57,7 +68,7 @@ namespace Resona.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Song");
+                name: "Track");
 
             migrationBuilder.DropTable(
                 name: "Album");

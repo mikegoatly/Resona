@@ -3,31 +3,23 @@
 #if DEBUG
     public class FakeAudioProvider : IAudioProvider
     {
-        public Task<IEnumerable<AudioContent>> GetAllAsync(AudioKind kind, CancellationToken cancellationToken)
+        public Task<IReadOnlyList<AudioContentSummary>> GetAllAsync(AudioKind kind, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Stream> GetAudioStreamAsync(AudioKind kind, string title, int chapterIndex, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<AudioContent> GetByTitleAsync(AudioKind kind, string title, CancellationToken cancellationToken)
+        public Task<AudioContent> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             return Task.FromResult(
                 new AudioContent(
-                    kind,
-                    title,
+                    id,
+                    AudioKind.Audiobook,
+                    "Test",
                     "Me",
-                    1,
-                    Enumerable.Range(1, 10).Select(x => new AudioTrack("", $"Track {x}", "", (uint)x, x - 1)).ToList()));
-        }
-
-        public Task<Stream> GetImageStreamAsync(AudioKind kind, string title, CancellationToken cancellationToken)
-        {
-            return Task.FromResult<Stream>(File.OpenRead(@"C:\dev\Audibobble\Resona.UI\Images\audiobooks.png"));
+                    null,
+                    Enumerable.Range(1, 10).Select(x => new AudioTrack("", $"Track {x}", "", x - 1)).ToList()));
         }
     }
+
 #endif
 }
