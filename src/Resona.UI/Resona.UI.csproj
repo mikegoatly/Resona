@@ -8,12 +8,16 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<TrimmerRootDescriptor Include="Roots.xml" />
+	</ItemGroup>
+
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<TreatWarningsAsErrors>FalsTruee</TreatWarningsAsErrors>
 	</PropertyGroup>
 	
 	<ItemGroup>
@@ -25,7 +29,6 @@
 		<None Remove="Images\audiobooks.png" />
 		<None Remove="Images\music.png" />
 		<None Remove="Images\sleep.png" />
-		<None Remove="Roots.xml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -43,9 +46,6 @@
 		</AvaloniaResource>
 	</ItemGroup>
 
-	<ItemGroup>
-		<Content Include="Roots.xml" />
-	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.0.0-preview6" />
 		<PackageReference Include="Avalonia.LinuxFramebuffer" Version="11.0.0-preview6" />
