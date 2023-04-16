@@ -11,6 +11,12 @@ This is very much a work in progress limited spare time hobby project... have pa
 * Music
 * Sleep Tunes
 
+## Sleep timers
+
+* Sleep timer to stop playback after a set time
+* Auto-shutdown on lack of interactivity (2 hours by default)
+* Screen dimming to prevent glare at night (20 seconds by default)
+
 ## Album art
 
 Album art is loaded from (in order of preference):

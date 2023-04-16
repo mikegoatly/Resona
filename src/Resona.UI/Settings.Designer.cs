@@ -79,7 +79,7 @@ namespace Resona.UI {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("00:05:00")]
+        [global::System.Configuration.DefaultSettingValueAttribute("02:00:00")]
         public global::System.TimeSpan InactivityShutdownTimeout {
             get {
                 return ((global::System.TimeSpan)(this["InactivityShutdownTimeout"]));

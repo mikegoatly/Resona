@@ -8,7 +8,8 @@
 			 xmlns:local="using:Resona.UI.Views"
 			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
 			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             mc:Ignorable="d"
+			 xmlns:converters="using:Resona.UI.Converters"
+			 mc:Ignorable="d"
              d:DesignWidth="800"
              d:DesignHeight="450"
 			 x:CompileBindings="True"
@@ -18,8 +19,12 @@
 	<Design.DataContext>
 		<vm:MainWindowViewModel />
 	</Design.DataContext>
-	
-	<Grid Background="Transparent">		
+
+	<UserControl.Resources>
+		<converters:DoubleToIsVisibleConverter x:Key="DoubleToIsVisibleConverter"/>
+	</UserControl.Resources>
+
+	<Grid Background="Transparent">
 		<i:Interaction.Behaviors>
 			<ia:EventTriggerBehavior EventName="PointerMoved">
 				<ia:InvokeCommandAction x:CompileBindings="False" Command="{Binding DataContext.ScreenInteraction, ElementName=Root}"/>
@@ -28,7 +33,7 @@
 				<ia:InvokeCommandAction x:CompileBindings="False" Command="{Binding DataContext.ScreenInteraction, ElementName=Root}"/>
 			</ia:EventTriggerBehavior>
 		</i:Interaction.Behaviors>
-		
+
 
 		<rxui:RoutedViewHost Router="{Binding Router}" >
 			<rxui:RoutedViewHost.PageTransition>
@@ -37,7 +42,7 @@
 				</CompositePageTransition>
 			</rxui:RoutedViewHost.PageTransition>
 		</rxui:RoutedViewHost>
-		
+
 		<StackPanel Orientation="Horizontal" Margin="15" VerticalAlignment="Top">
 			<StackPanel.Styles>
 				<Style Selector="StackPanel > :is(Control)">
@@ -48,13 +53,25 @@
 				</Style>
 			</StackPanel.Styles>
 			<Button Command="{Binding GoBack}" Classes="primary circle">
-					<icon:Icon Value="fa fa-arrow-left" />
+				<icon:Icon Value="fa fa-arrow-left" />
 			</Button>
 		</StackPanel>
 
 		<local:PlayerControlsView VerticalAlignment="Bottom" Height="100" />
 
-		<Border Background="Black" Opacity="{Binding ScreenDimPercentage}" IsHitTestVisible="False">
+		<!-- 
+		The screen dim display is shown over the other controls. It accepts hit testing because we don't
+		want users to accidentally click on a button when trying to clear it.
+		-->
+		<Border Background="Black" Opacity="{Binding ScreenDimPercentage}" IsVisible="{Binding ScreenDimPercentage, Converter={StaticResource DoubleToIsVisibleConverter}}">
+			<i:Interaction.Behaviors>
+				<ia:EventTriggerBehavior EventName="PointerMoved">
+					<ia:InvokeCommandAction x:CompileBindings="False" Command="{Binding DataContext.ScreenInteraction, ElementName=Root}"/>
+				</ia:EventTriggerBehavior>
+				<ia:EventTriggerBehavior EventName="PointerPressed">
+					<ia:InvokeCommandAction x:CompileBindings="False" Command="{Binding DataContext.ScreenInteraction, ElementName=Root}"/>
+				</ia:EventTriggerBehavior>
+			</i:Interaction.Behaviors>
 			<Border.Transitions>
 				<Transitions>
 					<DoubleTransition Property="Opacity" Duration="0:00:00.100" />
