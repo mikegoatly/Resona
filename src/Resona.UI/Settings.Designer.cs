@@ -67,5 +67,23 @@ namespace Resona.UI {
                 return ((string)(this["LogFile"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:20")]
+        public global::System.TimeSpan ScreenDimTimeout {
+            get {
+                return ((global::System.TimeSpan)(this["ScreenDimTimeout"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:05:00")]
+        public global::System.TimeSpan InactivityShutdownTimeout {
+            get {
+                return ((global::System.TimeSpan)(this["InactivityShutdownTimeout"]));
+            }
+        }
     }
 }

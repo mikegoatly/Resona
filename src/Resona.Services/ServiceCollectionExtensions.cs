@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
 using Resona.Services.Audio;
+using Resona.Services.Background;
 using Resona.Services.Bluetooth;
 using Resona.Services.Libraries;
+using Resona.Services.OS;
 
 namespace Resona.Services
 {
@@ -22,6 +24,8 @@ namespace Resona.Services
             services.AddSingleton<IAlbumImageProvider, AlbumImageProvider>();
             services.AddSingleton<ILibrarySyncer, LibrarySyncer>();
             services.AddSingleton<ILibraryFileWatcher, LibraryFileWatcher>();
+            services.AddSingleton<IOsCommandExecutor, OsCommandExecutor>();
+            services.AddSingleton<ITimerManager, TimerManager>();
         }
     }
 }

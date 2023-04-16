@@ -15,7 +15,8 @@ using ReactiveUI;
 
 using Resona.Persistence;
 using Resona.Services;
-using Resona.Services.Configuration;
+using Resona.Services.Background;
+using Resona.Services.Libraries;
 using Resona.UI.ViewModels;
 
 using Serilog;
@@ -41,13 +42,8 @@ namespace Resona.UI
             services.AddResonaServices();
             services.AddViewModels();
             services.AddViews();
-            services.AddOptions()
-                .Configure<AudiobookConfiguration>(x =>
-                {
-                    x.AudiobookPath = Settings.Default.AudiobooksFolder;
-                    x.MusicPath = Settings.Default.MusicFolder;
-                    x.SleepPath = Settings.Default.SleepFolder;
-                });
+
+            AddConfiguration(services);
 
             services.AddSingleton((s) => new RoutingState());
             services.UseMicrosoftDependencyResolver();
@@ -72,6 +68,24 @@ namespace Resona.UI
 
             Log.Information("Starting in desktop mode");
             return builder.StartWithClassicDesktopLifetime(args);
+        }
+
+        private static void AddConfiguration(ServiceCollection services)
+        {
+            services.AddOptions()
+                .Configure<AudiobookConfiguration>(x =>
+                {
+                    x.AudiobookPath = Settings.Default.AudiobooksFolder;
+                    x.MusicPath = Settings.Default.MusicFolder;
+                    x.SleepPath = Settings.Default.SleepFolder;
+                });
+
+            services.AddOptions()
+                .Configure<SleepConfiguration>(x =>
+                {
+                    x.InactivityShutdownTimeout = Settings.Default.InactivityShutdownTimeout;
+                    x.ScreenDimTimeout = Settings.Default.ScreenDimTimeout;
+                });
         }
 
         private static void ConfigureLogger()

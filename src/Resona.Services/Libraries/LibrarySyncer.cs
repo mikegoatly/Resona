@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 
 using Resona.Persistence;
-using Resona.Services.Configuration;
 
 using Serilog;
 
