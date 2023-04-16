@@ -6,12 +6,20 @@ namespace Resona.Services.OS
 {
     public interface IOsCommandExecutor
     {
+        void Restart();
         void Shutdown();
     }
 
     public class OsCommandExecutor : IOsCommandExecutor
     {
         public static ILogger logger = Log.ForContext<OsCommandExecutor>();
+
+        public void Restart()
+        {
+            // Because we're using systemd with auto restart, we can just kill this process and let systemd restart it
+            logger.Information("Restarting the system...");
+            Process.GetCurrentProcess().Kill();
+        }
 
         public void Shutdown()
         {

@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:Resona.UI.ViewModels"
+             mc:Ignorable="d"
+			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 d:DesignWidth="300" d:DesignHeight="300"
+             x:Class="Resona.UI.Views.PowerOptions"
+			 MaxWidth="300">
+	<Design.DataContext>
+		<vm:PowerOptionsViewModel/>
+	</Design.DataContext>
+	<Border>
+		<Border.Styles>
+			<Styles>
+				<Style Selector="Border Button">
+					<Setter Property="Height" Value="60" />
+					<Setter Property="Padding" Value="40,0" />
+					<Setter Property="HorizontalAlignment" Value="Stretch" />
+				</Style>
+
+				<Style Selector="Border Button StackPanel">
+					<Setter Property="Orientation" Value="Horizontal" />
+					<Setter Property="HorizontalAlignment" Value="Center" />
+				</Style>
+
+				<Style Selector="Border Button TextBlock">
+					<Setter Property="VerticalAlignment" Value="Center" />
+					<Setter Property="Margin" Value="5,0,0,0" />
+				</Style>
+			</Styles>
+		</Border.Styles>
+		<StackPanel Spacing="5">
+			<Button Command="{Binding ShutDownCommand}"
+					Classes="danger">
+				<StackPanel>
+					<icon:Icon Value="fa fa-power-off" />
+					<TextBlock>Turn off</TextBlock>
+				</StackPanel>
+			</Button>
+			<Button Command="{Binding RestartCommand}"
+					Classes="warning">
+				<StackPanel>
+					<icon:Icon Value="fa fa-arrows-rotate" />
+					<TextBlock>Restart</TextBlock>
+				</StackPanel>
+			</Button>
+		</StackPanel>
+	</Border>
+</UserControl>

@@ -2,9 +2,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	<Design.PreviewWith>
 
-		<Button Classes="primary circle">
-			<TextBlock>Test</TextBlock>
-		</Button>
+		<StackPanel Orientation="Horizontal">
+			<Button Classes="primary circle">
+				<TextBlock>Test</TextBlock>
+			</Button>
+			<Button Classes="danger circle">
+				<TextBlock>Test</TextBlock>
+			</Button>
+			<Button Classes="warning circle">
+				<TextBlock>Test</TextBlock>
+			</Button>
+		</StackPanel>
 	</Design.PreviewWith>
 
 	<Style Selector="TextBlock">
@@ -14,6 +22,14 @@
 	
 	<Style Selector="Button.primary">
 		<Setter Property="Background" Value="DarkSalmon" />
+	</Style>
+
+	<Style Selector="Button.danger">
+		<Setter Property="Background" Value="Red" />
+	</Style>
+
+	<Style Selector="Button.warning">
+		<Setter Property="Background" Value="DarkGoldenrod" />
 	</Style>
 
 	<Style Selector="Button.circle">

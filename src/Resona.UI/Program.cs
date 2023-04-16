@@ -61,8 +61,8 @@ namespace Resona.UI
             var builder = BuildAvaloniaApp();
             if (args.Contains("--drm"))
             {
-                Log.Information("Starting in DRM mode");
                 SilenceConsole();
+                Log.Information("Starting in DRM mode");
                 return builder.StartLinuxDrm(args, scaling: 1);
             }
 
@@ -115,17 +115,25 @@ namespace Resona.UI
 
         private static void SilenceConsole()
         {
-            new Thread(() =>
+            Log.Information("Silencing console");
+            try
             {
-                Console.CursorVisible = false;
-                while (true)
+                new Thread(() =>
                 {
-                    Console.ReadKey(true);
-                }
-            })
+                    Console.CursorVisible = false;
+                    while (true)
+                    {
+                        Console.Read();
+                    }
+                })
+                {
+                    IsBackground = true
+                }.Start();
+            }
+            catch (Exception ex)
             {
-                IsBackground = true
-            }.Start();
+                Log.ForContext<App>().Fatal(ex, "Error silencing console!");
+            }
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.

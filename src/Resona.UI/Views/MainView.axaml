@@ -43,19 +43,32 @@
 			</rxui:RoutedViewHost.PageTransition>
 		</rxui:RoutedViewHost>
 
-		<StackPanel Orientation="Horizontal" Margin="15" VerticalAlignment="Top">
-			<StackPanel.Styles>
-				<Style Selector="StackPanel > :is(Control)">
+		<Grid Margin="15" VerticalAlignment="Top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<Grid.Styles>
+				<Style Selector="Grid > :is(Control)">
 					<Setter Property="Margin" Value="2"/>
 				</Style>
-				<Style Selector="StackPanel > TextBlock">
+				<Style Selector="Grid > TextBlock">
 					<Setter Property="VerticalAlignment" Value="Center"/>
 				</Style>
-			</StackPanel.Styles>
+			</Grid.Styles>
 			<Button Command="{Binding GoBack}" Classes="primary circle">
 				<icon:Icon Value="fa fa-arrow-left" />
 			</Button>
-		</StackPanel>
+
+			<Button Classes="danger circle" Grid.Column="1">
+				<icon:Icon Value="fa fa-power-off" />
+				<Button.Flyout>
+					<Flyout PlacementGravity="BottomRight">
+						<local:PowerOptions />
+					</Flyout>
+				</Button.Flyout>
+			</Button>
+		</Grid>
 
 		<local:PlayerControlsView VerticalAlignment="Bottom" Height="100" />
 
