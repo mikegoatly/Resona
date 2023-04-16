@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		global.json = global.json
+		copy-pi-scripts.ps1 = copy-pi-scripts.ps1
 		publish.ps1 = publish.ps1
 		README.md = README.md
 	EndProjectSection
@@ -17,6 +18,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resona.Persistence", "src\Resona.Persistence\Resona.Persistence.csproj", "{E23B874D-A3F6-46FD-B394-C1AD6B513E32}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resona.Services", "src\Resona.Services\Resona.Services.csproj", "{E194272C-FFEF-4B57-8F70-9DEED424BB1F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pi-scripts", "pi-scripts", "{2386B6D4-610E-4BDB-9E73-D1F83BC8552B}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\configure-auto-run.sh = scripts\configure-auto-run.sh
+		scripts\disable-auto-run.sh = scripts\disable-auto-run.sh
+		scripts\install-dependencies.sh = scripts\install-dependencies.sh
+		scripts\reenable-auto-run.sh = scripts\reenable-auto-run.sh
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
