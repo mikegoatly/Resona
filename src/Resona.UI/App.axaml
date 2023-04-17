@@ -2,11 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Resona.UI"
              x:Class="Resona.UI.App"
+			 xmlns:sys="using:System"
 			 RequestedThemeVariant="Dark">
     <Application.DataTemplates>
         <local:DataTemplateViewLocator/>
     </Application.DataTemplates>
 
+	<Application.Resources>
+		<sys:Double x:Key="PlayerHeight">80</sys:Double>
+	</Application.Resources>
+	
     <Application.Styles>
 		<FluentTheme />
 		<StyleInclude Source="/Styles/Styles.axaml"/>

@@ -3,17 +3,63 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:Resona.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="60"
+			  xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-             x:Class="Resona.UI.Views.PlayerControlsView">
+             x:Class="Resona.UI.Views.PlayerControlsView"
+			 x:Name="Root"
+			 ClipToBounds="False">
 	<Design.DataContext>
 		<vm:PlayerControlsViewModel/>
 	</Design.DataContext>
 
-	<Grid>
-		<StackPanel VerticalAlignment="Center" 
-					Orientation="Horizontal" 
-					HorizontalAlignment="Center">
+	<Grid Background="#1D0C19" ClipToBounds="False">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<Grid Grid.Column="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+
+			<Image Source="{Binding Cover^}"
+				   Stretch="UniformToFill"
+				   Width="{StaticResource PlayerHeight}"
+				   Height="{StaticResource PlayerHeight}"
+				   HorizontalAlignment="Left"
+				   Margin="0,0,5,0">
+				<i:Interaction.Behaviors>
+					<ia:EventTriggerBehavior EventName="Tapped">
+						<ia:InvokeCommandAction Command="{Binding DataContext.NavigateToPlaying, ElementName=Root}"/>
+					</ia:EventTriggerBehavior>
+				</i:Interaction.Behaviors>
+			</Image>
+
+			<StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="5">
+				<StackPanel.Styles>
+					<Styles>
+						<Style Selector="TextBlock">
+							<Setter Property="FontSize" Value="14" />
+							<Setter Property="TextWrapping" Value="Wrap" />
+						</Style>
+					</Styles>
+				</StackPanel.Styles>
+				<TextBlock Text="{Binding Album}" />
+				<TextBlock Text="{Binding Title}" />
+			</StackPanel>
+		</Grid>
+
+		<StackPanel Grid.Column="1"
+					VerticalAlignment="Center"
+					ClipToBounds="False"
+					Orientation="Horizontal"
+					HorizontalAlignment="Center"
+					Spacing="5">
 			<Button Classes="primary circle"
 				Command="{Binding MovePreviousCommand}">
 				<icon:Icon
@@ -21,13 +67,21 @@
 			</Button>
 
 			<Button Classes="primary circle"
-					Command="{Binding PlayPauseCommand}">
+					Command="{Binding PlayPauseCommand}"
+					Width="80"
+					Height="80"
+					>
+				<Button.RenderTransform>
+					<TranslateTransform Y="-13" />
+				</Button.RenderTransform>
+
 				<icon:Icon
 					Value="{Binding PlayButtonIcon}" />
+
 			</Button>
-			
+
 			<Button Classes="primary circle"
-				Command="{Binding MoveNextCommand}">
+			Command="{Binding MoveNextCommand}">
 				<icon:Icon
 					Value="fa fa-forward" />
 			</Button>

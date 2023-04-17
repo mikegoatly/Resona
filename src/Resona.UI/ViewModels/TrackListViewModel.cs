@@ -21,7 +21,6 @@ namespace Resona.UI.ViewModels
         private readonly IAudioProvider audioProvider;
         private readonly IAlbumImageProvider imageProvider;
         private readonly IPlayerService playerService;
-        private AudioContent? model;
         private IReadOnlyList<AudioTrackViewModel>? tracks;
 
 #if DEBUG
@@ -49,9 +48,9 @@ namespace Resona.UI.ViewModels
 
         public async Task SetAudioContentAsync(int id, CancellationToken cancellationToken)
         {
-            this.model = await this.audioProvider.GetByIdAsync(id, cancellationToken);
-            this.Tracks = this.model.Tracks.Select(
-                t => new AudioTrackViewModel(t, this.playerService.Current?.Content == this.model))
+            this.Model = await this.audioProvider.GetByIdAsync(id, cancellationToken);
+            this.Tracks = this.Model.Tracks.Select(
+                t => new AudioTrackViewModel(t, this.playerService.Current?.Content == this.Model))
                 .ToList();
 
             Observable.FromEvent<(AudioContent, AudioTrack)>(
@@ -60,7 +59,7 @@ namespace Resona.UI.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.OnChapterPlaying(x.Item1, x.Item2));
 
-            this.Cover = this.LoadCoverAsync(this.model, cancellationToken);
+            this.Cover = this.LoadCoverAsync(this.Model, cancellationToken);
 
             this.RaisePropertyChanged(nameof(this.Name));
             this.RaisePropertyChanged(nameof(this.Artist));
@@ -69,7 +68,7 @@ namespace Resona.UI.ViewModels
 
         private void OnChapterPlaying(AudioContent content, AudioTrack playingTrack)
         {
-            if (content == this.model && this.Tracks != null)
+            if (content == this.Model && this.Tracks != null)
             {
                 foreach (var track in this.Tracks)
                 {
@@ -78,9 +77,9 @@ namespace Resona.UI.ViewModels
             }
         }
 
-        public string Name => this.model?.Name ?? string.Empty;
-        public string? Artist => this.model?.Artist;
-        public bool IsPlaying => this.model == this.playerService.Current?.Content;
+        public string Name => this.Model?.Name ?? string.Empty;
+        public string? Artist => this.Model?.Artist;
+        public bool IsPlaying => this.Model == this.playerService.Current?.Content;
 
         public IReadOnlyList<AudioTrackViewModel>? Tracks
         {
@@ -95,12 +94,13 @@ namespace Resona.UI.ViewModels
         }
 
         public ReactiveCommand<AudioTrackViewModel, Unit> PlayTrack { get; private set; }
+        public AudioContent? Model { get; set; }
 
         private void OnPlayTrack(AudioTrackViewModel track)
         {
-            if (this.model != null)
+            if (this.Model != null)
             {
-                this.playerService.Play(this.model, track.Model, 0);
+                this.playerService.Play(this.Model, track.Model, 0);
             }
         }
 

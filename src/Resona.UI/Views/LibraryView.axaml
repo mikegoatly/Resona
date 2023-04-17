@@ -14,7 +14,7 @@
 	</Design.DataContext>
 
 	<ScrollViewer MaxWidth="800"
-			 Margin="50,20,0,100">
+			 Margin="50,20,0,0">
 		<ItemsRepeater Items="{Binding AudioContent^}"
 				 Background="Transparent"
 				   >

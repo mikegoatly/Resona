@@ -25,6 +25,11 @@
 	</UserControl.Resources>
 
 	<Grid Background="Transparent">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="80"/>
+		</Grid.RowDefinitions>
+
 		<i:Interaction.Behaviors>
 			<ia:EventTriggerBehavior EventName="PointerMoved">
 				<ia:InvokeCommandAction x:CompileBindings="False" Command="{Binding DataContext.ScreenInteraction, ElementName=Root}"/>
@@ -70,13 +75,18 @@
 			</Button>
 		</Grid>
 
-		<local:PlayerControlsView VerticalAlignment="Bottom" Height="100" />
+		<local:PlayerControlsView
+			Grid.Row="1"/>
 
 		<!-- 
 		The screen dim display is shown over the other controls. It accepts hit testing because we don't
 		want users to accidentally click on a button when trying to clear it.
 		-->
-		<Border Background="Black" Opacity="{Binding ScreenDimPercentage}" IsVisible="{Binding ScreenDimPercentage, Converter={StaticResource DoubleToIsVisibleConverter}}">
+		<Border
+			Grid.RowSpan="2"
+			Background="Black"
+			Opacity="{Binding ScreenDimPercentage}"
+			IsVisible="{Binding ScreenDimPercentage, Converter={StaticResource DoubleToIsVisibleConverter}}">
 			<i:Interaction.Behaviors>
 				<ia:EventTriggerBehavior EventName="PointerMoved">
 					<ia:InvokeCommandAction x:CompileBindings="False" Command="{Binding DataContext.ScreenInteraction, ElementName=Root}"/>

@@ -115,7 +115,14 @@ namespace Resona.UI
 
         private static void SilenceConsole()
         {
-            Log.Information("Silencing console");
+            if (Console.IsInputRedirected)
+            {
+                Log.Debug("Redirected input detected; skipping console silencing");
+                return;
+            }
+
+            Log.Debug("Silencing console");
+
             try
             {
                 new Thread(() =>
@@ -123,7 +130,7 @@ namespace Resona.UI
                     Console.CursorVisible = false;
                     while (true)
                     {
-                        Console.Read();
+                        Console.ReadKey();
                     }
                 })
                 {
