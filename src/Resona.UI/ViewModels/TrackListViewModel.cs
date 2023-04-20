@@ -53,11 +53,7 @@ namespace Resona.UI.ViewModels
                 t => new AudioTrackViewModel(t, this.playerService.Current?.Content == this.Model))
                 .ToList();
 
-            Observable.FromEvent<(AudioContent, AudioTrack)>(
-                handler => this.playerService.ChapterPlaying += handler,
-                handler => this.playerService.ChapterPlaying -= handler)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.OnChapterPlaying(x.Item1, x.Item2));
+
 
             this.Cover = this.LoadCoverAsync(this.Model, cancellationToken);
 

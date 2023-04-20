@@ -12,6 +12,10 @@
 			<Button Classes="warning">
 				<TextBlock>Test</TextBlock>
 			</Button>
+
+			<Button Classes="warning circle" IsEnabled="False">
+				<TextBlock>Test</TextBlock>
+			</Button>
 		</StackPanel>
 	</Design.PreviewWith>
 
@@ -23,15 +27,31 @@
 	<Style Selector="Button.primary">
 		<Setter Property="Background" Value="#9F6BA0" />
 		<Setter Property="BorderBrush" Value="#4A2040" />
-		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="BorderThickness" Value="2" />
 	</Style>
 
 	<Style Selector="Button.danger">
 		<Setter Property="Background" Value="Red" />
+		<Setter Property="BorderBrush" Value="DarkRed" />
+		<Setter Property="BorderThickness" Value="2" />
 	</Style>
 
 	<Style Selector="Button.warning">
 		<Setter Property="Background" Value="DarkGoldenrod" />
+		<Setter Property="BorderBrush" Value="#99664b00" />
+		<Setter Property="BorderThickness" Value="2" />
+	</Style>
+
+	<Style Selector="Button.circle > Border">
+		<Setter Property="BoxShadow" Value="5 5 10 4 #99000000" />
+	</Style>
+
+	<Style Selector="Button.circle:pressed > Border">
+		<Setter Property="BoxShadow" Value="2 2 7 1 #99000000" />
+	</Style>
+
+	<Style Selector="Button.circle:disabled > Border">
+		<Setter Property="BoxShadow" Value="0 0 0 0 #99000000" />
 	</Style>
 
 	<Style Selector="Button.circle">
@@ -45,13 +65,18 @@
 						Background="{TemplateBinding Background}"
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}"
-						BoxShadow="inset 5 5 10 10 #99000000"
-						ClipToBounds="True"
+						ClipToBounds="False"
 						Width="{TemplateBinding Width}"
 						Height="{TemplateBinding Height}"
 				>
+						<Border.Transitions>
+							<Transitions>
+								<BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.1" />
+							</Transitions>
+						</Border.Transitions>
 						<ContentPresenter Name="PART_ContentPresenter"
 										  ClipToBounds="False"
+										  CornerRadius="180"
 										  Content="{TemplateBinding Content}"
 										  Background="Transparent"
 										  ContentTemplate="{TemplateBinding ContentTemplate}"

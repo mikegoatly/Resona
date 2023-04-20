@@ -1,4 +1,6 @@
-﻿using ManagedBass;
+﻿using System.Reactive.Subjects;
+
+using ManagedBass;
 
 using Resona.Services.Libraries;
 
@@ -6,15 +8,29 @@ using Serilog;
 
 namespace Resona.Services.Audio
 {
+    public enum PlaybackStateKind
+    {
+        Paused,
+        Playing,
+        Stopped,
+    }
+
+    public record struct PlayingTrack(AudioContent Content, AudioTrack Track);
+
+    public record struct PlaybackState(PlaybackStateKind Kind, double Position)
+    {
+        public static PlaybackState Stopped { get; } = new PlaybackState(PlaybackStateKind.Stopped, 0D);
+    }
+
     public interface IPlayerService : IDisposable
     {
-        (AudioContent Content, AudioTrack Track)? Current { get; }
+        PlayingTrack? Current { get; }
         bool HasNextTrack { get; }
         bool HasPreviousTrack { get; }
         bool Paused { get; }
-        double Position { get; }
-        Action<(AudioContent, AudioTrack)>? ChapterPlaying { get; set; }
-        Action? PlaybackStateChanged { get; set; }
+        double Position { get; set; }
+        IObservable<PlaybackState> PlaybackStateChanged { get; }
+        IObservable<PlayingTrack> PlayingTrackChanged { get; }
 
         void Next();
         void Play(AudioContent audiobook, AudioTrack? chapter, double position);
@@ -24,14 +40,24 @@ namespace Resona.Services.Audio
 
     public class PlayerService : IDisposable, IPlayerService
     {
+        private readonly Subject<PlaybackState> playbackStateChanged = new();
+        private readonly Subject<PlayingTrack> playingTrackChanged = new();
+
         private static readonly ILogger logger = Log.ForContext<PlayerService>();
+        private readonly Timer positionChangedTimer;
 
         private bool initialized;
         private int currentStream;
         private double channelLength;
+        private bool paused;
 
-        public Action<(AudioContent, AudioTrack)>? ChapterPlaying { get; set; }
-        public Action? PlaybackStateChanged { get; set; }
+        public PlayerService()
+        {
+            this.positionChangedTimer = new(this.RaisePositionChanged);
+        }
+
+        public IObservable<PlaybackState> PlaybackStateChanged => this.playbackStateChanged;
+        public IObservable<PlayingTrack> PlayingTrackChanged => this.playingTrackChanged;
 
         public void Play(AudioContent audiobook, AudioTrack? chapter, double position)
         {
@@ -41,7 +67,9 @@ namespace Resona.Services.Audio
             }
 
             chapter ??= audiobook.Tracks[0];
-            this.Current = (audiobook, chapter);
+            var playingTrack = new PlayingTrack(audiobook, chapter);
+            var isFirstPlay = this.Current == null;
+            this.Current = playingTrack;
 
             this.DisposeCurrentPlayer();
 
@@ -64,10 +92,7 @@ namespace Resona.Services.Audio
                     if (this.currentStream != 0)
                     {
                         this.channelLength = Bass.ChannelGetLength(this.currentStream);
-                        var positionInBytes = (long)(this.channelLength * position);
-                        logger.Debug("Setting initial position to {PositionInBytes} ({PositionAsPercent}%)", positionInBytes, position);
-
-                        Bass.ChannelSetPosition(this.currentStream, positionInBytes);
+                        this.Position = position;
 
                         logger.Debug("Setting end sync");
 
@@ -86,7 +111,14 @@ namespace Resona.Services.Audio
                             logger.Debug("Player was paused - not starting playback");
                         }
 
-                        this.OnChapterPlaying();
+                        if (isFirstPlay)
+                        {
+                            // Ensure the timer for the position changed event is set up by unpausing playback
+                            this.Paused = false;
+                        }
+
+                        this.playingTrackChanged.OnNext(playingTrack);
+                        this.OnPlaybackStateChanged();
                     }
                     else
                     {
@@ -106,18 +138,41 @@ namespace Resona.Services.Audio
             }
         }
 
-        private void PlaybackEnded(int Handle, int Channel, int Data, nint User)
+        public double Position
         {
-            // Automatically start playing the next chapter, if available.
-            this.Next();
+            get => this.currentStream == 0 ? 0 : Bass.ChannelGetPosition(this.currentStream) / this.channelLength;
+            set
+            {
+                if (Math.Round(this.Position, 3) != Math.Round(value, 3))
+                {
+                    var positionInBytes = (long)(this.channelLength * value);
+                    logger.Debug("Setting position to {PositionInBytes} ({PositionAsPercent}%)", positionInBytes, value);
+
+                    Bass.ChannelSetPosition(this.currentStream, positionInBytes);
+                }
+            }
         }
 
-        public double Position => this.currentStream == 0 ? 0 : Bass.ChannelGetPosition(this.currentStream) / this.channelLength;
-        public bool Paused { get; private set; }
+        public bool Paused
+        {
+            get => this.paused; private set
+            {
+                if (value)
+                {
+                    this.positionChangedTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+                }
+                else
+                {
+                    this.positionChangedTimer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1D));
+                }
+
+                this.paused = value;
+            }
+        }
         public bool HasPreviousTrack => this.Current?.Track.TrackIndex > 0;
         public bool HasNextTrack => this.Current?.Track.TrackIndex < this.Current?.Content.Tracks.Count - 1;
 
-        public (AudioContent Content, AudioTrack Track)? Current { get; private set; }
+        public PlayingTrack? Current { get; private set; }
 
         public void TogglePause()
         {
@@ -136,7 +191,7 @@ namespace Resona.Services.Audio
 
                 this.Paused = !this.Paused;
 
-                this.PlaybackStateChanged?.Invoke();
+                this.OnPlaybackStateChanged();
             }
         }
 
@@ -175,15 +230,6 @@ namespace Resona.Services.Audio
             }
         }
 
-        private void OnChapterPlaying()
-        {
-            if (this.Current != null)
-            {
-                var (content, track) = this.Current.GetValueOrDefault();
-                this.ChapterPlaying?.Invoke((content, track));
-            }
-        }
-
         public void Dispose()
         {
             this.DisposeCurrentPlayer();
@@ -195,6 +241,40 @@ namespace Resona.Services.Audio
             }
 
             GC.SuppressFinalize(this);
+        }
+
+        private void PlaybackEnded(int Handle, int Channel, int Data, nint User)
+        {
+            if (this.HasNextTrack)
+            {
+                // Automatically start playing the next chapter
+                this.Next();
+            }
+            else
+            {
+                if (this.Current != null)
+                {
+                    logger.Information("Final track completed");
+
+                    var (content, _) = this.Current.GetValueOrDefault();
+
+                    // Stop playing by pausing and resetting the player to the start of the first track.
+                    this.Paused = true;
+                    this.Play(content, content.Tracks[0], 0D);
+                }
+            }
+        }
+
+        private void RaisePositionChanged(object? _)
+        {
+            this.OnPlaybackStateChanged();
+        }
+
+        private void OnPlaybackStateChanged()
+        {
+            this.playbackStateChanged.OnNext(new PlaybackState(
+                this.Paused ? PlaybackStateKind.Paused : PlaybackStateKind.Playing,
+                this.Position));
         }
 
         private void DisposeCurrentPlayer()

@@ -20,6 +20,8 @@ namespace Resona.UI.ViewModels
         private bool canMoveNext;
         private bool canMovePrevious;
         private bool isPlaying;
+        private AudioTrack? audioTrack;
+        private double position;
         private AudioContent? audioContent;
         private readonly IPlayerService playerService;
         private readonly IAlbumImageProvider imageProvider;
@@ -29,9 +31,6 @@ namespace Resona.UI.ViewModels
         public PlayerControlsViewModel()
             : this(null!, null!, new FakePlayerService(), new FakeAlbumImageProvider())
         {
-            this.UpdatePlayingTrack(
-                new AudioContent(1, AudioKind.Audiobook, "Test album", "Artist", null, Array.Empty<AudioTrack>()),
-                new AudioTrack("", "Test track", "Artist", 1));
         }
 #endif
 
@@ -50,17 +49,13 @@ namespace Resona.UI.ViewModels
                 this.playerService.Next,
                 this.WhenAnyValue(x => x.CanMoveNext, x => x == true));
 
-            Observable.FromEvent<(AudioContent, AudioTrack)>(
-                handler => this.playerService.ChapterPlaying += handler,
-                handler => this.playerService.ChapterPlaying -= handler)
+            this.playerService.PlayingTrackChanged
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.UpdatePlayingTrack(x.Item1, x.Item2));
+                .Subscribe(this.UpdatePlayingTrack);
 
-            Observable.FromEvent(
-                handler => this.playerService.PlaybackStateChanged += handler,
-                handler => this.playerService.PlaybackStateChanged -= handler)
+            this.playerService.PlaybackStateChanged
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdatePlayerState());
+                .Subscribe(this.UpdatePlayerState);
 
             this.NavigateToPlaying = ReactiveCommand.CreateFromObservable(
                 () => Observable.FromAsync(
@@ -80,36 +75,53 @@ namespace Resona.UI.ViewModels
                     }));
         }
 
-        private void UpdatePlayerState()
+        private void UpdatePlayingTrack(PlayingTrack state)
         {
-            this.CanMoveNext = this.playerService.HasNextTrack;
-            this.CanMovePrevious = this.playerService.HasPreviousTrack;
-            this.IsPlaying = this.playerService.Paused == false;
-        }
+            var (audioContent, audioTrack) = state;
 
-        private void UpdatePlayingTrack(AudioContent audioContent, AudioTrack track)
-        {
             if (this.audioContent?.Id != audioContent.Id)
             {
+                this.audioContent = audioContent;
                 this.Cover = Task.Run(() => this.LoadCover(audioContent));
+                this.RaisePropertyChanged(nameof(this.Cover));
+                this.RaisePropertyChanged(nameof(this.Album));
             }
 
-            this.audioContent = audioContent;
-
-            this.UpdatePlayerState();
-
-            this.Album = audioContent.Name;
-            this.Title = track.Title;
-
-            this.RaisePropertyChanged(nameof(this.Title));
-            this.RaisePropertyChanged(nameof(this.Album));
-            this.RaisePropertyChanged(nameof(this.Cover));
+            if (this.audioTrack != audioTrack)
+            {
+                this.audioTrack = audioTrack;
+                this.RaisePropertyChanged(nameof(this.Title));
+                this.RaisePropertyChanged(nameof(this.CanPlay));
+                this.CanMoveNext = this.playerService.HasNextTrack;
+                this.CanMovePrevious = this.playerService.HasPreviousTrack;
+            }
         }
 
-        public string? Album { get; set; }
-        public string? Title { get; set; }
+        private void UpdatePlayerState(PlaybackState state)
+        {
+            this.IsPlaying = state.Kind == PlaybackStateKind.Playing;
+            this.Position = state.Position;
+            this.RaisePropertyChanged(nameof(this.Position));
+        }
+
+        public string? Album => this.audioContent?.Name;
+
+        public string? Title => this.audioTrack?.Title;
         public Task<Bitmap>? Cover { get; set; }
 
+        public double Position
+        {
+            get => this.position;
+            set
+            {
+                if (this.position != value)
+                {
+                    this.position = value;
+                    this.RaisePropertyChanged(nameof(this.position));
+                    this.playerService.Position = value;
+                }
+            }
+        }
 
         public ReactiveCommand<Unit, Unit> MovePreviousCommand { get; private set; }
 
@@ -136,6 +148,8 @@ namespace Resona.UI.ViewModels
                 this.RaisePropertyChanged(nameof(this.PlayButtonIcon));
             }
         }
+
+        public bool CanPlay => this.audioTrack != null;
 
         public string PlayButtonIcon => $"fa fa-{(this.IsPlaying ? "pause" : "play")}";
 

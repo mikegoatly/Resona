@@ -1,11 +1,16 @@
-﻿using Resona.Services.Libraries;
+﻿using System.Reactive.Linq;
+
+using Resona.Services.Libraries;
 
 namespace Resona.Services.Audio
 {
 #if DEBUG
     public class FakePlayerService : IPlayerService
     {
-        public (AudioContent Content, AudioTrack Track)? Current => null;
+        private static readonly AudioContent content = new(1, AudioKind.Audiobook, "Test album", "Artist", null, Array.Empty<AudioTrack>());
+        private static readonly AudioTrack track = new("", "Test track", "Artist", 1);
+
+        public PlayingTrack? Current => new(content, track);
 
         public bool HasNextTrack => false;
 
@@ -13,10 +18,10 @@ namespace Resona.Services.Audio
 
         public bool Paused => false;
 
-        public double Position => 0D;
+        public double Position { get; set; }
 
-        public Action<(AudioContent, AudioTrack)>? ChapterPlaying { get; set; }
-        public Action? PlaybackStateChanged { get; set; }
+        public IObservable<PlayingTrack> PlayingTrackChanged { get; } = new[] { new PlayingTrack(content, track) }.ToObservable();
+        public IObservable<PlaybackState> PlaybackStateChanged { get; } = new[] { new PlaybackState(PlaybackStateKind.Playing, 0D) }.ToObservable();
 
         public void Dispose()
         {
