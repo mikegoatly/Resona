@@ -27,7 +27,7 @@
 	<Grid Background="Transparent">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
-			<RowDefinition Height="80"/>
+			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 
 		<i:Interaction.Behaviors>

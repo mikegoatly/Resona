@@ -2,22 +2,47 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	<Design.PreviewWith>
 
-		<StackPanel Orientation="Horizontal" Spacing="10" Margin="10">
-			<Button Classes="primary circle">
-				<TextBlock>Test</TextBlock>
-			</Button>
-			<Button Classes="danger circle">
-				<TextBlock>Test</TextBlock>
-			</Button>
-			<Button Classes="warning">
-				<TextBlock>Test</TextBlock>
-			</Button>
+		<StackPanel Orientation="Vertical">
+			<Slider Value="50"></Slider>
+			<StackPanel Orientation="Horizontal" Spacing="10" Margin="10">
+				<Button Classes="primary circle">
+					<TextBlock>Test</TextBlock>
+				</Button>
+				<Button Classes="danger circle">
+					<TextBlock>Test</TextBlock>
+				</Button>
+				<Button Classes="warning">
+					<TextBlock>Test</TextBlock>
+				</Button>
 
-			<Button Classes="warning circle" IsEnabled="False">
-				<TextBlock>Test</TextBlock>
-			</Button>
+				<Button Classes="warning circle" IsEnabled="False">
+					<TextBlock>Test</TextBlock>
+				</Button>
+			</StackPanel>
 		</StackPanel>
 	</Design.PreviewWith>
+
+	<Style Selector="Slider:horizontal">
+		<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
+
+		<Style Selector="^:pointerover">
+			<Style Selector="^ /template/ RepeatButton#PART_DecreaseButton">
+				<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+			</Style>
+		</Style>
+		<Style Selector="^ Thumb">
+			<Setter Property="Width" Value="40" />
+			<Setter Property="Height" Value="30" />
+
+			<Style Selector="^ /template/ Border">
+				<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+				<Setter Property="CornerRadius" Value="500" />
+			</Style>
+			
+		</Style>
+	</Style>
+
+
 
 	<Style Selector="TextBlock">
 		<Setter Property="FontSize" Value="20" />
@@ -25,20 +50,20 @@
 	</Style>
 
 	<Style Selector="Button.primary">
-		<Setter Property="Background" Value="#9F6BA0" />
-		<Setter Property="BorderBrush" Value="#4A2040" />
+		<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+		<Setter Property="BorderBrush" Value="{StaticResource PrimaryColorDark}" />
 		<Setter Property="BorderThickness" Value="2" />
 	</Style>
 
 	<Style Selector="Button.danger">
-		<Setter Property="Background" Value="Red" />
-		<Setter Property="BorderBrush" Value="DarkRed" />
+		<Setter Property="Background" Value="{StaticResource DangerColor}" />
+		<Setter Property="BorderBrush" Value="{StaticResource DangerColorDark}" />
 		<Setter Property="BorderThickness" Value="2" />
 	</Style>
 
 	<Style Selector="Button.warning">
-		<Setter Property="Background" Value="DarkGoldenrod" />
-		<Setter Property="BorderBrush" Value="#99664b00" />
+		<Setter Property="Background" Value="{StaticResource WarningColor}" />
+		<Setter Property="BorderBrush" Value="{StaticResource WarningColorDark}" />
 		<Setter Property="BorderThickness" Value="2" />
 	</Style>
 
@@ -60,31 +85,31 @@
 		<Setter Property="ClipToBounds" Value="False" />
 		<Setter Property="Template">
 			<ControlTemplate>
-					<Border
-						CornerRadius="180"
-						Background="{TemplateBinding Background}"
-						BorderBrush="{TemplateBinding BorderBrush}"
-						BorderThickness="{TemplateBinding BorderThickness}"
-						ClipToBounds="False"
-						Width="{TemplateBinding Width}"
-						Height="{TemplateBinding Height}"
+				<Border
+					CornerRadius="180"
+					Background="{TemplateBinding Background}"
+					BorderBrush="{TemplateBinding BorderBrush}"
+					BorderThickness="{TemplateBinding BorderThickness}"
+					ClipToBounds="False"
+					Width="{TemplateBinding Width}"
+					Height="{TemplateBinding Height}"
 				>
-						<Border.Transitions>
-							<Transitions>
-								<BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.1" />
-							</Transitions>
-						</Border.Transitions>
-						<ContentPresenter Name="PART_ContentPresenter"
-										  ClipToBounds="False"
-										  CornerRadius="180"
-										  Content="{TemplateBinding Content}"
-										  Background="Transparent"
-										  ContentTemplate="{TemplateBinding ContentTemplate}"
-										  TextBlock.Foreground="{TemplateBinding Foreground}"
-										  Padding="{TemplateBinding Padding}"
-										  HorizontalContentAlignment="Center"
-										  VerticalContentAlignment="Center" />
-					</Border>
+					<Border.Transitions>
+						<Transitions>
+							<BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.1" />
+						</Transitions>
+					</Border.Transitions>
+					<ContentPresenter Name="PART_ContentPresenter"
+									  ClipToBounds="False"
+									  CornerRadius="180"
+									  Content="{TemplateBinding Content}"
+									  Background="Transparent"
+									  ContentTemplate="{TemplateBinding ContentTemplate}"
+									  TextBlock.Foreground="{TemplateBinding Foreground}"
+									  Padding="{TemplateBinding Padding}"
+									  HorizontalContentAlignment="Center"
+									  VerticalContentAlignment="Center" />
+				</Border>
 			</ControlTemplate>
 		</Setter>
 	</Style>

@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
+using Resona.Services;
 using Resona.Services.Audio;
 using Resona.Services.Libraries;
 
@@ -17,9 +19,6 @@ namespace Resona.UI.ViewModels
 {
     public class PlayerControlsViewModel : RoutableViewModelBase
     {
-        private bool canMoveNext;
-        private bool canMovePrevious;
-        private bool isPlaying;
         private AudioTrack? audioTrack;
         private double position;
         private AudioContent? audioContent;
@@ -40,6 +39,8 @@ namespace Resona.UI.ViewModels
             this.playerService = playerService;
             this.imageProvider = imageProvider;
             this.PlayPauseCommand = ReactiveCommand.Create(this.playerService.TogglePause);
+
+            this.LoadCover(null);
 
             this.MovePreviousCommand = ReactiveCommand.Create(
                 this.playerService.Previous,
@@ -82,7 +83,7 @@ namespace Resona.UI.ViewModels
             if (this.audioContent?.Id != audioContent.Id)
             {
                 this.audioContent = audioContent;
-                this.Cover = Task.Run(() => this.LoadCover(audioContent));
+                this.LoadCover(audioContent);
                 this.RaisePropertyChanged(nameof(this.Cover));
                 this.RaisePropertyChanged(nameof(this.Album));
             }
@@ -101,12 +102,12 @@ namespace Resona.UI.ViewModels
         {
             this.IsPlaying = state.Kind == PlaybackStateKind.Playing;
             this.Position = state.Position;
-            this.RaisePropertyChanged(nameof(this.Position));
         }
 
         public string? Album => this.audioContent?.Name;
 
         public string? Title => this.audioTrack?.Title;
+
         public Task<Bitmap>? Cover { get; set; }
 
         public double Position
@@ -117,7 +118,7 @@ namespace Resona.UI.ViewModels
                 if (this.position != value)
                 {
                     this.position = value;
-                    this.RaisePropertyChanged(nameof(this.position));
+                    this.RaisePropertyChanged(nameof(this.Position));
                     this.playerService.Position = value;
                 }
             }
@@ -127,41 +128,31 @@ namespace Resona.UI.ViewModels
 
         public ReactiveCommand<Unit, Unit> MoveNextCommand { get; private set; }
 
-        public bool CanMoveNext
-        {
-            get => this.canMoveNext;
-            set => this.RaiseAndSetIfChanged(ref this.canMoveNext, value);
-        }
+        [Reactive]
+        public bool CanMoveNext { get; set; }
 
-        public bool CanMovePrevious
-        {
-            get => this.canMovePrevious;
-            set => this.RaiseAndSetIfChanged(ref this.canMovePrevious, value);
-        }
+        [Reactive]
+        public bool CanMovePrevious { get; set; }
 
-        public bool IsPlaying
-        {
-            get => this.isPlaying;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isPlaying, value);
-                this.RaisePropertyChanged(nameof(this.PlayButtonIcon));
-            }
-        }
+        [Reactive]
+        public bool IsPlaying { get; set; }
 
         public bool CanPlay => this.audioTrack != null;
-
-        public string PlayButtonIcon => $"fa fa-{(this.IsPlaying ? "pause" : "play")}";
 
         // Command to play/pause the current track
         public ReactiveCommand<Unit, Unit> PlayPauseCommand { get; private set; }
         public ReactiveCommand<Unit, IObservable<IRoutableViewModel>> NavigateToPlaying { get; }
 
-        private Bitmap LoadCover(AudioContent audioContent)
+        private void LoadCover(AudioContent? audioContent)
         {
-            using var imageStream = this.imageProvider.GetImageStream(audioContent);
+            this.Cover = Task.Run(() =>
+            {
+                using var imageStream = audioContent == null
+                    ? new MemoryStream(Resources.Placeholder)
+                    : this.imageProvider.GetImageStream(audioContent);
 
-            return Bitmap.DecodeToWidth(imageStream, 60);
+                return Bitmap.DecodeToWidth(imageStream, 100);
+            });
         }
     }
 }

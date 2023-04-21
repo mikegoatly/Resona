@@ -163,7 +163,7 @@ namespace Resona.Services.Audio
                 }
                 else
                 {
-                    this.positionChangedTimer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1D));
+                    this.positionChangedTimer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(0.25D));
                 }
 
                 this.paused = value;

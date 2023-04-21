@@ -47,6 +47,10 @@ namespace Resona.Services.OS
                 // 2. Shutdown the system
                 sw.WriteLine("sudo uhubctl -l 2 -a 0 && sudo shutdown now");
             }
+            else
+            {
+                Process.GetCurrentProcess().Kill();
+            }
         }
     }
 }

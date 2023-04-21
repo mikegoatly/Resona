@@ -17,6 +17,17 @@
 			Source="{Binding Cover^}"
 			Stretch="UniformToFill"
 			Opacity="0.3"/>
+
+		<Grid.Styles>
+			<Style Selector="TextBlock">
+				<Setter Property="FontSize" Value="28" />
+				<Setter Property="Margin" Value="0,0,0,5" />
+
+				<Style Selector="^.playing">
+					<Setter Property="Foreground" Value="Yellow" />
+				</Style>
+			</Style>
+		</Grid.Styles>
 		<ScrollViewer Margin="20,20,20,100">
 			<ItemsControl
 				Items="{Binding Tracks}">
@@ -31,6 +42,7 @@
 							</i:Interaction.Behaviors>
 							<TextBlock
 								HorizontalAlignment="Center"
+								Classes.playing="{Binding IsPlaying}"
 								Text="{Binding Title}" />
 						</StackPanel>
 					</DataTemplate>

@@ -8,7 +8,7 @@ namespace Resona.Services.Libraries
     {
         public Stream GetImageStream(AudioContentSummary audioContent)
         {
-            return File.OpenRead(audioContent.ThumbnailFile ?? @"C:\dev\Audibobble\Resona.UI\Images\audiobooks.png");
+            return new MemoryStream(Resources.Placeholder);
         }
 
         public void UpdateThumbnail(AlbumRaw album)

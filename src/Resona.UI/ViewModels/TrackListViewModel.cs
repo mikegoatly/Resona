@@ -44,6 +44,10 @@ namespace Resona.UI.ViewModels
             this.audioProvider = audioProvider;
             this.imageProvider = imageProvider;
             this.playerService = playerService;
+
+            this.playerService.PlayingTrackChanged
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.OnChapterPlaying);
         }
 
         public async Task SetAudioContentAsync(int id, CancellationToken cancellationToken)
@@ -53,8 +57,6 @@ namespace Resona.UI.ViewModels
                 t => new AudioTrackViewModel(t, this.playerService.Current?.Content == this.Model))
                 .ToList();
 
-
-
             this.Cover = this.LoadCoverAsync(this.Model, cancellationToken);
 
             this.RaisePropertyChanged(nameof(this.Name));
@@ -62,8 +64,10 @@ namespace Resona.UI.ViewModels
             this.RaisePropertyChanged(nameof(this.IsPlaying));
         }
 
-        private void OnChapterPlaying(AudioContent content, AudioTrack playingTrack)
+        private void OnChapterPlaying(PlayingTrack playing)
         {
+            var (content, playingTrack) = playing;
+
             if (content == this.Model && this.Tracks != null)
             {
                 foreach (var track in this.Tracks)

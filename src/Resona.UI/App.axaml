@@ -9,15 +9,19 @@
     </Application.DataTemplates>
 
 	<Application.Resources>
-		<sys:Double x:Key="PlayerHeight">80</sys:Double>
+		<sys:Double x:Key="PlayerHeight">100</sys:Double>
+		<Color x:Key="WarningColorDark">#99664b00</Color>
+		<Color x:Key="WarningColor">DarkGoldenrod</Color>
+		<Color x:Key="DangerColorDark">DarkRed</Color>
+		<Color x:Key="DangerColor">Red</Color>
+		<Color x:Key="PrimaryColorDark">#4A2040</Color>
+		<Color x:Key="PrimaryColor">#9F6BA0</Color>
 	</Application.Resources>
 	
     <Application.Styles>
 		<FluentTheme />
 		<StyleInclude Source="/Styles/Styles.axaml"/>
 	</Application.Styles>
-
-	
 
 </Application>
 

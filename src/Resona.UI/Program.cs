@@ -147,11 +147,11 @@ namespace Resona.UI
         public static AppBuilder BuildAvaloniaApp()
         {
             return AppBuilder.Configure<App>()
-                        .UsePlatformDetect()
-                        .LogToTrace()
-                            .WithIcons(container => container
-                                .Register<FontAwesomeIconProvider>())
-                        .UseReactiveUI();
+                .UsePlatformDetect()
+                .LogToTrace()
+                .WithIcons(container => container
+                .Register<FontAwesomeIconProvider>())
+                .UseReactiveUI();
         }
     }
 }
