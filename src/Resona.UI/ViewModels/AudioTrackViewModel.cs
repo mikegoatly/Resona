@@ -14,6 +14,7 @@ namespace Resona.UI.ViewModels
             this.IsPlaying = isPlaying;
         }
         public string Title => this.Model.Title;
+        public int Index => this.Model.TrackIndex;
         public AudioTrack Model { get; }
 
         public bool IsPlaying

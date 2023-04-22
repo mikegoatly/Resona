@@ -7,6 +7,7 @@
 			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
 			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 x:Name="Root"
+			 xmlns:behaviors="using:Resona.UI.Behaviors"
              x:Class="Resona.UI.Views.TrackListView">
 	<Design.DataContext>
 		<vm:TrackListViewModel />
@@ -28,9 +29,14 @@
 				</Style>
 			</Style>
 		</Grid.Styles>
-		<ScrollViewer Margin="20,20,20,100">
+		<ScrollViewer Margin="20" >
 			<ItemsControl
-				Items="{Binding Tracks}">
+				Items="{Binding Tracks}"
+				>
+				<i:Interaction.Behaviors>
+					<behaviors:AutoScrollToPlayingBehavior />
+				</i:Interaction.Behaviors>
+				
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
 						<StackPanel Background="Transparent">							

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 using Resona.Services.Audio;
 using Resona.Services.Libraries;
@@ -53,33 +54,48 @@ namespace Resona.UI.ViewModels
         public async Task SetAudioContentAsync(int id, CancellationToken cancellationToken)
         {
             this.Model = await this.audioProvider.GetByIdAsync(id, cancellationToken);
+            var isCurrentContent = this.IsCurrentContent;
+            var currentTrackIndex = this.playerService.Current?.Track.TrackIndex;
             this.Tracks = this.Model.Tracks.Select(
-                t => new AudioTrackViewModel(t, this.playerService.Current?.Content == this.Model))
+                t => new AudioTrackViewModel(t, isCurrentContent && currentTrackIndex == t.TrackIndex))
                 .ToList();
+
+            this.CurrentTrack = this.Tracks.FirstOrDefault(x => x.IsPlaying);
 
             this.Cover = this.LoadCoverAsync(this.Model, cancellationToken);
 
             this.RaisePropertyChanged(nameof(this.Name));
             this.RaisePropertyChanged(nameof(this.Artist));
-            this.RaisePropertyChanged(nameof(this.IsPlaying));
+            this.RaisePropertyChanged(nameof(this.IsCurrentContent));
         }
 
         private void OnChapterPlaying(PlayingTrack playing)
         {
             var (content, playingTrack) = playing;
 
-            if (content == this.Model && this.Tracks != null)
+            AudioTrackViewModel? currentTrack = null;
+            if (content.Id == this.Model?.Id && this.Tracks != null)
             {
                 foreach (var track in this.Tracks)
                 {
-                    track.IsPlaying = track.Model.TrackIndex == playingTrack.TrackIndex;
+                    var isPlaying = track.Model.TrackIndex == playingTrack.TrackIndex;
+                    track.IsPlaying = isPlaying;
+                    if (isPlaying)
+                    {
+                        currentTrack = track;
+                    }
                 }
             }
+
+            this.CurrentTrack = currentTrack;
         }
 
         public string Name => this.Model?.Name ?? string.Empty;
         public string? Artist => this.Model?.Artist;
-        public bool IsPlaying => this.Model == this.playerService.Current?.Content;
+        public bool IsCurrentContent => this.Model?.Id == this.playerService.Current?.Content.Id;
+
+        [Reactive]
+        public AudioTrackViewModel? CurrentTrack { get; set; }
 
         public IReadOnlyList<AudioTrackViewModel>? Tracks
         {
