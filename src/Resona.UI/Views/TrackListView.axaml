@@ -34,7 +34,10 @@
 				Items="{Binding Tracks}"
 				>
 				<i:Interaction.Behaviors>
-					<behaviors:AutoScrollToPlayingBehavior />
+					<behaviors:AutoScrollToIndexBehavior 
+						CurrentIndex="{Binding CurrentTrack.Index}" 
+						Easing="SineEaseOut" 
+						ScrollDuration="0:0:1.0"/>
 				</i:Interaction.Behaviors>
 				
 				<ItemsControl.ItemTemplate>

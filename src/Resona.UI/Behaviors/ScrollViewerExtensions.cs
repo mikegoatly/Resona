@@ -20,7 +20,14 @@ namespace Resona.UI.Behaviors
                 Easing = easing ?? new LinearEasing(),
                 Children =
                 {
-                    new KeyFrame { Cue= new Cue(1D), Setters = { new Setter(ScrollViewer.OffsetProperty, targetOffset) }}
+                    new KeyFrame
+                    {
+                        Cue= new Cue(1D),
+                        Setters =
+                        {
+                            new Setter(ScrollViewer.OffsetProperty, targetOffset)
+                        }
+                    }
                 }
             };
 
