@@ -28,16 +28,22 @@ namespace Resona.UI.ViewModels
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public PlayerControlsViewModel()
-            : this(null!, null!, new FakePlayerService(), new FakeAlbumImageProvider())
+            : this(null!, null!, new FakePlayerService(), new FakeAlbumImageProvider(), new SleepOptionsViewModel())
         {
         }
 #endif
 
-        public PlayerControlsViewModel(RoutingState router, IScreen hostScreen, IPlayerService playerService, IAlbumImageProvider imageProvider)
+        public PlayerControlsViewModel(
+            RoutingState router,
+            IScreen hostScreen,
+            IPlayerService playerService,
+            IAlbumImageProvider imageProvider,
+            SleepOptionsViewModel sleepOptions)
             : base(router, hostScreen, "player")
         {
             this.playerService = playerService;
             this.imageProvider = imageProvider;
+            this.SleepOptions = sleepOptions;
             this.PlayPauseCommand = ReactiveCommand.Create(this.playerService.TogglePause);
 
             this.LoadCover(null);
@@ -142,6 +148,7 @@ namespace Resona.UI.ViewModels
         // Command to play/pause the current track
         public ReactiveCommand<Unit, Unit> PlayPauseCommand { get; private set; }
         public ReactiveCommand<Unit, IObservable<IRoutableViewModel>> NavigateToPlaying { get; }
+        public SleepOptionsViewModel SleepOptions { get; }
 
         private void LoadCover(AudioContent? audioContent)
         {

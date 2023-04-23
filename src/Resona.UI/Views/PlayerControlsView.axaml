@@ -7,7 +7,9 @@
 			  xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
 			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 xmlns:local="using:Resona.UI.Views"
              x:Class="Resona.UI.Views.PlayerControlsView"
+			 x:DataType="vm:PlayerControlsViewModel"
 			 x:Name="Root"
 			 Height="140"
 			 Background="#120810"
@@ -23,13 +25,13 @@
 	<Grid ClipToBounds="False">
 		<Slider Grid.Column="0"
 		IsEnabled="{Binding CanPlay}"
-	Grid.ColumnSpan="3"
-	Margin="131,-15,0,0"
-	VerticalAlignment="Top"
-	ClipToBounds="False"
-	Value="{Binding Position, Mode=TwoWay}"
-	Maximum="1"
-	Minimum="0" />
+		Grid.ColumnSpan="3"
+		Margin="131,-15,0,0"
+		VerticalAlignment="Top"
+		ClipToBounds="False"
+		Value="{Binding Position, Mode=TwoWay}"
+		Maximum="1"
+		Minimum="0" />
 
 		<DockPanel LastChildFill="True" Margin="0,30,0,0" Background="#1D0C19">
 			<DockPanel LastChildFill="True">
@@ -47,10 +49,12 @@
 						>
 						<Image Source="{Binding Cover^}"
 							   Stretch="UniformToFill"
+							   
 					   >
 							<i:Interaction.Behaviors>
 								<ia:EventTriggerBehavior EventName="Tapped">
-									<ia:InvokeCommandAction Command="{Binding DataContext.NavigateToPlaying, ElementName=Root}"/>
+									<ia:InvokeCommandAction 
+										Command="{Binding DataContext.NavigateToPlaying, ElementName=Root}"/>
 								</ia:EventTriggerBehavior>
 							</i:Interaction.Behaviors>
 						</Image>
@@ -76,6 +80,7 @@
 						Margin="10"
 						HorizontalAlignment="Right"
 						Spacing="5">
+
 				<Button Classes="primary circle"
 						Width="{StaticResource SkipButtonSize}"
 						Height="{StaticResource SkipButtonSize}"
@@ -86,6 +91,7 @@
 
 				<Button Classes="primary circle"
 						Command="{Binding PlayPauseCommand}"
+						x:CompileBindings="False"
 						Width="100"
 						IsEnabled="{Binding CanPlay}"
 						Height="85"
@@ -115,6 +121,31 @@
 					<icon:Icon
 						Value="fa fa-forward" />
 				</Button>
+
+				<DockPanel MinWidth="80" LastChildFill="True">
+					<Border IsVisible="{Binding SleepOptions.SleepModeActive}"
+							BorderThickness="2"
+							BorderBrush="{StaticResource PrimaryColor}"
+							CornerRadius="10"
+							VerticalAlignment="Center"
+							Padding="5,0,20,0"
+							Margin="5,0,-15,0">
+							
+						<TextBlock Text="{Binding SleepOptions.RemainingSleepTime, FallbackValue='1 hour'}" />
+					</Border>
+					<Button Classes="primary circle"
+							Width="40"
+							Height="40"
+							HorizontalAlignment="Right">
+						<icon:Icon Value="fa fa-stopwatch" />
+
+						<Button.Flyout>
+							<Flyout Placement="TopEdgeAlignedRight">
+								<local:SleepTimerOptionsView DataContext="{Binding SleepOptions}" />
+							</Flyout>
+						</Button.Flyout>
+					</Button>
+				</DockPanel>
 			</StackPanel>
 		</DockPanel>
 	</Grid>

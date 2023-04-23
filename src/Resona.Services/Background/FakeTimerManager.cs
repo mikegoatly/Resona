@@ -1,12 +1,15 @@
-﻿namespace Resona.Services.Background
+﻿using System.Reactive.Linq;
+
+namespace Resona.Services.Background
 {
 #if DEBUG
     public class FakeTimerManager : ITimerManager
     {
-        public Action? ShowConfiguration { get; set; }
         public Action? SleepTimerCompleted { get; set; }
-        public Action<TimeSpan>? SleepTimerUpdated { get; set; }
-        public Action<bool>? ScreenDimStateChanged { get; set; }
+
+        IObservable<TimeSpan?> ITimerManager.SleepTimerUpdated => Observable.Empty<TimeSpan?>();
+
+        IObservable<bool> ITimerManager.ScreenDimStateChanged => Observable.Empty<bool>();
 
         public void CancelSleepTimer()
         {

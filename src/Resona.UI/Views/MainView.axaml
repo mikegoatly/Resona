@@ -68,7 +68,7 @@
 			<Button Classes="danger circle" Grid.Column="1">
 				<icon:Icon Value="fa fa-power-off" />
 				<Button.Flyout>
-					<Flyout PlacementGravity="BottomRight">
+					<Flyout Placement="BottomEdgeAlignedRight">
 						<local:PowerOptions />
 					</Flyout>
 				</Button.Flyout>

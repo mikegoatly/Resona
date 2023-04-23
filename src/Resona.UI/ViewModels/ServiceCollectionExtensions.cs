@@ -17,6 +17,7 @@ namespace Resona.UI.ViewModels
             services.AddSingleton<LibraryViewModel>();
             services.AddSingleton<TrackListViewModel>();
             services.AddSingleton<PowerOptionsViewModel>();
+            services.AddSingleton<SleepOptionsViewModel>();
             services.AddSingleton<IScreen, MainWindowViewModel>(x => x.GetRequiredService<MainWindowViewModel>());
         }
 

@@ -2,6 +2,7 @@
 
 using ManagedBass;
 
+using Resona.Services.Background;
 using Resona.Services.Libraries;
 
 using Serilog;
@@ -45,15 +46,21 @@ namespace Resona.Services.Audio
 
         private static readonly ILogger logger = Log.ForContext<PlayerService>();
         private readonly Timer positionChangedTimer;
-
         private bool initialized;
         private int currentStream;
         private double channelLength;
         private bool paused;
 
-        public PlayerService()
+        public PlayerService(ITimerManager timerManager)
         {
             this.positionChangedTimer = new(this.RaisePositionChanged);
+            timerManager.SleepTimerCompleted += () =>
+            {
+                if (this.paused == false)
+                {
+                    this.TogglePause();
+                }
+            };
         }
 
         public IObservable<PlaybackState> PlaybackStateChanged => this.playbackStateChanged;

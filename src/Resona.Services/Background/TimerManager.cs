@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Reactive.Subjects;
+
+using Microsoft.Extensions.Options;
 
 using Resona.Services.OS;
 
@@ -8,10 +10,9 @@ namespace Resona.Services.Background
 {
     public interface ITimerManager
     {
-        Action? ShowConfiguration { get; set; }
+        IObservable<TimeSpan?> SleepTimerUpdated { get; }
         Action? SleepTimerCompleted { get; set; }
-        Action<TimeSpan>? SleepTimerUpdated { get; set; }
-        Action<bool>? ScreenDimStateChanged { get; set; }
+        IObservable<bool> ScreenDimStateChanged { get; }
 
         void CancelSleepTimer();
         void ResetInactivityTimers();
@@ -52,6 +53,9 @@ namespace Resona.Services.Background
         private bool sleepTimerActive;
         private bool screenDimmed;
 
+        private readonly Subject<bool> screenDimStateChanged = new();
+        private readonly Subject<TimeSpan?> sleepTimerUpdated = new();
+
         public TimerManager(IOptions<SleepConfiguration> sleepConfiguration, IOsCommandExecutor osCommandExecutor)
         {
             this.configuration = sleepConfiguration.Value;
@@ -70,18 +74,15 @@ namespace Resona.Services.Background
         private void RestartTimer()
         {
             this.timer.Change(
-                // Adding an initial delay of 1 second ensures we don't fire a little early and miss a minute's change
-                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(0.1),
                 TimeSpan.FromMinutes(1));
         }
 
-        public Action? ShowConfiguration { get; set; }
+        public IObservable<TimeSpan?> SleepTimerUpdated => this.sleepTimerUpdated;
 
-        public Action<TimeSpan>? SleepTimerUpdated { get; set; }
+        public IObservable<bool> ScreenDimStateChanged => this.screenDimStateChanged;
 
         public Action? SleepTimerCompleted { get; set; }
-
-        public Action<bool>? ScreenDimStateChanged { get; set; }
 
         public void ResetInactivityTimers()
         {
@@ -95,6 +96,8 @@ namespace Resona.Services.Background
 
         public void SetSleepTimer(TimeSpan duration)
         {
+            logger.Information("Setting sleep timer to {Duration}", duration);
+
             this.sleepTime = DateTime.UtcNow.Add(duration);
 
             this.sleepTimerActive = true;
@@ -111,6 +114,8 @@ namespace Resona.Services.Background
 
         private void TimerTick(object? state)
         {
+            logger.Debug("Timer tick");
+
             var now = DateTime.UtcNow;
 
             if (this.sleepTimerActive)
@@ -122,7 +127,7 @@ namespace Resona.Services.Background
                 else
                 {
                     logger.Debug("Sleep timer ticked");
-                    this.SleepTimerUpdated?.Invoke(this.sleepTime - now);
+                    this.sleepTimerUpdated.OnNext(this.sleepTime - now);
                 }
             }
 
@@ -139,7 +144,7 @@ namespace Resona.Services.Background
                 logger.Information("Changing screen dim state to {State}", dimmed);
 
                 this.screenDimmed = dimmed;
-                this.ScreenDimStateChanged?.Invoke(dimmed);
+                this.screenDimStateChanged.OnNext(dimmed);
             }
         }
 
@@ -148,6 +153,7 @@ namespace Resona.Services.Background
             logger.Information("Sleep timer ended");
 
             this.sleepTimerActive = false;
+            this.sleepTimerUpdated.OnNext(null);
             this.SleepTimerCompleted?.Invoke();
         }
     }

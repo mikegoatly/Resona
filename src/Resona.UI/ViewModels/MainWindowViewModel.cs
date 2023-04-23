@@ -44,9 +44,7 @@ namespace Resona.UI.ViewModels
 
             this.ScreenInteraction = ReactiveCommand.Create(this.timerManager.ResetInactivityTimers);
 
-            Observable.FromEvent<bool>(
-                x => this.timerManager.ScreenDimStateChanged += x,
-                x => this.timerManager.ScreenDimStateChanged -= x)
+            this.timerManager.ScreenDimStateChanged
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.ScreenDimPercentage = x ? 0.8D : 0D);
         }
