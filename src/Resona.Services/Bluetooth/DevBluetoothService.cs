@@ -7,9 +7,12 @@ namespace Resona.Services.Bluetooth
     public sealed class DevBluetoothService : BluetoothServiceBase
     {
         private readonly Timer scanTimer;
+        private int scanCount;
         private static readonly ConcurrentBag<BluetoothDevice> knownDevices = new()
         {
-            new BluetoothDevice("Initial device", Guid.NewGuid().ToString(), true)
+            new BluetoothDevice("Initial device 1", Guid.NewGuid().ToString(), false),
+            new BluetoothDevice("Initial device 2", Guid.NewGuid().ToString(), false),
+            new BluetoothDevice("Initial device 3", Guid.NewGuid().ToString(), true)
         };
 
         public DevBluetoothService()
@@ -20,16 +23,19 @@ namespace Resona.Services.Bluetooth
 
         public override Task StartScanningAsync(CancellationToken cancellationToken)
         {
+            this.scanCount = 0;
             this.OnStartScanning();
             this.scanTimer.Change(1000, 1000);
+
             return Task.CompletedTask;
         }
 
         public override Task StopScanningAsync(CancellationToken cancellationToken)
         {
+            this.scanTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
             this.OnStopScanning();
 
-            this.scanTimer.Change(Timeout.Infinite, Timeout.Infinite);
             return Task.CompletedTask;
         }
 
@@ -40,13 +46,18 @@ namespace Resona.Services.Bluetooth
 
         public override async Task ConnectAsync(BluetoothDevice device, CancellationToken cancellationToken)
         {
+            device.Status = DeviceStatus.Connecting;
             await Task.Delay(2000, cancellationToken);
-            device.Connected = true;
             this.OnDeviceConnected(device);
         }
 
         private void ScanTimerTicked(object? state)
         {
+            if (++this.scanCount == 2)
+            {
+                this.StopScanningAsync(default);
+            }
+
             var address = Guid.NewGuid().ToString();
             var newDevice = new BluetoothDevice("Test " + address, address);
 

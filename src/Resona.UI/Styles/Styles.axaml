@@ -8,6 +8,9 @@
 				<Button Classes="primary circle">
 					<TextBlock>Test</TextBlock>
 				</Button>
+				<Button Classes="secondary circle">
+					<TextBlock>Test</TextBlock>
+				</Button>
 				<Button Classes="danger circle">
 					<TextBlock>Test</TextBlock>
 				</Button>
@@ -52,6 +55,12 @@
 	<Style Selector="Button.primary">
 		<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
 		<Setter Property="BorderBrush" Value="{StaticResource PrimaryColorDark}" />
+		<Setter Property="BorderThickness" Value="2" />
+	</Style>
+
+	<Style Selector="Button.secondary">
+		<Setter Property="Background" Value="{StaticResource SecondaryColor}" />
+		<Setter Property="BorderBrush" Value="{StaticResource SecondaryColorDark}" />
 		<Setter Property="BorderThickness" Value="2" />
 	</Style>
 

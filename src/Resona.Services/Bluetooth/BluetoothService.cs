@@ -7,9 +7,9 @@ namespace Resona.Services.Bluetooth
 {
     public interface IBluetoothService
     {
-        event EventHandler<BluetoothDevice>? BluetoothDeviceDiscovered;
-        event EventHandler<BluetoothDevice>? BluetoothDeviceConnected;
-        event EventHandler? ScanningStopped;
+        IObservable<BluetoothDevice> BluetoothDeviceDiscovered { get; }
+        IObservable<BluetoothDevice> BluetoothDeviceConnected { get; }
+        IObservable<bool> ScanningStateChanged { get; }
 
         Task StartScanningAsync(CancellationToken cancellationToken);
         Task ConnectAsync(BluetoothDevice device, CancellationToken cancellationToken);
@@ -32,73 +32,87 @@ namespace Resona.Services.Bluetooth
             using var nameContext = LogContext.PushProperty("Name", device.Name);
             using var macContext = LogContext.PushProperty("Mac", device.Address);
 
-            var adapter = await this.GetAdapterAsync();
-
-            var bluezDevice = await adapter.GetDeviceAsync(device.Address);
-            if (bluezDevice == null)
-            {
-                logger.Information("Device not found");
-                return;
-            }
-
-            var properties = await bluezDevice.GetAllAsync();
-            if (properties.Connected)
-            {
-                logger.Information("Already connected");
-                this.OnDeviceConnected(device);
-                return;
-            }
-
-            if (!properties.Paired)
-            {
-                //logger.Information("Removing device");
-                //await adapter.RemoveDeviceAsync(bluezDevice.ObjectPath);
-
-                logger.Information("Trusting device");
-                await bluezDevice.SetTrustedAsync(true);
-
-                logger.Information("Pairing device");
-                await bluezDevice.PairAsync();
-            }
-
-            // We use a semaphore to control the code flow so that we 
-            // wait until the device is fully connected before continuing
-            var connectedSemaphore = new SemaphoreSlim(0);
-            Task BluezDeviceConnected(Device sender, BlueZEventArgs eventArgs)
-            {
-                connectedSemaphore.Release();
-                return Task.CompletedTask;
-            }
-
-            bluezDevice.Connected += BluezDeviceConnected;
-
-            logger.Information("Connecting device");
-
             try
             {
-                await bluezDevice.ConnectAsync();
+                var adapter = await this.GetAdapterAsync();
 
-                if (await connectedSemaphore.WaitAsync(5000))
+                var bluezDevice = await adapter.GetDeviceAsync(device.Address);
+                if (bluezDevice == null)
                 {
+                    logger.Information("Device not found");
+                    return;
+                }
+
+                if (await bluezDevice.GetConnectedAsync())
+                {
+                    logger.Information("Already connected");
+                    device.Status = DeviceStatus.Connected;
                     this.OnDeviceConnected(device);
+                    return;
+                }
+
+                device.Status = DeviceStatus.Connecting;
+
+                if (await bluezDevice.GetPairedAsync())
+                {
+                    logger.Information("Already paired");
                 }
                 else
                 {
-                    logger.Warning("Timeout connecting to device");
+                    //logger.Information("Removing device");
+                    //await adapter.RemoveDeviceAsync(bluezDevice.ObjectPath);
 
-                    // Refetch the properties to see if we have connected
-                    properties = await bluezDevice.GetAllAsync();
-                    if (properties.Connected)
+                    logger.Information("Trusting device");
+                    await bluezDevice.SetTrustedAsync(true);
+
+                    logger.Information("Pairing device");
+                    await bluezDevice.PairAsync();
+                }
+
+                // We use a semaphore to control the code flow so that we 
+                // wait until the device is fully connected before continuing
+                var connectedSemaphore = new SemaphoreSlim(0);
+                Task BluezDeviceConnected(Device sender, BlueZEventArgs eventArgs)
+                {
+                    logger.Debug("Received connected event");
+                    connectedSemaphore.Release();
+                    return Task.CompletedTask;
+                }
+
+                bluezDevice.Connected += BluezDeviceConnected;
+
+                logger.Information("Connecting device");
+
+                try
+                {
+                    await bluezDevice.ConnectAsync();
+
+                    if (await connectedSemaphore.WaitAsync(5000, cancellationToken))
                     {
-                        logger.Information("Device did connect");
                         this.OnDeviceConnected(device);
-                        return;
+                    }
+                    else
+                    {
+                        logger.Warning("Timeout connecting to device");
+
+                        // Re-fetch the properties to see if we have connected
+                        if (await bluezDevice.GetConnectedAsync())
+                        {
+                            logger.Information("Device connected");
+                            this.OnDeviceConnected(device);
+                            return;
+                        }
                     }
                 }
+                finally
+                {
+                    bluezDevice.Connected -= BluezDeviceConnected;
+                }
             }
-            finally
+            catch (Exception ex)
             {
-                bluezDevice.Connected -= BluezDeviceConnected;
+                logger.Error(ex, "Error connecting to device");
+                device.Status = DeviceStatus.NotConnected;
             }
         }
 
@@ -118,17 +132,12 @@ namespace Resona.Services.Bluetooth
 
         private static async Task<BluetoothDevice> GetDeviceInfoAsync(Device device)
         {
-            //Console.WriteLine($"Name: {props.Name} Alias: {props.Alias} Paired: {props.Paired} Trusted: {props.Trusted} Connected: {props.Connected} Address: {props.Address} RSSI: {props.RSSI}");
-            //if (props.ManufacturerData != null)
-            //{
-            //    foreach (var prop in props.ManufacturerData)
-            //    {
-            //        Console.WriteLine($"    {prop.Key}:{prop.Value}");
-            //    }
-            //}
+            var name = await device.GetNameAsync();
+            var alias = await device.GetAliasAsync();
+            var address = await device.GetAddressAsync();
+            var connected = await device.GetConnectedAsync();
 
-            var props = await device.GetAllAsync();
-            return new BluetoothDevice(props.Alias ?? props.Address, props.Address, props.Connected);
+            return new BluetoothDevice(alias ?? name ?? address, address, connected);
         }
 
         private async Task<Adapter> GetAdapterAsync()

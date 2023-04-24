@@ -65,7 +65,11 @@
 				<icon:Icon Value="fa fa-arrow-left" />
 			</Button>
 
-			<Button Classes="danger circle" Grid.Column="1">
+			<StackPanel Orientation="Horizontal" Grid.Column="1" Spacing="5">
+			<Button Classes="secondary circle" Command="{Binding NavigateToSettingsCommand}" >
+				<icon:Icon Value="fa fa-gear" />
+			</Button>
+			<Button Classes="danger circle">
 				<icon:Icon Value="fa fa-power-off" />
 				<Button.Flyout>
 					<Flyout Placement="BottomEdgeAlignedRight">
@@ -73,6 +77,7 @@
 					</Flyout>
 				</Button.Flyout>
 			</Button>
+			</StackPanel>
 		</Grid>
 
 		<local:PlayerControlsView

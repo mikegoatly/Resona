@@ -4,6 +4,7 @@ using ReactiveUI;
 
 using Resona.UI.ViewModels;
 using Resona.UI.Views;
+using Resona.UI.Views.Settings;
 
 namespace Resona.UI.ViewModels
 {
@@ -18,6 +19,8 @@ namespace Resona.UI.ViewModels
             services.AddSingleton<TrackListViewModel>();
             services.AddSingleton<PowerOptionsViewModel>();
             services.AddSingleton<SleepOptionsViewModel>();
+            services.AddSingleton<BluetoothSettingsViewModel>();
+            services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<IScreen, MainWindowViewModel>(x => x.GetRequiredService<MainWindowViewModel>());
         }
 
@@ -27,6 +30,7 @@ namespace Resona.UI.ViewModels
             services.AddScoped<IViewFor<AudioSelectionViewModel>, AudioSelectionView>();
             services.AddScoped<IViewFor<LibraryViewModel>, LibraryView>();
             services.AddScoped<IViewFor<TrackListViewModel>, TrackListView>();
+            services.AddScoped<IViewFor<SettingsViewModel>, SettingsView>();
         }
     }
 }

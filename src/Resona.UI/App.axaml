@@ -16,6 +16,9 @@
 		<Color x:Key="DangerColor">Red</Color>
 		<Color x:Key="PrimaryColorDark">#4A2040</Color>
 		<Color x:Key="PrimaryColor">#9F6BA0</Color>
+		<Color x:Key="SecondaryColorDark">#30362F</Color>
+		<Color x:Key="SecondaryColor">#638763</Color>
+		<Color x:Key="SuccessColor">Green</Color>
 	</Application.Resources>
 	
     <Application.Styles>

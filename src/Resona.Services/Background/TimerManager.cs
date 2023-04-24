@@ -114,8 +114,6 @@ namespace Resona.Services.Background
 
         private void TimerTick(object? state)
         {
-            logger.Debug("Timer tick");
-
             var now = DateTime.UtcNow;
 
             if (this.sleepTimerActive)

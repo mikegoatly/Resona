@@ -47,6 +47,8 @@ namespace Resona.UI.ViewModels
             this.timerManager.ScreenDimStateChanged
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.ScreenDimPercentage = x ? 0.8D : 0D);
+
+            this.NavigateToSettingsCommand = ReactiveCommand.Create(() => this.Router.Navigate.Execute(Locator.Current.GetService<SettingsViewModel>()!));
         }
 
         public RoutingState Router { get; }
@@ -63,5 +65,6 @@ namespace Resona.UI.ViewModels
             get => this.screenDimPercentage;
             set => this.RaiseAndSetIfChanged(ref this.screenDimPercentage, value);
         }
+        public ReactiveCommand<Unit, IObservable<IRoutableViewModel>> NavigateToSettingsCommand { get; }
     }
 }

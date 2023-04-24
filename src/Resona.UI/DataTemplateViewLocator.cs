@@ -23,7 +23,7 @@ namespace Resona.UI
 
             var name = typeName.Replace("ViewModel", "View");
 
-            Log.Debug("Building view {ViewTypeName} for {ViewModelTypeName}", typeName, name);
+            Log.Verbose("Building view {ViewTypeName} for {ViewModelTypeName}", typeName, name);
 
             var type = Type.GetType(name);
 

@@ -12,11 +12,15 @@ namespace Resona.Services
     {
         public static void AddResonaServices(this IServiceCollection services)
         {
-#if DEBUG
-            services.AddSingleton<IBluetoothService, DevBluetoothService>();
-#else
-            services.AddSingleton<IBluetoothService, BluetoothService>();
-#endif
+            // Fr linux platform register real service, for windows register dev:
+            if (OperatingSystem.IsLinux())
+            {
+                services.AddSingleton<IBluetoothService, BluetoothService>();
+            }
+            else
+            {
+                services.AddSingleton<IBluetoothService, DevBluetoothService>();
+            }
 
             services.AddScoped<IAudioProvider, AudioProvider>();
 

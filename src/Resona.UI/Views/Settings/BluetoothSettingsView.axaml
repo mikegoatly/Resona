@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 xmlns:vm="using:Resona.UI.ViewModels"
+             x:Class="Resona.UI.Views.Settings.BluetoothSettingsView"
+			 xmlns:devices="using:Resona.Services.Bluetooth"
+			 xmlns:converters="using:Avalonia.Controls.Converters"
+			 x:Name="Root">
+	<Design.DataContext>
+		<vm:BluetoothSettingsViewModel />
+	</Design.DataContext>
+
+	<UserControl.Resources>
+		<converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+	</UserControl.Resources>
+
+	<Grid MaxWidth="600">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<DockPanel LastChildFill="True">
+			<TextBlock
+				Margin="0,5,0,5"
+				Text="Bluetooth devices:" />
+			<Button Command="{Binding RefreshDeviceList}" Classes="primary"
+					HorizontalAlignment="Right">
+				<StackPanel Orientation="Horizontal" Spacing="10">
+					<TextBlock>Scan for more devices </TextBlock>
+					<icon:Icon Value="fa fa-arrows-rotate"/>
+				</StackPanel>
+			</Button>
+		</DockPanel>
+
+		<ScrollViewer Margin="0,10,0,0" Grid.Row="1">
+			<ItemsControl Items="{Binding BluetoothDevices}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Button Classes="secondary"
+								Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
+								CommandParameter="{Binding}"
+								Classes.connected="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.Connected}}"
+								Classes.disconnected="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.NotConnected}}"
+								Classes.connecting="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.Connecting}}"
+								HorizontalAlignment="Stretch">
+							<Button.Styles>
+								<Style Selector="Button.connected">
+									<Style Selector="^ Border">
+										<Setter Property="Background" Value="White"/>
+									</Style>
+									<Style Selector="^ icon|Icon">
+										<Setter Property="Value" Value="fa fa-headphones" />
+										<Setter Property="Foreground" Value="{StaticResource SuccessColor}" />
+									</Style>
+								</Style>
+								<Style Selector="Button.disconnected">
+									<Style Selector="^ Border">
+										<Setter Property="Background" Value="Transparent"/>
+									</Style>
+									<Style Selector="^ icon|Icon">
+										<Setter Property="Value" Value="fa fa-headphones" />
+										<Setter Property="Foreground" Value="Transparent" />
+									</Style>
+								</Style>
+								<Style Selector="Button.connecting">
+									<Style Selector="^ Border">
+										<Setter Property="Background" Value="White"/>
+									</Style>
+									<Style Selector="^ icon|Icon">
+										<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
+										<Setter Property="Value" Value="fa fa-satellite-dish" />
+									</Style>
+								</Style>
+							</Button.Styles>
+
+							<DockPanel LastChildFill="True">
+								<Border CornerRadius="5" 
+										Padding="2">
+									<icon:Icon
+										FontSize="20"
+									/>
+								</Border>
+								<TextBlock Text="{Binding Name}"
+										   HorizontalAlignment="Center"/>
+							</DockPanel>
+
+						</Button>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

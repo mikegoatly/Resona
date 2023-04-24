@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using System.Reactive.Subjects;
+
+using Serilog;
 
 namespace Resona.Services.Bluetooth
 {
@@ -6,16 +8,19 @@ namespace Resona.Services.Bluetooth
     {
         private readonly Timer scanTimeout;
         private readonly ILogger logger;
-
-        public event EventHandler<BluetoothDevice>? BluetoothDeviceDiscovered;
-        public event EventHandler<BluetoothDevice>? BluetoothDeviceConnected;
-        public event EventHandler? ScanningStopped;
+        private readonly Subject<BluetoothDevice> bluetoothDeviceDiscovered = new();
+        private readonly Subject<BluetoothDevice> bluetoothDeviceConnected = new();
+        private readonly Subject<bool> scanningStateChanged = new();
 
         public BluetoothServiceBase(ILogger logger)
         {
             this.scanTimeout = new Timer(this.ScanTimeoutTicked, null, Timeout.Infinite, Timeout.Infinite);
             this.logger = logger;
         }
+
+        public IObservable<BluetoothDevice> BluetoothDeviceDiscovered => this.bluetoothDeviceDiscovered;
+        public IObservable<BluetoothDevice> BluetoothDeviceConnected => this.bluetoothDeviceConnected;
+        public IObservable<bool> ScanningStateChanged => this.scanningStateChanged;
 
         public void Dispose()
         {
@@ -35,6 +40,8 @@ namespace Resona.Services.Bluetooth
         {
             this.logger.Information("Starting scanning...");
 
+            this.scanningStateChanged.OnNext(true);
+
             this.scanTimeout.Change(30000, Timeout.Infinite);
         }
 
@@ -42,19 +49,21 @@ namespace Resona.Services.Bluetooth
         {
             this.logger.Information("Stopping scanning...");
             this.scanTimeout.Change(Timeout.Infinite, Timeout.Infinite);
-            ScanningStopped?.Invoke(this, EventArgs.Empty);
+            this.scanningStateChanged.OnNext(false);
         }
 
         protected void OnDeviceDiscovered(BluetoothDevice device)
         {
             this.logger.Information("New device discovered: {Name} [{Mac}]", device.Name, device.Address);
-            BluetoothDeviceDiscovered?.Invoke(this, device);
+            this.bluetoothDeviceDiscovered.OnNext(device);
         }
 
         protected void OnDeviceConnected(BluetoothDevice device)
         {
+            device.Status = DeviceStatus.Connected;
+
             this.logger.Information("Device connected: {Name} [{Mac}]", device.Name, device.Address);
-            BluetoothDeviceConnected?.Invoke(this, device);
+            this.bluetoothDeviceConnected.OnNext(device);
         }
 
         private async void ScanTimeoutTicked(object? state)
