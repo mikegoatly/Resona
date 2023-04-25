@@ -5,6 +5,14 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Resona.UI.Views.Settings.SettingsView"
              xmlns:local="using:Resona.UI.Views.Settings">
-	<local:BluetoothSettingsView DataContext="{Binding BluetoothSettings}" />
+	<TabControl Margin="80,20" MaxWidth="800">
+		
+		<TabItem Header="Audio settings">
+			<local:AudioSettingsView DataContext="{Binding AudioSettings}" />
+		</TabItem>
+		<TabItem Header="Bluetooth settings">
+			<local:BluetoothSettingsView DataContext="{Binding BluetoothSettings}" />
+		</TabItem>
+	</TabControl>
 
 </UserControl>

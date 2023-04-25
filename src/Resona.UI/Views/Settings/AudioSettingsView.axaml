@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:vm="using:Resona.UI.ViewModels"
+			 xmlns:converters="using:Avalonia.Controls.Converters"
+			 xmlns:audio="using:Resona.Services.Audio"
+			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+             x:Class="Resona.UI.Views.Settings.AudioSettingsView">
+	<Design.DataContext>
+		<vm:AudioSettingsViewModel />
+	</Design.DataContext>
+
+	<UserControl.Resources>
+		<converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+	</UserControl.Resources>
+
+	<Grid>
+		<TextBlock Text="Test" />
+		<ScrollViewer MaxWidth="600">
+			<ItemsControl Items="{Binding AudioDevices}" >
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Button Classes="secondary"
+								Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
+								CommandParameter="{Binding}"
+								Classes.audio-out="{Binding Kind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static audio:AudioDeviceKind.AudioOut}}"
+								Classes.bluetooth="{Binding Kind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static audio:AudioDeviceKind.Bluetooth}}"
+								Classes.speaker="{Binding Kind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static audio:AudioDeviceKind.Speaker}}"
+								Classes.inactive="{Binding !Active}"
+								HorizontalAlignment="Stretch">
+							<Button.Styles>
+								<Style Selector="Button.audio-out">
+									<Style Selector="^ icon|Icon">
+										<Setter Property="Value" Value="fa fa-headphones" />
+									</Style>
+								</Style>
+								<Style Selector="Button.bluetooth">
+									<Style Selector="^ icon|Icon">
+										<Setter Property="Value" Value="fa fa-bluetooth" />
+									</Style>
+								</Style>
+								<Style Selector="Button.speaker">
+									<Style Selector="^ icon|Icon">
+										<Setter Property="Value" Value="fa fa-volume-off" />
+									</Style>
+								</Style>
+								<Style Selector="Button.inactive">
+									<Setter Property="Opacity" Value="0.5" />
+								</Style>
+							</Button.Styles>
+
+							<DockPanel LastChildFill="True">
+								<Border CornerRadius="5"
+										Background="White"
+										Padding="2">
+									<icon:Icon
+										Foreground="{StaticResource	PrimaryColor}"
+										FontSize="20"
+									/>
+								</Border>
+								<TextBlock Text="{Binding Name}"
+										   HorizontalAlignment="Center"/>
+							</DockPanel>
+
+						</Button>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

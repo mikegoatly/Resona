@@ -8,6 +8,7 @@
 			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 x:Name="Root"
 			 xmlns:behaviors="using:Resona.UI.Behaviors"
+			 Classes="pagehost"
              x:Class="Resona.UI.Views.TrackListView">
 	<Design.DataContext>
 		<vm:TrackListViewModel />
@@ -29,7 +30,7 @@
 				</Style>
 			</Style>
 		</Grid.Styles>
-		<ScrollViewer Margin="20" >
+		<ScrollViewer Margin="80,20">
 			<ItemsControl
 				Items="{Binding Tracks}"
 				>

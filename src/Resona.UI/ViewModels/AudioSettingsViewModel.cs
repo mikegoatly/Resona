@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Reactive;
+using System.Reactive.Linq;
+
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Resona.Services.Audio;
+
+using Serilog;
+
+namespace Resona.UI.ViewModels
+{
+    public class AudioSettingsViewModel : ReactiveObject
+    {
+#if DEBUG
+        public AudioSettingsViewModel()
+            : this(new DevAudioOutputService())
+        {
+        }
+#endif
+
+        public AudioSettingsViewModel(IAudioOutputService audioOutputService)
+        {
+            audioOutputService.AudioOutputs
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
+                {
+                    Log.Information("Properties changed");
+                    this.AudioDevices = x;
+                });
+
+            this.ConnectDeviceCommand = ReactiveCommand.CreateFromTask<AudioDevice>(
+                x => audioOutputService.SetActiveDeviceAsync(x, default));
+        }
+
+        [Reactive]
+        public IReadOnlyList<AudioDevice>? AudioDevices { get; set; }
+        public ReactiveCommand<AudioDevice, Unit> ConnectDeviceCommand { get; }
+    }
+}

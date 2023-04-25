@@ -1,4 +1,4 @@
-﻿namespace Resona.Services.Bluetooth
+﻿namespace Resona.Services.Audio
 {
     public class AudioDevice
     {

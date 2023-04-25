@@ -17,12 +17,12 @@ namespace Resona.Services.Bluetooth
         Task StopScanningAsync(CancellationToken cancellationToken);
     }
 
-    public class BluetoothService : BluetoothServiceBase
+    public class LinuxBluetoothService : BluetoothServiceBase
     {
         private Adapter? adapter;
-        private static readonly ILogger logger = Log.ForContext<BluetoothService>();
+        private static readonly ILogger logger = Log.ForContext<LinuxBluetoothService>();
 
-        public BluetoothService()
+        public LinuxBluetoothService()
             : base(logger)
         {
         }

@@ -8,13 +8,13 @@
 			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 x:Name="Root"
 			 xmlns:local="using:Resona.UI.Views"
+			 Classes="pagehost"
              x:Class="Resona.UI.Views.LibraryView">
 	<Design.DataContext>
 		<vm:LibraryViewModel />
 	</Design.DataContext>
 
-	<ScrollViewer MaxWidth="800"
-			 Margin="50,20,0,0">
+	<ScrollViewer MaxWidth="800" Margin="80,20">
 		<ItemsRepeater Items="{Binding AudioContent^}"
 				 Background="Transparent"
 				   >

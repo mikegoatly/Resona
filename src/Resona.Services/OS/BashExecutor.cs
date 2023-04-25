@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Serilog;
+
 namespace Resona.Services.OS
 {
     public enum BashCommandKind
@@ -42,6 +44,7 @@ namespace Resona.Services.OS
 
     internal static class BashExecutor
     {
+        private static readonly ILogger logger = Log.ForContext("StaticClass", "BashExecutor");
         public delegate bool TryMatchOutput<TResult>(string line, [NotNullWhen(true)] out TResult? result);
 
         public static async Task<string> ExecuteBatchAsync<TResult>(
@@ -71,7 +74,7 @@ namespace Resona.Services.OS
                 }
                 else
                 {
-                    Console.WriteLine("Output: " + line);
+                    logger.Debug("Output: {Line}", line);
 
                     if (waitMatcher != null && waitMatcher.IsMatch(line))
                     {
@@ -99,11 +102,11 @@ namespace Resona.Services.OS
                     switch (commandQueue.Dequeue())
                     {
                         case BashCommand command:
-                            Console.WriteLine("Executing command " + command.Command);
+                            logger.Debug("Executing command {Command}", command.Command);
                             p.StandardInput.WriteLine(command.Command);
                             break;
                         case WaitForOutput waitForOutput:
-                            Console.WriteLine("Waiting for " + waitForOutput.OutputMatcher.ToString());
+                            logger.Debug("Waiting for {ExpectedOutput}", waitForOutput.OutputMatcher.ToString());
                             waitMatcher = waitForOutput.OutputMatcher;
                             if (!await outputSemaphore.WaitAsync(TimeSpan.FromSeconds(60), cancellationToken))
                             {
@@ -118,11 +121,11 @@ namespace Resona.Services.OS
             finally
             {
                 // Force exit bash whether or not we're successful
-                Console.WriteLine("Killing process...");
+                logger.Debug("Killing process...");
                 p.Kill();
             }
 
-            Console.WriteLine("Finished");
+            logger.Debug("Finished");
             return output.ToString();
         }
 
@@ -133,11 +136,12 @@ namespace Resona.Services.OS
         {
             var output = new List<TResult>();
 
-            Console.WriteLine("Executing: " + command);
+            logger.Debug("Executing: {Command}", command);
 
             var info = new ProcessStartInfo("bash", $"-c \"{command}\"")
             {
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false
             };
 
@@ -145,11 +149,20 @@ namespace Resona.Services.OS
             p.OutputDataReceived += (sender, args) =>
             {
                 var line = args.Data;
-                Console.WriteLine($"Output: {line}");
+                logger.Debug("Output: {Line}", line);
                 if (line != default && lineProcessor(line, out var match))
                 {
-                    Console.WriteLine($"Matched: {match}");
+                    logger.Debug("Matched: {Match}", match);
                     output.Add(match);
+                }
+            };
+
+            p.ErrorDataReceived += (sender, args) =>
+            {
+                var errorLine = args.Data;
+                if (!string.IsNullOrEmpty(errorLine))
+                {
+                    logger.Error("Error: {ErrorLine}", errorLine);
                 }
             };
 
@@ -158,6 +171,8 @@ namespace Resona.Services.OS
             p.BeginOutputReadLine();
 
             await p.WaitForExitAsync(cancellationToken);
+
+            logger.Debug("Exit code {ExitCode}", p.ExitCode);
 
             return output;
         }

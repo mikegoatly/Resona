@@ -1,4 +1,5 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	<Design.PreviewWith>
 
@@ -15,7 +16,7 @@
 					<TextBlock>Test</TextBlock>
 				</Button>
 				<Button Classes="warning">
-					<TextBlock>Test</TextBlock>
+					<icon:Icon Value="fa fa-exclamation" />
 				</Button>
 
 				<Button Classes="warning circle" IsEnabled="False">
@@ -45,8 +46,6 @@
 		</Style>
 	</Style>
 
-
-
 	<Style Selector="TextBlock">
 		<Setter Property="FontSize" Value="20" />
 		<Setter Property="FontFamily" Value="resm:Resona.UI.Fonts.Acme-Regular.ttf?assembly=Resona.UI#Acme" />
@@ -74,6 +73,10 @@
 		<Setter Property="Background" Value="{StaticResource WarningColor}" />
 		<Setter Property="BorderBrush" Value="{StaticResource WarningColorDark}" />
 		<Setter Property="BorderThickness" Value="2" />
+	</Style>
+
+	<Style Selector="Button > icon|Icon">
+		<Setter Property="FontSize" Value="20" />
 	</Style>
 
 	<Style Selector="Button.circle > Border">
