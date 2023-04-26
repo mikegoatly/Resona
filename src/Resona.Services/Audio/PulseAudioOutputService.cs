@@ -40,9 +40,9 @@ namespace Resona.Services.Audio
                 .Replay(1)
                 .RefCount();
 
-            logger.Information("Starting PulseAudioOutputService");
-
             this.refreshTrigger.OnNext(Unit.Default);
+
+            logger.Information("Starting Pulse Audio service");
         }
 
         public IObservable<IReadOnlyList<AudioDevice>> AudioOutputs { get; private set; }
@@ -69,8 +69,15 @@ namespace Resona.Services.Audio
 
                 if (device.Mac != null)
                 {
-                    device.Name = await GetNameFromMacAsync(device.Mac, cancellationToken);
+                    device.FriendlyName = await GetNameFromMacAsync(device.Mac, cancellationToken);
                 }
+            }
+
+            // Special case - if no audio devices are selected then we pick the first one in the list and activate it.
+            if (devices.Any(x => x.Active) == false && devices.Count > 0)
+            {
+                logger.Information("No active audio device detected; switching to the default one");
+                await this.SetActiveDeviceAsync(devices[0], cancellationToken);
             }
 
             return devices;
@@ -78,7 +85,7 @@ namespace Resona.Services.Audio
 
         public async Task SetActiveDeviceAsync(AudioDevice device, CancellationToken cancellationToken)
         {
-            logger.Information($"Setting active audio device to #{device.Id} - {device.Name}");
+            logger.Information($"Setting active audio device to #{device.Id} - {device.FriendlyName}");
 
             await BashExecutor.ExecuteAsync(
                 $"pactl set-default-sink {device.Id}",
@@ -90,12 +97,25 @@ namespace Resona.Services.Audio
 
         private async void OnBluetoothDeviceConnected(BluetoothDevice device)
         {
-            logger.Information("Attempting to switch audio output to {DeviceName}", device.Name);
+            logger.Information("Attempting to switch audio output to {DeviceName}, {Mac}", device.Name, device.Address);
 
             try
             {
                 var audioOutputs = await this.ListAsync(default);
                 var audioOutput = audioOutputs.FirstOrDefault(x => x.Mac == device.Address);
+                if (audioOutput != null)
+                {
+                    logger.Information("Matched audio output on MAC address");
+                }
+                else
+                {
+                    audioOutput = audioOutputs.FirstOrDefault(x => x.FriendlyName == device.Name);
+                    if (audioOutput != null)
+                    {
+                        logger.Information("Matched audio output on name");
+                    }
+                }
+
                 if (audioOutput == null)
                 {
                     logger.Information("Cannot find audio output with matching mac address - the device may not have audio output capabilities");
@@ -156,10 +176,10 @@ namespace Resona.Services.Audio
         private static bool ProcessListOutputLine(string line, [NotNullWhen(true)] out AudioDevice? result)
         {
             var match = bluezSinkOutputRegex.Match(line);
-            if (match.Success && int.TryParse(match.Groups["Number"].Value, out var number) && number != 2)
+            if (match.Success && int.TryParse(match.Groups["Number"].Value, out var channelNumber) && channelNumber != 2)
             {
                 var mac = match.Groups["Mac"];
-                if (number > 1 && !mac.Success)
+                if (channelNumber > 1 && !mac.Success)
                 {
                     logger.Error("MISSING BLUETOOTH MAC!");
                     result = default;
@@ -167,24 +187,27 @@ namespace Resona.Services.Audio
                 }
 
                 result = new AudioDevice(
-                    number,
-                    number switch
+                    channelNumber,
+                    channelNumber switch
                     {
                         < 2 => null,
                         _ => mac.Value.Replace('_', ':')
                     },
-                    number switch
-                    {
-                        0 => "Speaker",
-                        1 => "Audio out",
-                        _ => match.Groups["Name"].Value
-                    },
-                    number switch
+                    match.Groups["Name"].Value,
+                    channelNumber switch
                     {
                         0 => AudioDeviceKind.Speaker,
                         1 => AudioDeviceKind.AudioOut,
                         _ => AudioDeviceKind.Bluetooth
-                    });
+                    })
+                {
+                    FriendlyName = channelNumber switch
+                    {
+                        0 => "Speaker",
+                        1 => "Audio out",
+                        _ => match.Groups["Name"].Value
+                    }
+                };
 
                 return true;
             }

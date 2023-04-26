@@ -136,6 +136,52 @@ namespace Resona.Services.OS
         {
             var output = new List<TResult>();
 
+            await ExecuteBashCommandAsync(
+                command,
+                (sender, args) =>
+                {
+                    var line = args.Data;
+                    logger.Verbose("Output: {Line}", line);
+                    if (line != default && lineProcessor(line, out var match))
+                    {
+                        logger.Debug("Matched: {@Match}", match);
+                        output.Add(match);
+                    }
+                },
+                cancellationToken);
+
+            return output;
+        }
+
+        public static async Task<string> ExecuteAsync(
+            string command,
+            CancellationToken cancellationToken)
+        {
+            var output = new StringBuilder();
+            await ExecuteBashCommandAsync(
+                command,
+                (sender, args) =>
+                {
+                    var line = args.Data;
+                    if (line == null)
+                    {
+                        output.AppendLine();
+                    }
+                    else
+                    {
+                        output.AppendLine(line);
+                    }
+                },
+                cancellationToken);
+
+            var result = output.ToString();
+            logger.Debug("Output: {Line}", result);
+
+            return result;
+        }
+
+        private static async Task ExecuteBashCommandAsync(string command, DataReceivedEventHandler outputReceived, CancellationToken cancellationToken)
+        {
             logger.Debug("Executing: {Command}", command);
 
             var info = new ProcessStartInfo("bash", $"-c \"{command}\"")
@@ -146,16 +192,8 @@ namespace Resona.Services.OS
             };
 
             var p = new Process() { StartInfo = info };
-            p.OutputDataReceived += (sender, args) =>
-            {
-                var line = args.Data;
-                logger.Debug("Output: {Line}", line);
-                if (line != default && lineProcessor(line, out var match))
-                {
-                    logger.Debug("Matched: {Match}", match);
-                    output.Add(match);
-                }
-            };
+
+            p.OutputDataReceived += outputReceived;
 
             p.ErrorDataReceived += (sender, args) =>
             {
@@ -172,43 +210,7 @@ namespace Resona.Services.OS
 
             await p.WaitForExitAsync(cancellationToken);
 
-            logger.Debug("Exit code {ExitCode}", p.ExitCode);
-
-            return output;
-        }
-
-        public static async Task<string> ExecuteAsync(
-            string command,
-            CancellationToken cancellationToken)
-        {
-            var output = new StringBuilder();
-            var info = new ProcessStartInfo("bash", $"-c \"{command}\"")
-            {
-                RedirectStandardOutput = true,
-                UseShellExecute = false
-            };
-
-            var p = new Process() { StartInfo = info };
-            p.OutputDataReceived += (sender, args) =>
-            {
-                var line = args.Data;
-                if (line == null)
-                {
-                    output.AppendLine();
-                }
-                else
-                {
-                    output.AppendLine(line);
-                }
-            };
-
-            p.Start();
-
-            p.BeginOutputReadLine();
-
-            await p.WaitForExitAsync(cancellationToken);
-
-            return output.ToString();
+            logger.Verbose("Exit code {ExitCode}", p.ExitCode);
         }
     }
 }

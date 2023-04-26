@@ -6,9 +6,9 @@ namespace Resona.Services.Audio
     {
         private readonly AudioDevice[] devices = new[]
         {
-            new AudioDevice(0, null, "Speakers", AudioDeviceKind.Speaker),
-            new AudioDevice(1, null, "Speakers", AudioDeviceKind.AudioOut),
-            new AudioDevice(3, null, "Taotronics", AudioDeviceKind.Bluetooth) { Active = true }
+            new AudioDevice(0, null, "Speakers", AudioDeviceKind.Speaker) { FriendlyName ="Speakers"},
+            new AudioDevice(1, null, "Audio Out", AudioDeviceKind.AudioOut) { FriendlyName ="Audio Out"},
+            new AudioDevice(3, null, "Bluetooth headphones", AudioDeviceKind.Bluetooth) { Active = true, FriendlyName = "Bluetooth headphones" }
         };
 
         private readonly ReplaySubject<IReadOnlyList<AudioDevice>> audioDevices = new();
@@ -27,7 +27,8 @@ namespace Resona.Services.Audio
                 knownDevice.Active = device == knownDevice;
             }
 
-            this.audioDevices.OnNext(this.devices);
+            // ToList is a hack here - it tricks the UI into updating the list even though the list itself is the same
+            this.audioDevices.OnNext(this.devices.ToList());
 
             return Task.CompletedTask;
         }

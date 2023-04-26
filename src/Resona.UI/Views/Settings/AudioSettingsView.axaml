@@ -6,6 +6,7 @@
 			 xmlns:vm="using:Resona.UI.ViewModels"
 			 xmlns:converters="using:Avalonia.Controls.Converters"
 			 xmlns:audio="using:Resona.Services.Audio"
+			 x:Name="Root"
 			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
              x:Class="Resona.UI.Views.Settings.AudioSettingsView">
 	<Design.DataContext>
@@ -17,7 +18,6 @@
 	</UserControl.Resources>
 
 	<Grid>
-		<TextBlock Text="Test" />
 		<ScrollViewer MaxWidth="600">
 			<ItemsControl Items="{Binding AudioDevices}" >
 				<ItemsControl.ItemTemplate>
@@ -25,11 +25,13 @@
 						<Button Classes="secondary"
 								Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
 								CommandParameter="{Binding}"
+								Height="50"
 								Classes.audio-out="{Binding Kind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static audio:AudioDeviceKind.AudioOut}}"
 								Classes.bluetooth="{Binding Kind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static audio:AudioDeviceKind.Bluetooth}}"
 								Classes.speaker="{Binding Kind, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static audio:AudioDeviceKind.Speaker}}"
 								Classes.inactive="{Binding !Active}"
-								HorizontalAlignment="Stretch">
+								HorizontalAlignment="Stretch"
+								Margin="0,0,0,5">
 							<Button.Styles>
 								<Style Selector="Button.audio-out">
 									<Style Selector="^ icon|Icon">
@@ -57,10 +59,11 @@
 										Padding="2">
 									<icon:Icon
 										Foreground="{StaticResource	PrimaryColor}"
-										FontSize="20"
+										FontSize="30"
 									/>
 								</Border>
-								<TextBlock Text="{Binding Name}"
+								<TextBlock Text="{Binding FriendlyName}"
+										   VerticalAlignment="Center"
 										   HorizontalAlignment="Center"/>
 							</DockPanel>
 
