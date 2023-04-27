@@ -22,6 +22,14 @@ namespace Resona.UI.Behaviors
                 {
                     new KeyFrame
                     {
+                        Cue= new Cue(0D),
+                        Setters =
+                        {
+                            new Setter(ScrollViewer.OffsetProperty, scrollViewer.Offset)
+                        }
+                    },
+                    new KeyFrame
+                    {
                         Cue= new Cue(1D),
                         Setters =
                         {

@@ -37,7 +37,7 @@
 				<i:Interaction.Behaviors>
 					<behaviors:AutoScrollToIndexBehavior 
 						CurrentIndex="{Binding CurrentTrack.Index}" 
-						Easing="SineEaseOut" 
+						Easing="QuinticEaseOut" 
 						ScrollDuration="0:0:1.0"/>
 				</i:Interaction.Behaviors>
 				
