@@ -10,6 +10,7 @@
 			 xmlns:local="using:Resona.UI.Views"
              x:Class="Resona.UI.Views.PlayerControlsView"
 			 x:DataType="vm:PlayerControlsViewModel"
+			 xmlns:converters="using:Resona.UI.Converters"
 			 x:Name="Root"
 			 Height="140"
 			 Background="#120810"
@@ -20,6 +21,7 @@
 
 	<UserControl.Resources>
 		<x:Double x:Key="SkipButtonSize">75</x:Double>
+		<converters:VolumeToFontAwesomeConverter x:Key="VolumeToFontAwesomeConverter" />
 	</UserControl.Resources>
 
 	<Grid ClipToBounds="False">
@@ -53,7 +55,7 @@
 					   >
 							<i:Interaction.Behaviors>
 								<ia:EventTriggerBehavior EventName="Tapped">
-									<ia:InvokeCommandAction 
+									<ia:InvokeCommandAction
 										Command="{Binding DataContext.NavigateToPlaying, ElementName=Root}"/>
 								</ia:EventTriggerBehavior>
 							</i:Interaction.Behaviors>
@@ -122,30 +124,62 @@
 						Value="fa fa-forward" />
 				</Button>
 
-				<DockPanel MinWidth="80" LastChildFill="True">
-					<Border IsVisible="{Binding SleepOptions.SleepModeActive}"
-							BorderThickness="2"
-							BorderBrush="{StaticResource PrimaryColor}"
-							CornerRadius="10"
-							VerticalAlignment="Center"
-							Padding="5,0,20,0"
-							Margin="5,0,-15,0">
-							
-						<TextBlock Text="{Binding SleepOptions.RemainingSleepTime, FallbackValue='1 hour'}" />
-					</Border>
+				<StackPanel Orientation="Vertical"
+							VerticalAlignment="Center">
+
 					<Button Classes="primary circle"
-							Width="40"
-							Height="40"
-							HorizontalAlignment="Right">
-						<icon:Icon Value="fa fa-stopwatch" />
+								Width="40"
+								Height="40"
+								Margin="0,0,0,10"
+								HorizontalAlignment="Right">
+						<icon:Icon Value="{Binding Volume, Converter={StaticResource VolumeToFontAwesomeConverter}}" />
 
 						<Button.Flyout>
 							<Flyout Placement="TopEdgeAlignedRight">
-								<local:SleepTimerOptionsView DataContext="{Binding SleepOptions}" />
+								<StackPanel Orientation="Vertical"
+											HorizontalAlignment="Center">
+									<icon:Icon Value="fa fa-volume-high" 
+											   FontSize="30"/>
+									<Slider 
+										Margin="0,5"
+										Value="{Binding Volume}"
+										Maximum="1"
+										Minimum="0"
+										Orientation="Vertical"
+										VerticalAlignment="Stretch" 
+										Height="200" />
+									<icon:Icon Value="fa fa-volume-off" 
+											   FontSize="20"/>
+								</StackPanel>
 							</Flyout>
 						</Button.Flyout>
 					</Button>
-				</DockPanel>
+					
+					<DockPanel MinWidth="80" LastChildFill="True">
+						<Border IsVisible="{Binding SleepOptions.SleepModeActive}"
+								BorderThickness="2"
+								BorderBrush="{StaticResource PrimaryColor}"
+								CornerRadius="10"
+									VerticalAlignment="Center"
+								Padding="5,0,20,0"
+								Margin="5,0,-15,0">
+
+							<TextBlock Text="{Binding SleepOptions.RemainingSleepTime, FallbackValue='1 hour'}" />
+						</Border>
+						<Button Classes="primary circle"
+								Width="40"
+								Height="40"
+								HorizontalAlignment="Right">
+							<icon:Icon Value="fa fa-stopwatch" />
+
+							<Button.Flyout>
+								<Flyout Placement="TopEdgeAlignedRight">
+									<local:SleepTimerOptionsView DataContext="{Binding SleepOptions}" />
+								</Flyout>
+							</Button.Flyout>
+						</Button>
+					</DockPanel>
+				</StackPanel>
 			</StackPanel>
 		</DockPanel>
 	</Grid>

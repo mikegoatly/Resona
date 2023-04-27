@@ -23,6 +23,18 @@
 					<TextBlock>Test</TextBlock>
 				</Button>
 			</StackPanel>
+			<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+				<icon:Icon Value="fa fa-volume-high"
+						   FontSize="30"/>
+				<Slider
+					Maximum="1"
+					Minimum="0"
+					Orientation="Vertical"
+					VerticalAlignment="Stretch"
+					Height="200" />
+				<icon:Icon Value="fa fa-volume-off"
+						   FontSize="20"/>
+			</StackPanel>
 		</StackPanel>
 	</Design.PreviewWith>
 
@@ -43,6 +55,26 @@
 				<Setter Property="CornerRadius" Value="500" />
 			</Style>
 			
+		</Style>
+	</Style>
+
+	<Style Selector="Slider:vertical">
+		<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
+
+		<Style Selector="^:pointerover">
+			<Style Selector="^ /template/ RepeatButton#PART_DecreaseButton">
+				<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+			</Style>
+		</Style>
+		<Style Selector="^ Thumb">
+			<Setter Property="Width" Value="40" />
+			<Setter Property="Height" Value="30" />
+
+			<Style Selector="^ /template/ Border">
+				<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+				<Setter Property="CornerRadius" Value="500" />
+			</Style>
+
 		</Style>
 	</Style>
 

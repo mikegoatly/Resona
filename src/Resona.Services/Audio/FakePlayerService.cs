@@ -22,6 +22,7 @@ namespace Resona.Services.Audio
 
         public IObservable<PlayingTrack> PlayingTrackChanged { get; } = new[] { new PlayingTrack(content, track) }.ToObservable();
         public IObservable<PlaybackState> PlaybackStateChanged { get; } = new[] { new PlaybackState(PlaybackStateKind.Playing, 0D) }.ToObservable();
+        public float Volume { get; set; } = 0.3F;
 
         public void Dispose()
         {

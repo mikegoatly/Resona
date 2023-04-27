@@ -32,6 +32,7 @@ namespace Resona.Services.Audio
         double Position { get; set; }
         IObservable<PlaybackState> PlaybackStateChanged { get; }
         IObservable<PlayingTrack> PlayingTrackChanged { get; }
+        float Volume { get; set; }
 
         void Next();
         void Play(AudioContent audiobook, AudioTrack? chapter, double position);
@@ -50,6 +51,7 @@ namespace Resona.Services.Audio
         private int currentStream;
         private double channelLength;
         private bool paused;
+        private float volume = 0.3F;
 
         public PlayerService(ITimerManager timerManager)
         {
@@ -104,6 +106,7 @@ namespace Resona.Services.Audio
                         logger.Debug("Setting end sync");
 
                         Bass.ChannelSetSync(this.currentStream, SyncFlags.End, 0L, this.PlaybackEnded);
+                        this.SetStreamVolume(this.currentStream);
 
                         if (this.Paused == false)
                         {
@@ -179,6 +182,16 @@ namespace Resona.Services.Audio
         public bool HasPreviousTrack => this.Current?.Track.TrackIndex > 0;
         public bool HasNextTrack => this.Current?.Track.TrackIndex < this.Current?.Content.Tracks.Count - 1;
 
+        public float Volume
+        {
+            get => this.volume;
+            set
+            {
+                this.volume = value;
+                this.SetStreamVolume(this.currentStream);
+            }
+        }
+
         public PlayingTrack? Current { get; private set; }
 
         public void TogglePause()
@@ -248,6 +261,14 @@ namespace Resona.Services.Audio
             }
 
             GC.SuppressFinalize(this);
+        }
+
+        private void SetStreamVolume(int currentStream)
+        {
+            if (this.currentStream != 0)
+            {
+                Bass.ChannelSetAttribute(this.currentStream, ChannelAttribute.Volume, this.Volume);
+            }
         }
 
         private void PlaybackEnded(int Handle, int Channel, int Data, nint User)

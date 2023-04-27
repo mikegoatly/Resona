@@ -130,6 +130,19 @@ namespace Resona.UI.ViewModels
             }
         }
 
+        public float Volume
+        {
+            get => this.playerService.Volume;
+            set
+            {
+                if (this.Volume != value)
+                {
+                    this.RaisePropertyChanged(nameof(this.Volume));
+                    this.playerService.Volume = value;
+                }
+            }
+        }
+
         public ReactiveCommand<Unit, Unit> MovePreviousCommand { get; private set; }
 
         public ReactiveCommand<Unit, Unit> MoveNextCommand { get; private set; }
