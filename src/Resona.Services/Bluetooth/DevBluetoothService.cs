@@ -11,7 +11,7 @@ namespace Resona.Services.Bluetooth
         private static readonly ConcurrentBag<BluetoothDevice> knownDevices = new()
         {
             new BluetoothDevice("Initial device 1", Guid.NewGuid().ToString(), false),
-            new BluetoothDevice("Initial device 2", Guid.NewGuid().ToString(), false),
+            new BluetoothDevice("Initial device 2", Guid.NewGuid().ToString(), false, true),
             new BluetoothDevice("Initial device 3", Guid.NewGuid().ToString(), true)
         };
 
@@ -48,6 +48,7 @@ namespace Resona.Services.Bluetooth
         {
             device.Status = DeviceStatus.Connecting;
             await Task.Delay(2000, cancellationToken);
+            device.Status = DeviceStatus.Connected;
             this.OnDeviceConnected(device);
         }
 
@@ -64,6 +65,12 @@ namespace Resona.Services.Bluetooth
             this.OnDeviceDiscovered(newDevice);
 
             knownDevices.Add(newDevice);
+        }
+
+        public override Task ForgetDeviceAsync(BluetoothDevice device, CancellationToken cancellationToken)
+        {
+            device.Paired = false;
+            return Task.CompletedTask;
         }
     }
 }

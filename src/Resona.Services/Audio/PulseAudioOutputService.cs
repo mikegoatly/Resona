@@ -33,6 +33,7 @@ namespace Resona.Services.Audio
         public PulseAudioOutputService(IBluetoothService bluetoothService)
         {
             bluetoothService.BluetoothDeviceConnected.Subscribe(this.OnBluetoothDeviceConnected);
+            bluetoothService.BluetoothDeviceDisconnected.Subscribe(this.OnBluetoothDeviceDisconnected);
 
             // Update the audioOutputs collection when a new list is emitted.
             this.AudioOutputs = this.refreshTrigger
@@ -42,14 +43,14 @@ namespace Resona.Services.Audio
 
             this.refreshTrigger.OnNext(Unit.Default);
 
-            logger.Information("Starting Pulse Audio service");
+            logger.Verbose("Starting Pulse Audio service");
         }
 
         public IObservable<IReadOnlyList<AudioDevice>> AudioOutputs { get; private set; }
 
         private async Task<IReadOnlyList<AudioDevice>> ListAsync(CancellationToken cancellationToken)
         {
-            logger.Information("Reading list of devices");
+            logger.Verbose("Reading list of Pulse Audio devices");
 
             var devices = await BashExecutor.ExecuteAsync<AudioDevice>(
                 "pactl list short sinks",
@@ -80,6 +81,15 @@ namespace Resona.Services.Audio
                 await this.SetActiveDeviceAsync(devices[0], cancellationToken);
             }
 
+            if (logger.IsEnabled(Serilog.Events.LogEventLevel.Debug))
+            {
+                logger.Debug("Found {Count} audio devices", devices.Count);
+                foreach (var device in devices)
+                {
+                    logger.Debug("   {Id} - {Name} - {Mac} - {Active} - {Kind}", device.Id, device.Name, device.Mac, device.Active, device.Kind);
+                }
+            }
+
             return devices;
         }
 
@@ -93,6 +103,31 @@ namespace Resona.Services.Audio
 
             // Refresh the available list of devices
             this.refreshTrigger.OnNext(Unit.Default);
+        }
+
+        private async void OnBluetoothDeviceDisconnected(Unit unit)
+        {
+            try
+            {
+                var remainingOutputs = await this.ListAsync(default);
+
+                // If after a bluetooth device disconnect the active output is the Audio Out, this is probably not what we want;
+                // switching to the speaker is probably the best option.
+                if (remainingOutputs.Any(x => x.Kind == AudioDeviceKind.AudioOut && x.Active))
+                {
+                    logger.Information("Switching to speaker after bluetooth disconnect");
+                    await this.SetActiveDeviceAsync(remainingOutputs[0], default);
+                }
+                else
+                {
+                    // Just refresh the list of audio devices. This will switch over to speakers if needed.
+                    this.refreshTrigger.OnNext(Unit.Default);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error refreshing audio device list after bluetooth disconnect");
+            }
         }
 
         private async void OnBluetoothDeviceConnected(BluetoothDevice device)
@@ -118,7 +153,7 @@ namespace Resona.Services.Audio
 
                 if (audioOutput == null)
                 {
-                    logger.Information("Cannot find audio output with matching mac address - the device may not have audio output capabilities");
+                    logger.Warning("Cannot find audio output with matching mac address");
                 }
                 else
                 {
@@ -176,7 +211,7 @@ namespace Resona.Services.Audio
         private static bool ProcessListOutputLine(string line, [NotNullWhen(true)] out AudioDevice? result)
         {
             var match = bluezSinkOutputRegex.Match(line);
-            if (match.Success && int.TryParse(match.Groups["Number"].Value, out var channelNumber) && channelNumber != 2)
+            if (match.Success && int.TryParse(match.Groups["Number"].Value, out var channelNumber))
             {
                 var mac = match.Groups["Mac"];
                 if (channelNumber > 1 && !mac.Success)

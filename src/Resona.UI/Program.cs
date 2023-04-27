@@ -21,6 +21,7 @@ using Resona.UI.ViewModels;
 
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting;
 
 using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
@@ -104,7 +105,8 @@ namespace Resona.UI
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Is(logLevel)
-                .WriteTo.File(Settings.Default.LogFile, rollingInterval: RollingInterval.Day)
+                .Enrich.FromLogContext()
+                .WriteTo.Console(new JournalLogLevelCustomFormatter())
                 .CreateLogger();
 
             if (!parsedLogLevel)
@@ -152,6 +154,30 @@ namespace Resona.UI
                 .WithIcons(container => container
                 .Register<FontAwesomeIconProvider>())
                 .UseReactiveUI();
+        }
+    }
+
+    public class JournalLogLevelCustomFormatter : ITextFormatter
+    {
+        public void Format(LogEvent logEvent, TextWriter output)
+        {
+            // https://wiki.archlinux.org/title/Systemd/Journal
+            var journalPriority = logEvent.Level switch
+            {
+                LogEventLevel.Verbose => 7, // Debug
+                LogEventLevel.Debug => 6, // Informational
+                LogEventLevel.Information => 5, // Notice
+                LogEventLevel.Warning => 4, // Warning
+                LogEventLevel.Error => 3, // Error
+                LogEventLevel.Fatal => 2, // Critical
+                _ => throw new NotImplementedException("Unknown LogEventLevel " + logEvent.Level),
+            };
+
+            output.WriteLine($"<{journalPriority}> {logEvent.RenderMessage()}");
+            if (logEvent.Exception != null)
+            {
+                output.WriteLine(logEvent.Exception.ToString());
+            }
         }
     }
 }

@@ -10,7 +10,7 @@
 		<TabItem Header="Audio settings">
 			<local:AudioSettingsView DataContext="{Binding AudioSettings}" />
 		</TabItem>
-		<TabItem Header="Bluetooth settings">
+		<TabItem Header="Bluetooth devices">
 			<local:BluetoothSettingsView DataContext="{Binding BluetoothSettings}" />
 		</TabItem>
 	</TabControl>

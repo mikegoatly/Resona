@@ -1,4 +1,5 @@
-﻿using System.Reactive.Subjects;
+﻿using System.Reactive;
+using System.Reactive.Subjects;
 
 using Serilog;
 
@@ -10,6 +11,7 @@ namespace Resona.Services.Bluetooth
         private readonly ILogger logger;
         private readonly Subject<BluetoothDevice> bluetoothDeviceDiscovered = new();
         private readonly Subject<BluetoothDevice> bluetoothDeviceConnected = new();
+        private readonly Subject<Unit> bluetoothDeviceDisconnected = new();
         private readonly Subject<bool> scanningStateChanged = new();
 
         public BluetoothServiceBase(ILogger logger)
@@ -20,6 +22,7 @@ namespace Resona.Services.Bluetooth
 
         public IObservable<BluetoothDevice> BluetoothDeviceDiscovered => this.bluetoothDeviceDiscovered;
         public IObservable<BluetoothDevice> BluetoothDeviceConnected => this.bluetoothDeviceConnected;
+        public IObservable<Unit> BluetoothDeviceDisconnected => this.bluetoothDeviceDisconnected;
         public IObservable<bool> ScanningStateChanged => this.scanningStateChanged;
 
         public void Dispose()
@@ -38,7 +41,7 @@ namespace Resona.Services.Bluetooth
 
         protected void OnStartScanning()
         {
-            this.logger.Information("Starting scanning...");
+            this.logger.Debug("Starting scanning...");
 
             this.scanningStateChanged.OnNext(true);
 
@@ -47,7 +50,7 @@ namespace Resona.Services.Bluetooth
 
         protected void OnStopScanning()
         {
-            this.logger.Information("Stopping scanning...");
+            this.logger.Debug("Stopping scanning...");
             this.scanTimeout.Change(Timeout.Infinite, Timeout.Infinite);
             this.scanningStateChanged.OnNext(false);
         }
@@ -60,10 +63,15 @@ namespace Resona.Services.Bluetooth
 
         protected void OnDeviceConnected(BluetoothDevice device)
         {
-            device.Status = DeviceStatus.Connected;
-
             this.logger.Information("Device connected: {Name} [{Mac}]", device.Name, device.Address);
             this.bluetoothDeviceConnected.OnNext(device);
+        }
+
+        protected void OnDeviceDisconnected()
+        {
+            this.logger.Information("Device disconnected");
+
+            this.bluetoothDeviceDisconnected.OnNext(Unit.Default);
         }
 
         private async void ScanTimeoutTicked(object? state)
@@ -82,5 +90,6 @@ namespace Resona.Services.Bluetooth
         public abstract Task ConnectAsync(BluetoothDevice device, CancellationToken cancellationToken);
         public abstract Task<IReadOnlyList<BluetoothDevice>> GetKnownDevicesAsync(CancellationToken cancellationToken);
         public abstract Task StopScanningAsync(CancellationToken cancellationToken);
+        public abstract Task ForgetDeviceAsync(BluetoothDevice device, CancellationToken cancellationToken);
     }
 }

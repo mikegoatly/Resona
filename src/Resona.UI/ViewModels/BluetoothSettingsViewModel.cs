@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-
-using DynamicData;
+using System.Threading.Tasks;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -17,9 +15,8 @@ namespace Resona.UI.ViewModels
 {
     public class BluetoothSettingsViewModel : ReactiveObject
     {
-        private readonly ObservableAsPropertyHelper<ObservableCollection<BluetoothDevice>> bluetoothDevices;
-        private static readonly ILogger logger = Log.ForContext<BluetoothSettingsViewModel>();
         private readonly IBluetoothService bluetoothService;
+        private static readonly ILogger logger = Log.ForContext<BluetoothSettingsViewModel>();
 
 #if DEBUG
         public BluetoothSettingsViewModel()
@@ -33,6 +30,13 @@ namespace Resona.UI.ViewModels
         {
             this.bluetoothService = bluetoothService;
 
+            this.RefreshDeviceList = ReactiveCommand.CreateFromTask(
+                this.bluetoothService.StartScanningAsync,
+                this.WhenAnyValue(x => x.IsScanning, x => x == false));
+
+            var task = this.ResyncDeviceListAsync();
+
+
             this.bluetoothService.ScanningStateChanged
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.ScanningStateChanged);
@@ -41,33 +45,29 @@ namespace Resona.UI.ViewModels
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.BluetoothDeviceDiscovered);
 
-            this.RefreshDeviceList = ReactiveCommand.CreateFromTask(
-                this.bluetoothService.StartScanningAsync,
-                this.WhenAnyValue(x => x.IsScanning, x => x == false));
-
-            this.bluetoothDevices = Observable
-                .FromAsync(this.bluetoothService.GetKnownDevicesAsync)
+            this.bluetoothService.BluetoothDeviceDisconnected
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Select(x => new ObservableCollection<BluetoothDevice>(x))
-                .ToProperty(this, x => x.BluetoothDevices);
+                .Subscribe(this.BluetoothDeviceDisconnected);
 
             this.ConnectDeviceCommand = ReactiveCommand.CreateFromTask<BluetoothDevice>(
                 x => this.bluetoothService.ConnectAsync(x, default));
-
-            // Trigger the refresh command immediately to populate the list
-            this.RefreshDeviceList.Execute().Subscribe().Dispose();
         }
 
-        private void BluetoothDeviceDiscovered(BluetoothDevice device)
+        private async void BluetoothDeviceDisconnected(Unit unit)
         {
-            // This is running on the main thread, so we can safely modify the collection
-            var duplicate = this.BluetoothDevices.FirstOrDefault(x => x.Address == device.Address);
-            if (duplicate != null)
-            {
-                logger.Debug("Replacing duplicate detected device with address {Address}", device.Address);
-                this.BluetoothDevices.Replace(duplicate, device);
-            }
-            else
+            await this.ResyncDeviceListAsync();
+        }
+
+        private async void BluetoothDeviceDiscovered(BluetoothDevice device)
+        {
+            await this.ResyncDeviceListAsync();
+        }
+
+        private async Task ResyncDeviceListAsync()
+        {
+            this.BluetoothDevices.Clear();
+
+            foreach (var device in await this.bluetoothService.GetKnownDevicesAsync(default))
             {
                 this.BluetoothDevices.Add(device);
             }
@@ -79,7 +79,7 @@ namespace Resona.UI.ViewModels
         }
 
         public ReactiveCommand<BluetoothDevice, Unit> ConnectDeviceCommand { get; }
-        public ObservableCollection<BluetoothDevice> BluetoothDevices => this.bluetoothDevices.Value;
+        public ObservableCollection<BluetoothDevice> BluetoothDevices { get; } = new ObservableCollection<BluetoothDevice>();
 
         [Reactive]
         public bool IsScanning { get; set; }

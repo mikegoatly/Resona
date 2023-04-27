@@ -8,8 +8,6 @@ using ReactiveUI.Fody.Helpers;
 
 using Resona.Services.Audio;
 
-using Serilog;
-
 namespace Resona.UI.ViewModels
 {
     public class AudioSettingsViewModel : ReactiveObject
@@ -25,11 +23,7 @@ namespace Resona.UI.ViewModels
         {
             audioOutputService.AudioOutputs
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x =>
-                {
-                    Log.Information("Properties changed");
-                    this.AudioDevices = x;
-                });
+                .Subscribe(x => this.AudioDevices = x);
 
             this.ConnectDeviceCommand = ReactiveCommand.CreateFromTask<AudioDevice>(
                 x => audioOutputService.SetActiveDeviceAsync(x, default));

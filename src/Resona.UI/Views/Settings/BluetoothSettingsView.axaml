@@ -6,6 +6,7 @@
 			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
 			 xmlns:vm="using:Resona.UI.ViewModels"
              x:Class="Resona.UI.Views.Settings.BluetoothSettingsView"
+			 xmlns:local="using:Resona.UI.Views.Settings"
 			 xmlns:devices="using:Resona.Services.Bluetooth"
 			 xmlns:converters="using:Avalonia.Controls.Converters"
 			 x:Name="Root">
@@ -16,6 +17,54 @@
 	<UserControl.Resources>
 		<converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
 	</UserControl.Resources>
+
+	<UserControl.Styles>
+		<Style Selector="Border.device">
+			<Setter Property="Background" Value="{StaticResource SecondaryColor}" />
+			<Setter Property="BorderBrush" Value="{StaticResource SecondaryColorDark}" />
+			<Setter Property="CornerRadius" Value="5" />
+			<Setter Property="ClipToBounds" Value="True" />
+			<Setter Property="Height" Value="50" />
+			<Setter Property="Margin" Value="0,0,0,5" />
+
+			<Style Selector="^ TextBlock">
+				<Setter Property="VerticalAlignment" Value="Center" />
+			</Style>
+
+			<Style Selector="^ Border">
+				<Setter Property="Background" Value="White"/>
+				<Setter Property="CornerRadius" Value="5" />
+				<Setter Property="Padding" Value="5" />
+				<Setter Property="Margin" Value="0,0,10,0" />
+
+				<Style Selector="^ icon|Icon">
+					<Setter Property="FontSize" Value="20" />
+				</Style>
+			</Style>
+
+			<Style Selector="^.connected">
+				<Style Selector="^ icon|Icon">
+					<Setter Property="Value" Value="fa fa-check" />
+					<Setter Property="Foreground" Value="{StaticResource SuccessColor}" />
+				</Style>
+			</Style>
+			<Style Selector="^.disconnected">
+				<Style Selector="^ Border">
+					<Setter Property="Background" Value="Transparent"/>
+				</Style>
+				<Style Selector="^ icon|Icon">
+					<Setter Property="Value" Value="fa fa-headphones" />
+					<Setter Property="Foreground" Value="Transparent" />
+				</Style>
+			</Style>
+			<Style Selector="^.connecting">
+				<Style Selector="^ icon|Icon">
+					<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
+					<Setter Property="Value" Value="fa fa-ellipsis" />
+				</Style>
+			</Style>
+		</Style>
+	</UserControl.Styles>
 
 	<Grid MaxWidth="600">
 		<Grid.RowDefinitions>
@@ -37,55 +86,23 @@
 			<ItemsControl Items="{Binding BluetoothDevices}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Button Classes="secondary"
-								Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
-								CommandParameter="{Binding}"
+						<Border Classes="device"
 								Classes.connected="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.Connected}}"
 								Classes.disconnected="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.NotConnected}}"
-								Classes.connecting="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.Connecting}}"
-								HorizontalAlignment="Stretch">
-							<Button.Styles>
-								<Style Selector="Button.connected">
-									<Style Selector="^ Border">
-										<Setter Property="Background" Value="White"/>
-									</Style>
-									<Style Selector="^ icon|Icon">
-										<Setter Property="Value" Value="fa fa-check" />
-										<Setter Property="Foreground" Value="{StaticResource SuccessColor}" />
-									</Style>
-								</Style>
-								<Style Selector="Button.disconnected">
-									<Style Selector="^ Border">
-										<Setter Property="Background" Value="Transparent"/>
-									</Style>
-									<Style Selector="^ icon|Icon">
-										<Setter Property="Value" Value="fa fa-headphones" />
-										<Setter Property="Foreground" Value="Transparent" />
-									</Style>
-								</Style>
-								<Style Selector="Button.connecting">
-									<Style Selector="^ Border">
-										<Setter Property="Background" Value="White"/>
-									</Style>
-									<Style Selector="^ icon|Icon">
-										<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
-										<Setter Property="Value" Value="fa fa-ellipsis" />
-									</Style>
-								</Style>
-							</Button.Styles>
-
-							<DockPanel LastChildFill="True">
-								<Border CornerRadius="5" 
-										Padding="2">
-									<icon:Icon
-										FontSize="20"
-									/>
-								</Border>
-								<TextBlock Text="{Binding Name}"
-										   HorizontalAlignment="Center"/>
-							</DockPanel>
-
-						</Button>
+								Classes.connecting="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.Connecting}}">
+							<Button Background="Transparent"
+									Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
+									CommandParameter="{Binding}"
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch">
+								<DockPanel LastChildFill="True" VerticalAlignment="Center">
+									<Border>
+										<icon:Icon />
+									</Border>
+									<TextBlock Text="{Binding Name}"/>
+								</DockPanel>
+							</Button>
+						</Border>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>

@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -33,7 +35,12 @@ namespace Resona.UI
             var syncer = Locator.Current.GetService<ILibrarySyncer>();
             if (syncer != null)
             {
-                syncer.StartSync();
+                Task.Run(async () =>
+                {
+                    // Wait for the application to warm up before hitting the storage with a sync process
+                    await Task.Delay(3000);
+                    syncer.StartSync();
+                });
             }
             else
             {

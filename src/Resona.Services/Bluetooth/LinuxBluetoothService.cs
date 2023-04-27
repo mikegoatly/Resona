@@ -1,4 +1,7 @@
-﻿using ProrepubliQ.DotNetBlueZ;
+﻿using System.Collections.Concurrent;
+using System.Reactive;
+
+using ProrepubliQ.DotNetBlueZ;
 
 using Serilog;
 using Serilog.Context;
@@ -9,16 +12,20 @@ namespace Resona.Services.Bluetooth
     {
         IObservable<BluetoothDevice> BluetoothDeviceDiscovered { get; }
         IObservable<BluetoothDevice> BluetoothDeviceConnected { get; }
+        IObservable<Unit> BluetoothDeviceDisconnected { get; }
         IObservable<bool> ScanningStateChanged { get; }
 
         Task StartScanningAsync(CancellationToken cancellationToken);
         Task ConnectAsync(BluetoothDevice device, CancellationToken cancellationToken);
         Task<IReadOnlyList<BluetoothDevice>> GetKnownDevicesAsync(CancellationToken cancellationToken);
         Task StopScanningAsync(CancellationToken cancellationToken);
+
+        Task ForgetDeviceAsync(BluetoothDevice device, CancellationToken cancellationToken);
     }
 
     public class LinuxBluetoothService : BluetoothServiceBase
     {
+        private readonly ConcurrentDictionary<string, (Device bluezDevice, BluetoothDevice device)> knownDevices = new();
         private Adapter? adapter;
         private static readonly ILogger logger = Log.ForContext<LinuxBluetoothService>();
 
@@ -39,35 +46,20 @@ namespace Resona.Services.Bluetooth
                 var bluezDevice = await adapter.GetDeviceAsync(device.Address);
                 if (bluezDevice == null)
                 {
-                    logger.Information("Device not found");
+                    logger.Warning("Device not found");
                     return;
                 }
 
                 if (await bluezDevice.GetConnectedAsync())
                 {
                     logger.Information("Already connected");
-                    device.Status = DeviceStatus.Connected;
                     this.OnDeviceConnected(device);
                     return;
                 }
 
                 device.Status = DeviceStatus.Connecting;
 
-                if (await bluezDevice.GetPairedAsync())
-                {
-                    logger.Information("Already paired");
-                }
-                else
-                {
-                    //logger.Information("Removing device");
-                    //await adapter.RemoveDeviceAsync(bluezDevice.ObjectPath);
-
-                    logger.Information("Trusting device");
-                    await bluezDevice.SetTrustedAsync(true);
-
-                    logger.Information("Pairing device");
-                    await bluezDevice.PairAsync();
-                }
+                await this.EnsureDevicePaired(bluezDevice);
 
                 // We use a semaphore to control the code flow so that we 
                 // wait until the device is fully connected before continuing
@@ -112,32 +104,124 @@ namespace Resona.Services.Bluetooth
             catch (Exception ex)
             {
                 logger.Error(ex, "Error connecting to device");
+            }
+            finally
+            {
+                await this.RefreshDeviceStateAsync(device);
+            }
+        }
+
+        private async Task RefreshDeviceStateAsync(Device device)
+        {
+            await this.GetDeviceInfoAsync(device);
+        }
+
+        private async Task RefreshDeviceStateAsync(BluetoothDevice device)
+        {
+            var bluezDevice = await this.adapter.GetDeviceAsync(device.Address);
+            if (bluezDevice == null)
+            {
+                logger.Warning("Device not found when refreshing state");
                 device.Status = DeviceStatus.NotConnected;
+            }
+            else
+            {
+                await this.RefreshDeviceStateAsync(bluezDevice);
+            }
+        }
+
+        private async Task EnsureDevicePaired(Device bluezDevice)
+        {
+            if (await bluezDevice.GetPairedAsync())
+            {
+                logger.Information("Already paired");
+            }
+            else
+            {
+                logger.Information("Trusting device");
+                await bluezDevice.SetTrustedAsync(true);
+
+                logger.Information("Pairing device");
+                await bluezDevice.PairAsync();
             }
         }
 
         public override async Task<IReadOnlyList<BluetoothDevice>> GetKnownDevicesAsync(CancellationToken cancellationToken)
         {
-            var adapter = await this.GetAdapterAsync();
-
-            var devices = new List<BluetoothDevice>();
-
-            foreach (var device in await adapter.GetDevicesAsync())
+            if (this.knownDevices.Count == 0)
             {
-                devices.Add(await GetDeviceInfoAsync(device));
+                // Calling this will make sure that the adapter is hooked up and has populated the initial
+                // list with any known devices
+                await (await this.GetAdapterAsync()).GetDevicesAsync();
             }
 
-            return devices.OrderBy(d => d.Name).ToList();
+            return this.knownDevices.Select(x => x.Value.device)
+                .OrderBy(x => x.Name)
+                .ToList();
         }
 
-        private static async Task<BluetoothDevice> GetDeviceInfoAsync(Device device)
+        private async Task<BluetoothDevice> GetDeviceInfoAsync(Device bluezDevice)
         {
-            var name = await device.GetNameAsync();
-            var alias = await device.GetAliasAsync();
-            var address = await device.GetAddressAsync();
-            var connected = await device.GetConnectedAsync();
+            var name = await bluezDevice.GetNameAsync();
+            var alias = await bluezDevice.GetAliasAsync();
+            var address = await bluezDevice.GetAddressAsync();
+            var connected = await bluezDevice.GetConnectedAsync();
+            var trusted = await bluezDevice.GetTrustedAsync();
+            var paired = await bluezDevice.GetPairedAsync();
 
-            return new BluetoothDevice(alias ?? name ?? address, address, connected);
+            BluetoothDevice? device = null;
+            if (this.knownDevices.TryGetValue(address, out var cachedInfo))
+            {
+                // We're already tracking this device, so we'll return a modified version of the existing one
+                device = cachedInfo.device;
+                device.Name = alias ?? name ?? address;
+                device.Status = connected ? DeviceStatus.Connected : DeviceStatus.NotConnected;
+                device.Paired = paired;
+                device.Trusted = trusted;
+
+                if (cachedInfo.bluezDevice != bluezDevice)
+                {
+                    logger.Verbose("BluezDevice instance differs");
+
+                    // Detach from the original device
+                    cachedInfo.bluezDevice.Disconnected -= this.DeviceDisconnected;
+
+                    // Attach to the new device presented to us
+                    bluezDevice.Disconnected += this.DeviceDisconnected;
+                }
+                else
+                {
+                    logger.Verbose("BluezDevice instance matches");
+                }
+
+                // Update the dictionary with the new bluez device
+                this.knownDevices[address] = (bluezDevice, device);
+            }
+            else
+            {
+                // This is a new device, so we'll create a new instance
+                logger.Verbose("Novel bluetooth device; creating new instance");
+                device = new BluetoothDevice(
+                    alias ?? name ?? address,
+                    address,
+                    connected: connected,
+                    paired: paired,
+                    trusted: trusted);
+
+                bluezDevice.Disconnected += this.DeviceDisconnected;
+
+                this.knownDevices[address] = (bluezDevice, device);
+            }
+
+            logger.Information("Device state is {@Device}", device);
+
+            return device;
+        }
+
+        private async Task DeviceDisconnected(Device sender, BlueZEventArgs eventArgs)
+        {
+            await this.RefreshDeviceStateAsync(sender);
+            this.OnDeviceDisconnected();
         }
 
         private async Task<Adapter> GetAdapterAsync()
@@ -155,7 +239,7 @@ namespace Resona.Services.Bluetooth
 
         private async Task AdapterDeviceFound(Adapter sender, DeviceFoundEventArgs eventArgs)
         {
-            this.OnDeviceDiscovered(await GetDeviceInfoAsync(eventArgs.Device));
+            this.OnDeviceDiscovered(await this.GetDeviceInfoAsync(eventArgs.Device));
         }
 
         public override async Task StartScanningAsync(CancellationToken cancellationToken)
@@ -174,6 +258,32 @@ namespace Resona.Services.Bluetooth
             var adapter = await this.GetAdapterAsync();
 
             await adapter.StopDiscoveryAsync();
+        }
+
+        public override async Task ForgetDeviceAsync(BluetoothDevice device, CancellationToken cancellationToken)
+        {
+            if (this.knownDevices.TryGetValue(device.Address, out var deviceInfo))
+            {
+                var adapter = await this.GetAdapterAsync();
+                if (adapter != null)
+                {
+                    try
+                    {
+                        await adapter.RemoveDeviceAsync(deviceInfo.bluezDevice.ObjectPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex, "Error removing device");
+                    }
+                }
+            }
+            else
+            {
+                // Log the fact that the device isn't tracked
+                logger.Error("Device {Address} not in known devices list", device.Address);
+            }
+
+            await this.RefreshDeviceStateAsync(device);
         }
     }
 }
