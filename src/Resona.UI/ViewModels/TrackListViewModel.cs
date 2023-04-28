@@ -19,7 +19,7 @@ namespace Resona.UI.ViewModels
     public class TrackListViewModel : RoutableViewModelBase, IDisposable
     {
         private Task<Bitmap>? cover;
-        private readonly IAudioProvider audioProvider;
+        private readonly IAudioRepository audioProvider;
         private readonly IAlbumImageProvider imageProvider;
         private readonly IPlayerService playerService;
         private IReadOnlyList<AudioTrackViewModel>? tracks;
@@ -27,7 +27,7 @@ namespace Resona.UI.ViewModels
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public TrackListViewModel()
-            : this(null!, null!, new FakeAudioProvider(), new FakeAlbumImageProvider(), new FakePlayerService())
+            : this(null!, null!, new FakeAudioRepository(), new FakeAlbumImageProvider(), new FakePlayerService())
         {
             this.SetAudioContentAsync(1, default).GetAwaiter().GetResult();
         }
@@ -36,7 +36,7 @@ namespace Resona.UI.ViewModels
         public TrackListViewModel(
             RoutingState router,
             IScreen hostScreen,
-            IAudioProvider audioProvider,
+            IAudioRepository audioProvider,
             IAlbumImageProvider imageProvider,
             IPlayerService playerService)
             : base(router, hostScreen, "track-list")
@@ -116,7 +116,7 @@ namespace Resona.UI.ViewModels
         {
             if (this.Model != null)
             {
-                this.playerService.Play(this.Model, track.Model, 0);
+                this.playerService.Play(this.Model, track.Model, 0, true);
             }
         }
 

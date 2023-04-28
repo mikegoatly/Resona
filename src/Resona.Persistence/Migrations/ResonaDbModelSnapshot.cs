@@ -30,6 +30,15 @@ namespace Resona.Persistence.Migrations
                     b.Property<int>("Kind")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("LastPlayedDateUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("LastPlayedTrackId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double?>("LastPlayedTrackPosition")
+                        .HasColumnType("REAL");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -45,6 +54,10 @@ namespace Resona.Persistence.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("AlbumId");
+
+                    b.HasIndex("LastPlayedDateUtc");
+
+                    b.HasIndex("LastPlayedTrackId");
 
                     b.HasIndex("Kind", "Name");
 
@@ -88,6 +101,16 @@ namespace Resona.Persistence.Migrations
                     b.HasIndex("AlbumId");
 
                     b.ToTable("Track");
+                });
+
+            modelBuilder.Entity("Resona.Persistence.AlbumRaw", b =>
+                {
+                    b.HasOne("Resona.Persistence.TrackRaw", "LastPlayedTrack")
+                        .WithMany()
+                        .HasForeignKey("LastPlayedTrackId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("LastPlayedTrack");
                 });
 
             modelBuilder.Entity("Resona.Persistence.TrackRaw", b =>

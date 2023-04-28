@@ -7,6 +7,7 @@ namespace Resona.Persistence
 {
     [Table("Album")]
     [Index(nameof(Kind), nameof(Name))]
+    [Index(nameof(LastPlayedDateUtc))]
     public class AlbumRaw
     {
         private ICollection<TrackRaw>? tracks;
@@ -24,6 +25,14 @@ namespace Resona.Persistence
 
         [MaxLength(100)]
         public string? Artist { get; set; }
+
+        public double? LastPlayedTrackPosition { get; set; }
+
+        public int? LastPlayedTrackId { get; set; }
+
+        public virtual TrackRaw? LastPlayedTrack { get; set; }
+
+        public DateTime? LastPlayedDateUtc { get; set; }
 
         public virtual ICollection<TrackRaw> Tracks
         {

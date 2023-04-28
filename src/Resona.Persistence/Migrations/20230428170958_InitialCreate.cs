@@ -21,6 +21,9 @@ namespace Resona.Persistence.Migrations
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Path = table.Column<string>(type: "TEXT", maxLength: 250, nullable: false),
                     Artist = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    LastPlayedTrackPosition = table.Column<double>(type: "REAL", nullable: true),
+                    LastPlayedTrackId = table.Column<int>(type: "INTEGER", nullable: true),
+                    LastPlayedDateUtc = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ThumbnailFile = table.Column<string>(type: "TEXT", maxLength: 350, nullable: true)
                 },
                 constraints: table =>
@@ -59,14 +62,36 @@ namespace Resona.Persistence.Migrations
                 columns: new[] { "Kind", "Name" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Album_LastPlayedDateUtc",
+                table: "Album",
+                column: "LastPlayedDateUtc");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Album_LastPlayedTrackId",
+                table: "Album",
+                column: "LastPlayedTrackId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Track_AlbumId",
                 table: "Track",
                 column: "AlbumId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Album_Track_LastPlayedTrackId",
+                table: "Album",
+                column: "LastPlayedTrackId",
+                principalTable: "Track",
+                principalColumn: "TrackId",
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Album_Track_LastPlayedTrackId",
+                table: "Album");
+
             migrationBuilder.DropTable(
                 name: "Track");
 

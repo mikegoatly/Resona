@@ -16,13 +16,13 @@ namespace Resona.UI.ViewModels
     {
         private AudioKind kind;
         private Task<List<AudioContentViewModel>>? audioContent;
-        private readonly IAudioProvider audioProvider;
+        private readonly IAudioRepository audioProvider;
         private readonly IAlbumImageProvider imageProvider;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public LibraryViewModel()
-        : this(null!, null!, new FakeAudioProvider(), new FakeAlbumImageProvider(), new FakeLibrarySyncer())
+        : this(null!, null!, new FakeAudioRepository(), new FakeAlbumImageProvider(), new FakeLibrarySyncer())
         {
             this.AudioContent = Task.FromResult(
                 new List<AudioContentViewModel>
@@ -43,7 +43,7 @@ namespace Resona.UI.ViewModels
         public LibraryViewModel(
             RoutingState router,
             IScreen hostScreen,
-            IAudioProvider audioProvider,
+            IAudioRepository audioProvider,
             IAlbumImageProvider imageProvider,
             ILibrarySyncer librarySyncer)
                 : base(router, hostScreen, "library")

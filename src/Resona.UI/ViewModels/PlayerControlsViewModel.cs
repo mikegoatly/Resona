@@ -23,12 +23,14 @@ namespace Resona.UI.ViewModels
         private double position;
         private AudioContent? audioContent;
         private readonly IPlayerService playerService;
+        private readonly IAudioRepository audioRepository;
         private readonly IAlbumImageProvider imageProvider;
+
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public PlayerControlsViewModel()
-            : this(null!, null!, new FakePlayerService(), new FakeAlbumImageProvider(), new SleepOptionsViewModel())
+            : this(null!, null!, new FakePlayerService(), new FakeAudioRepository(), new FakeAlbumImageProvider(), new SleepOptionsViewModel())
         {
         }
 #endif
@@ -37,11 +39,13 @@ namespace Resona.UI.ViewModels
             RoutingState router,
             IScreen hostScreen,
             IPlayerService playerService,
+            IAudioRepository audioRepository,
             IAlbumImageProvider imageProvider,
             SleepOptionsViewModel sleepOptions)
             : base(router, hostScreen, "player")
         {
             this.playerService = playerService;
+            this.audioRepository = audioRepository;
             this.imageProvider = imageProvider;
             this.SleepOptions = sleepOptions;
             this.PlayPauseCommand = ReactiveCommand.Create(this.playerService.TogglePause);

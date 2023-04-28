@@ -24,7 +24,7 @@ namespace Resona.Services
                 services.AddSingleton<IAudioOutputService, DevAudioOutputService>();
             }
 
-            services.AddScoped<IAudioProvider, AudioProvider>();
+            services.AddScoped<IAudioRepository, AudioRepository>();
 
             services.AddSingleton<IPlayerService, PlayerService>();
             services.AddSingleton<IAlbumImageProvider, AlbumImageProvider>();

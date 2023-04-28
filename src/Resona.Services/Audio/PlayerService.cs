@@ -1,4 +1,5 @@
-﻿using System.Reactive.Subjects;
+﻿using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 using ManagedBass;
 
@@ -35,26 +36,30 @@ namespace Resona.Services.Audio
         float Volume { get; set; }
 
         void Next();
-        void Play(AudioContent audiobook, AudioTrack? chapter, double position);
+        void Play(AudioContent audiobook, AudioTrack? chapter, double position, bool forceUnpause = false);
         void Previous();
         void TogglePause();
     }
 
     public class PlayerService : IDisposable, IPlayerService
     {
-        private readonly Subject<PlaybackState> playbackStateChanged = new();
-        private readonly Subject<PlayingTrack> playingTrackChanged = new();
-
         private static readonly ILogger logger = Log.ForContext<PlayerService>();
+
+        private readonly ReplaySubject<PlaybackState> playbackStateChanged = new();
+        private readonly ReplaySubject<PlayingTrack> playingTrackChanged = new();
+        private readonly IAudioRepository audioRepository;
+
         private readonly Timer positionChangedTimer;
         private bool initialized;
         private int currentStream;
         private double channelLength;
         private bool paused;
         private float volume = 0.3F;
+        private DateTime nextPositionPersistTime;
 
-        public PlayerService(ITimerManager timerManager)
+        public PlayerService(IAudioRepository audioRepository, ITimerManager timerManager)
         {
+            this.audioRepository = audioRepository;
             this.positionChangedTimer = new(this.RaisePositionChanged);
             timerManager.SleepTimerCompleted += () =>
             {
@@ -63,12 +68,28 @@ namespace Resona.Services.Audio
                     this.TogglePause();
                 }
             };
+
+            // Asynchronously check the last played track recorded in the repository and update state
+            Observable.FromAsync(audioRepository.GetLastPlayedContentAsync)
+                .Subscribe(
+                    x =>
+                    {
+                        if (x != null)
+                        {
+                            // Don't startle anyone by starting the audio playback from the last position as soon
+                            // as the app is opened
+                            this.Paused = true;
+
+                            this.Play(x, x.LastPlayedTrack, x.LastPlayedTrackPosition.GetValueOrDefault());
+
+                        }
+                    });
         }
 
         public IObservable<PlaybackState> PlaybackStateChanged => this.playbackStateChanged;
         public IObservable<PlayingTrack> PlayingTrackChanged => this.playingTrackChanged;
 
-        public void Play(AudioContent audiobook, AudioTrack? chapter, double position)
+        public void Play(AudioContent audiobook, AudioTrack? chapter, double position, bool forceUnpause = false)
         {
             if (audiobook.Tracks.Count == 0)
             {
@@ -121,10 +142,16 @@ namespace Resona.Services.Audio
                             logger.Debug("Player was paused - not starting playback");
                         }
 
-                        if (isFirstPlay)
+                        if (isFirstPlay && this.Paused == false)
                         {
                             // Ensure the timer for the position changed event is set up by unpausing playback
                             this.Paused = false;
+                        }
+
+                        // Force unpausing is needed so we can allow the user to click on a tracks and for it to play immediately
+                        if (forceUnpause && this.Paused)
+                        {
+                            this.TogglePause();
                         }
 
                         this.playingTrackChanged.OnNext(playingTrack);
@@ -300,9 +327,21 @@ namespace Resona.Services.Audio
 
         private void OnPlaybackStateChanged()
         {
+            var position = this.Position;
             this.playbackStateChanged.OnNext(new PlaybackState(
                 this.Paused ? PlaybackStateKind.Paused : PlaybackStateKind.Playing,
-                this.Position));
+                position));
+
+            // We don't want to hammer the database with updates, so we only update the position every 2 seconds
+            if (DateTime.UtcNow > this.nextPositionPersistTime && this.Current != null)
+            {
+                this.audioRepository.UpdateTrackPlayTime(
+                    this.Current.GetValueOrDefault().Track.Id,
+                    position,
+                    default);
+
+                this.nextPositionPersistTime = DateTime.UtcNow.AddSeconds(2);
+            }
         }
 
         private void DisposeCurrentPlayer()

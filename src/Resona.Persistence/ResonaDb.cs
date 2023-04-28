@@ -60,5 +60,22 @@ namespace Resona.Persistence
 
             optionsBuilder.UseSqlite(connectionString);
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AlbumRaw>()
+                .HasMany(album => album.Tracks)
+                .WithOne(track => track.Album)
+                .HasForeignKey(track => track.AlbumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AlbumRaw>()
+                .HasOne(album => album.LastPlayedTrack)
+                .WithMany()
+                .HasForeignKey(album => album.LastPlayedTrackId)
+                .OnDelete(DeleteBehavior.SetNull);
+        }
     }
 }
