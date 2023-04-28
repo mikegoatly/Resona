@@ -35,8 +35,32 @@
 				<icon:Icon Value="fa fa-volume-off"
 						   FontSize="20"/>
 			</StackPanel>
+			<TabControl>
+				<TabItem Header="Foo">
+					<TextBlock Margin="10">Hello world</TextBlock>
+				</TabItem>
+				<TabItem Header="Bar">
+
+				</TabItem>
+			</TabControl>
 		</StackPanel>
 	</Design.PreviewWith>
+
+
+	<Style Selector="TabControl">
+		<Style Selector="^ TabItem">
+			<Style Selector="^:selected > Border">
+				<Setter Property="Background" Value="{StaticResource PrimaryColor}" />
+				<Setter Property="BorderBrush" Value="{StaticResource PrimaryColorDark}" />
+				<Setter Property="BorderThickness" Value="2,2,2,0" />
+				<Setter Property="CornerRadius" Value="20,20,0,0" />
+
+				<Style Selector="^ Border#PART_SelectedPipe">
+					<Setter Property="IsVisible" Value="False" />
+				</Style>
+			</Style>
+		</Style>
+	</Style>
 
 	<Style Selector="Slider:horizontal">
 		<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
