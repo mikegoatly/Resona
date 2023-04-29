@@ -63,6 +63,10 @@
 					Classes.bounce-visible="{Binding CanGoBack}"
 					Classes="primary circle bounce"
 					VerticalAlignment="Top">
+				<!-- 
+					Default the back button to scaled out so it doesn't appear
+					for a short time when the app loads
+				-->
 				<Button.RenderTransform>
 					<ScaleTransform ScaleX="0" ScaleY="0" />
 				</Button.RenderTransform>
@@ -81,6 +85,8 @@
 					</Button.Flyout>
 				</Button>
 				<Button Classes="secondary circle" 
+						Classes.bounce-hidden="{Binding !ShowSettingsButton}"
+						Classes.bounce-visible="{Binding ShowSettingsButton}"
 						Command="{Binding NavigateToSettingsCommand}"
 						VerticalAlignment="Bottom">
 					<icon:Icon Value="fa fa-gear" />

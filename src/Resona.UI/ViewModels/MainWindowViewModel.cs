@@ -55,6 +55,12 @@ namespace Resona.UI.ViewModels
                 .DistinctUntilChanged()
                 .Subscribe(x => this.CanGoBack = x == true);
 
+            this.Router.CurrentViewModel
+                .Where(x => x != null)
+                .Select(x => x!.GetType())
+                .DistinctUntilChanged()
+                .Subscribe(x => this.ShowSettingsButton = x != typeof(SettingsViewModel));
+
         }
 
         public RoutingState Router { get; }
@@ -71,6 +77,9 @@ namespace Resona.UI.ViewModels
 
         [Reactive]
         public bool CanGoBack { get; set; }
+
+        [Reactive]
+        public bool ShowSettingsButton { get; set; }
 
         public ReactiveCommand<Unit, IObservable<IRoutableViewModel>> NavigateToSettingsCommand { get; }
     }
