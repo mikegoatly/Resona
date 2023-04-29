@@ -6,6 +6,8 @@
         x:Class="Resona.UI.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
 		xmlns:views="clr-namespace:Resona.UI.Views"
+					 Width="1024"
+			 Height="600"
         Title="Resona.UI">
 
 	<views:MainView />

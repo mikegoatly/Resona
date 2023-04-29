@@ -57,9 +57,15 @@
 					<Setter Property="VerticalAlignment" Value="Center"/>
 				</Style>
 			</DockPanel.Styles>
-			
-			<Button Command="{Binding GoBack}" Classes="primary circle"
+
+			<Button Command="{Binding GoBack}"
+					Classes.bounce-hidden="{Binding !CanGoBack}"
+					Classes.bounce-visible="{Binding CanGoBack}"
+					Classes="primary circle bounce"
 					VerticalAlignment="Top">
+				<Button.RenderTransform>
+					<ScaleTransform ScaleX="0" ScaleY="0" />
+				</Button.RenderTransform>
 				<icon:Icon Value="fa fa-arrow-left" />
 			</Button>
 

@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 using Resona.Services.Background;
 
@@ -16,7 +17,6 @@ namespace Resona.UI.ViewModels
     {
         private static readonly Serilog.ILogger logger = Log.ForContext<MainWindowViewModel>();
         private readonly ITimerManager timerManager;
-        private double screenDimPercentage = 0D;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
@@ -49,6 +49,12 @@ namespace Resona.UI.ViewModels
                 .Subscribe(x => this.ScreenDimPercentage = x ? 0.8D : 0D);
 
             this.NavigateToSettingsCommand = ReactiveCommand.Create(() => this.Router.Navigate.Execute(Locator.Current.GetService<SettingsViewModel>()!));
+
+            this.Router.NavigateBack.CanExecute
+                .Throttle(TimeSpan.FromMilliseconds(100))
+                .DistinctUntilChanged()
+                .Subscribe(x => this.CanGoBack = x == true);
+
         }
 
         public RoutingState Router { get; }
@@ -60,11 +66,12 @@ namespace Resona.UI.ViewModels
         // The command that navigates a user back.
         public ReactiveCommand<Unit, IRoutableViewModel?> GoBack => this.Router.NavigateBack;
 
-        public double ScreenDimPercentage
-        {
-            get => this.screenDimPercentage;
-            set => this.RaiseAndSetIfChanged(ref this.screenDimPercentage, value);
-        }
+        [Reactive]
+        public double ScreenDimPercentage { get; set; }
+
+        [Reactive]
+        public bool CanGoBack { get; set; }
+
         public ReactiveCommand<Unit, IObservable<IRoutableViewModel>> NavigateToSettingsCommand { get; }
     }
 }
