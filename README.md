@@ -1,7 +1,24 @@
 # Resona
-An audiobook/music/sleep tunes audio player designed to run on a Raspberry Pi
+An audiobook/music/sleep tunes audio player designed to run on a Raspberry Pi.
 
-This is very much a work in progress limited spare time hobby project... have patience young padawan. 
+## Motivation
+
+I wanted to have a single-use device for playing audio that my kids could safely use in their bedroom, without giving them a phone or tablet that also gave them other unhelpful distractions. 
+
+This is a rebuild of an old project which had an ASP.NET core backend with a Blazor client. This new
+version relies on [Avalonia UI](https://www.avaloniaui.net/). Having all the logic and UI combined in a single executable has proven to be much more efficient and development has been much quicker.
+This all came together as a spare time project over the course of a couple of weeks.
+
+You can clone and run this repo locally to try it out, and deploy it to a Raspberry Pi using the dev notes below. I might look to streamline the installation process at some point if there's
+demand for it - I'd also be happy to receive contributions.
+
+### Roadmap
+
+I've a couple of things I still want to do:
+
+* Expose a web application from the device that parents can use to upload new content, rather than using `scp` 😊
+* Allow for more configuration options to allow kids to personalize things a bit, including the main icons for the home screen.
+
 
 # Features
 
@@ -11,13 +28,17 @@ This is very much a work in progress limited spare time hobby project... have pa
 * Music
 * Sleep Tunes
 
-Files are added to the database by scanning a folder on the local filesystem.
+![Home screen](docs/home.png)
+
+Files are added to the database by scanning a folder on the local filesystem. This is currently the well known location, `home/pi/audiobooks`, `home/pi/music` and `home/pi/sleep`.
 
 ## Sleep timers
 
 * Sleep timer to stop playback after a set time
 * Auto-shutdown on lack of interactivity (2 hours by default)
-* Screen dimming to prevent glare at night (20 seconds by default)
+* Screen dimming to prevent glare at night (30 seconds by default)
+
+![Sleep timer optons](docs/sleep-timer.png)
 
 ## Album art
 
@@ -25,6 +46,24 @@ Album art is loaded from (in order of preference):
 
 * `image.jpg` or `image.png` in the album folder
 * The first `mp3` file in the album folder that contains an embedded image
+
+![Track selection](docs/track-selection.png)
+
+## Playback
+
+* Resona keeps track of the last played position of albums and will be ready to continue playing from the last played track when it restarts
+* Scrubbing supported
+* Volume control through the player in case your display doesn't have volume controls
+
+## Audio output selection
+
+Select the audio output channel through the UI:
+
+![Audio output selection](docs/audio-output-selection.png)
+
+Scan for and pair bluetooth devices:
+
+![Bluetooth device scanning](docs/bluetooth-devices.png)
 
 # Dev notes
 

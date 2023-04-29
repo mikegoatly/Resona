@@ -7,8 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		global.json = global.json
 		copy-pi-scripts.ps1 = copy-pi-scripts.ps1
+		global.json = global.json
 		publish.ps1 = publish.ps1
 		README.md = README.md
 	EndProjectSection
@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pi-scripts", "pi-scripts", 
 		scripts\install-dependencies.sh = scripts\install-dependencies.sh
 		scripts\reenable-auto-run.sh = scripts\reenable-auto-run.sh
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{188E7350-304E-49B5-BEFE-4ECF9E982B13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +50,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{188E7350-304E-49B5-BEFE-4ECF9E982B13} = {ABEDA4FE-19C9-478F-A94A-43E39416B8B0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88447A8D-E80D-4EB6-8683-BBF6028CA114}
