@@ -10,9 +10,9 @@ namespace Resona.Services.Bluetooth
         private int scanCount;
         private static readonly ConcurrentBag<BluetoothDevice> knownDevices = new()
         {
-            new BluetoothDevice("Initial device 1", Guid.NewGuid().ToString(), false),
-            new BluetoothDevice("Initial device 2", Guid.NewGuid().ToString(), false, true),
-            new BluetoothDevice("Initial device 3", Guid.NewGuid().ToString(), true)
+            new BluetoothDevice("My Phone", Guid.NewGuid().ToString(), false),
+            new BluetoothDevice("Bluetooth Headphones", Guid.NewGuid().ToString(), false, true),
+            new BluetoothDevice("Someone's TV", Guid.NewGuid().ToString(), true)
         };
 
         public DevBluetoothService()
@@ -60,7 +60,7 @@ namespace Resona.Services.Bluetooth
             }
 
             var address = Guid.NewGuid().ToString();
-            var newDevice = new BluetoothDevice("Test " + address, address);
+            var newDevice = new BluetoothDevice(address[4..] + " another random device", address);
 
             this.OnDeviceDiscovered(newDevice);
 
