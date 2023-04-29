@@ -243,6 +243,14 @@ namespace Resona.Services.Libraries
             track.Name = DeriveSongName(file, tags);
             track.Artist = DeriveArtist(tags);
             track.Duration = tagFile.Properties.Duration;
+
+            var albumTag = tags.Album;
+            if (track.TrackNumber == 1 && !string.IsNullOrWhiteSpace(albumTag))
+            {
+                // Also update the album name from this track; it means that the folder name doesn't
+                // have to be nicely formatted
+                album.Name = albumTag;
+            }
         }
 
         private static TrackRaw CreateTrack(AlbumRaw album, FileInfo file)
