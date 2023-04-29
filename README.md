@@ -1,6 +1,8 @@
 # Resona
 An audiobook/music/sleep tunes audio player designed to run on a Raspberry Pi.
 
+![Screenshot of the player view in Resona](docs/player.png)
+
 ## Motivation
 
 I wanted to have a single-use device for playing audio that my kids could safely use in their bedroom, without giving them a phone or tablet that also gave them other unhelpful distractions. 
@@ -54,6 +56,8 @@ Album art is loaded from (in order of preference):
 * Resona keeps track of the last played position of albums and will be ready to continue playing from the last played track when it restarts
 * Scrubbing supported
 * Volume control through the player in case your display doesn't have volume controls
+
+![Player screenshot](docs/player.png)
 
 ## Audio output selection
 
