@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 using Resona.Persistence;
 
@@ -27,14 +26,13 @@ namespace Resona.Services.Libraries
 
         public LibrarySyncer(
             ILibraryFileWatcher libraryFileWatcher,
-            IAlbumImageProvider thumbnailProvider,
-            IOptions<AudiobookConfiguration> configuration)
+            IAlbumImageProvider thumbnailProvider)
         {
             this.audioPaths = new[]
             {
-                (configuration.Value.AudiobookPath, AlbumKind.AudioBook),
-                (configuration.Value.MusicPath, AlbumKind.Music),
-                (configuration.Value.SleepPath, AlbumKind.Sleep),
+                (Settings.Default.AudiobooksFolder, AlbumKind.AudioBook),
+                (Settings.Default.MusicFolder, AlbumKind.Music),
+                (Settings.Default.SleepFolder, AlbumKind.Sleep),
             };
 
             // Use the library file watcher to automate resyncs when files change

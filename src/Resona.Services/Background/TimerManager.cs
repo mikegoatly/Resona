@@ -1,6 +1,5 @@
-﻿using System.Reactive.Subjects;
-
-using Microsoft.Extensions.Options;
+﻿using System.ComponentModel;
+using System.Reactive.Subjects;
 
 using Resona.Services.OS;
 
@@ -22,8 +21,6 @@ namespace Resona.Services.Background
     internal class TimerManager : ITimerManager
     {
         private static readonly ILogger logger = Log.ForContext<TimerManager>();
-
-        private readonly SleepConfiguration configuration;
 
         /// <summary>
         /// We have one timer that ticks every minute, and we use it to check if we need to perform any timed actions
@@ -56,14 +53,15 @@ namespace Resona.Services.Background
         private readonly Subject<bool> screenDimStateChanged = new();
         private readonly Subject<TimeSpan?> sleepTimerUpdated = new();
 
-        public TimerManager(IOptions<SleepConfiguration> sleepConfiguration, IOsCommandExecutor osCommandExecutor)
+        public TimerManager(IOsCommandExecutor osCommandExecutor)
         {
-            this.configuration = sleepConfiguration.Value;
             this.timer = new Timer(this.TimerTick);
             this.screenDimTimer = new Timer(this.ScreenDimTimerTick);
             this.ResetInactivityTimers();
             this.RestartTimer();
             this.osCommandExecutor = osCommandExecutor;
+
+            Settings.Default.SettingsSaving += this.SettingsChanged;
         }
 
         private void ScreenDimTimerTick(object? state)
@@ -87,9 +85,9 @@ namespace Resona.Services.Background
         public void ResetInactivityTimers()
         {
             var now = DateTime.UtcNow;
-            this.shutDownTime = now.Add(this.configuration.InactivityShutdownTimeout);
+            this.shutDownTime = now.Add(Settings.Default.InactivityShutdownTimeout);
 
-            this.screenDimTimer.Change(this.configuration.ScreenDimTimeout, Timeout.InfiniteTimeSpan);
+            this.screenDimTimer.Change(Settings.Default.ScreenDimTimeout, Timeout.InfiniteTimeSpan);
 
             this.ChangeScreenDimState(false);
         }
@@ -110,6 +108,12 @@ namespace Resona.Services.Background
         {
             Console.WriteLine("Sleep timer cancelled");
             this.OnSleepTimerCompleted();
+        }
+
+        private void SettingsChanged(object sender, CancelEventArgs e)
+        {
+            logger.Debug("Detected settings changed, resetting timers");
+            this.ResetInactivityTimers();
         }
 
         private void TimerTick(object? state)

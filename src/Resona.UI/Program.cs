@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -15,13 +14,10 @@ using ReactiveUI;
 
 using Resona.Persistence;
 using Resona.Services;
-using Resona.Services.Background;
-using Resona.Services.Libraries;
+using Resona.Services.OS;
 using Resona.UI.ViewModels;
 
 using Serilog;
-using Serilog.Events;
-using Serilog.Formatting;
 
 using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
@@ -37,14 +33,11 @@ namespace Resona.UI
         [STAThread]
         public static int Main(string[] args)
         {
-            ConfigureLogger();
-
             var services = new ServiceCollection();
+            services.AddSingleton<ILogService>(new LogService());
             services.AddResonaServices();
             services.AddViewModels();
             services.AddViews();
-
-            AddConfiguration(services);
 
             services.AddSingleton((s) => new RoutingState());
             services.UseMicrosoftDependencyResolver();
@@ -69,50 +62,6 @@ namespace Resona.UI
 
             Log.Information("Starting in desktop mode");
             return builder.StartWithClassicDesktopLifetime(args);
-        }
-
-        private static void AddConfiguration(ServiceCollection services)
-        {
-            services.AddOptions()
-                .Configure<AudiobookConfiguration>(x =>
-                {
-                    x.AudiobookPath = Settings.Default.AudiobooksFolder;
-                    x.MusicPath = Settings.Default.MusicFolder;
-                    x.SleepPath = Settings.Default.SleepFolder;
-                });
-
-            services.AddOptions()
-                .Configure<SleepConfiguration>(x =>
-                {
-                    x.InactivityShutdownTimeout = Settings.Default.InactivityShutdownTimeout;
-                    x.ScreenDimTimeout = Settings.Default.ScreenDimTimeout;
-                });
-        }
-
-        private static void ConfigureLogger()
-        {
-            var parsedLogLevel = Enum.TryParse<LogEventLevel>(Settings.Default.LogLevel, out var logLevel);
-            if (!parsedLogLevel)
-            {
-                logLevel = LogEventLevel.Warning;
-            }
-
-            var logDir = Path.GetDirectoryName(Settings.Default.LogFile) ?? "/home/pi/logs";
-            if (!Directory.Exists(logDir))
-            {
-                Directory.CreateDirectory(logDir);
-            }
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Is(logLevel)
-                .Enrich.FromLogContext()
-                .WriteTo.Console(new JournalLogLevelCustomFormatter())
-                .CreateLogger();
-
-            if (!parsedLogLevel)
-            {
-                Log.ForContext<App>().Error("Unable to parse log level {LogLevel} - defaulting to Warning", Settings.Default.LogLevel);
-            }
         }
 
         private static void SilenceConsole()
@@ -157,27 +106,5 @@ namespace Resona.UI
         }
     }
 
-    public class JournalLogLevelCustomFormatter : ITextFormatter
-    {
-        public void Format(LogEvent logEvent, TextWriter output)
-        {
-            // https://wiki.archlinux.org/title/Systemd/Journal
-            var journalPriority = logEvent.Level switch
-            {
-                LogEventLevel.Verbose => 7, // Debug
-                LogEventLevel.Debug => 6, // Informational
-                LogEventLevel.Information => 5, // Notice
-                LogEventLevel.Warning => 4, // Warning
-                LogEventLevel.Error => 3, // Error
-                LogEventLevel.Fatal => 2, // Critical
-                _ => throw new NotImplementedException("Unknown LogEventLevel " + logEvent.Level),
-            };
 
-            output.WriteLine($"<{journalPriority}> {logEvent.RenderMessage()}");
-            if (logEvent.Exception != null)
-            {
-                output.WriteLine(logEvent.Exception.ToString());
-            }
-        }
-    }
 }

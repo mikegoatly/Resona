@@ -9,6 +9,7 @@ namespace Resona.Services.Libraries
     public interface IAlbumImageProvider
     {
         Stream GetImageStream(AudioContentSummary audioContent);
+
         void UpdateThumbnail(AlbumRaw album);
     }
 
