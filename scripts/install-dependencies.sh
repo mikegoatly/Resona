@@ -10,3 +10,5 @@ sudo apt install uhubctl pulseaudio-module-bluetooth -y
 
 # Start pulseaudio
 systemctl --user start pulseaudio && sudo usermod -a -G bluetooth pi
+ 
+sudo reboot --reboot

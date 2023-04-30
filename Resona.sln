@@ -28,6 +28,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pi-scripts", "pi-scripts", 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{188E7350-304E-49B5-BEFE-4ECF9E982B13}"
+	ProjectSection(SolutionItems) = preProject
+		docs\audio-output-selection.png = docs\audio-output-selection.png
+		docs\bluetooth-devices.png = docs\bluetooth-devices.png
+		docs\home.png = docs\home.png
+		docs\player.png = docs\player.png
+		docs\sleep-timer.png = docs\sleep-timer.png
+		docs\track-selection.png = docs\track-selection.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
