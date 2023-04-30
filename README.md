@@ -123,6 +123,12 @@ display_rotate=0
 hdmi_cvt 1024 600 60 6 0 0 0
 ```
 
+Enable fkms to fix audio issues:
+
+```
+sudo sed -i 's/dtoverlay=vc4-kms-v3d/dtoverlay=vc4-fkms-v3d/g' /boot/config.txt
+```
+
 #### 
 
 ## Database
