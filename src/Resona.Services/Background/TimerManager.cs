@@ -131,6 +131,8 @@ namespace Resona.Services.Background
 
             if (now > this.shutDownTime)
             {
+                logger.Information("Current time {Now} exceeded shutdown time {ShutDownTime}", now, this.shutDownTime);
+
                 this.osCommandExecutor.Shutdown();
             }
         }
