@@ -17,11 +17,13 @@ namespace Resona.Services
             {
                 services.AddSingleton<IBluetoothService, LinuxBluetoothService>();
                 services.AddSingleton<IAudioOutputService, PulseAudioOutputService>();
+                services.AddSingleton<ILogService>(new LinuxLogService());
             }
             else
             {
                 services.AddSingleton<IBluetoothService, DevBluetoothService>();
                 services.AddSingleton<IAudioOutputService, DevAudioOutputService>();
+                services.AddSingleton<ILogService>(new FakeLogService());
             }
 
             services.AddScoped<IAudioRepository, AudioRepository>();

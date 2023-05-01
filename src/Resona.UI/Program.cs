@@ -14,7 +14,6 @@ using ReactiveUI;
 
 using Resona.Persistence;
 using Resona.Services;
-using Resona.Services.OS;
 using Resona.UI.ViewModels;
 
 using Serilog;
@@ -34,7 +33,6 @@ namespace Resona.UI
         public static int Main(string[] args)
         {
             var services = new ServiceCollection();
-            services.AddSingleton<ILogService>(new LogService());
             services.AddResonaServices();
             services.AddViewModels();
             services.AddViews();

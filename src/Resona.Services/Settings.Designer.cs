@@ -50,30 +50,39 @@ namespace Resona.Services {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Debug")]
         public string LogLevel {
             get {
                 return ((string)(this["LogLevel"]));
             }
+            set {
+                this["LogLevel"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("00:00:30")]
         public global::System.TimeSpan ScreenDimTimeout {
             get {
                 return ((global::System.TimeSpan)(this["ScreenDimTimeout"]));
             }
+            set {
+                this["ScreenDimTimeout"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("02:00:00")]
         public global::System.TimeSpan InactivityShutdownTimeout {
             get {
                 return ((global::System.TimeSpan)(this["InactivityShutdownTimeout"]));
+            }
+            set {
+                this["InactivityShutdownTimeout"] = value;
             }
         }
     }

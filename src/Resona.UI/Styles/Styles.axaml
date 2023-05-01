@@ -107,6 +107,11 @@
 		<Setter Property="FontFamily" Value="resm:Resona.UI.Fonts.Acme-Regular.ttf?assembly=Resona.UI#Acme" />
 	</Style>
 
+	<Style Selector="Label">
+		<Setter Property="FontSize" Value="20" />
+		<Setter Property="FontFamily" Value="resm:Resona.UI.Fonts.Acme-Regular.ttf?assembly=Resona.UI#Acme" />
+	</Style>
+
 	<Style Selector="Button">
 		<Style Selector="^.bounce-hidden">
 			<Style.Animations>

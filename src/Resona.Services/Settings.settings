@@ -11,13 +11,13 @@
     <Setting Name="SleepFolder" Type="System.String" Scope="Application">
       <Value Profile="(Default)">/home/pi/sleep</Value>
     </Setting>
-    <Setting Name="LogLevel" Type="System.String" Scope="Application">
+    <Setting Name="LogLevel" Type="System.String" Scope="User">
       <Value Profile="(Default)">Debug</Value>
     </Setting>
-    <Setting Name="ScreenDimTimeout" Type="System.TimeSpan" Scope="Application">
+    <Setting Name="ScreenDimTimeout" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:00:30</Value>
     </Setting>
-    <Setting Name="InactivityShutdownTimeout" Type="System.TimeSpan" Scope="Application">
+    <Setting Name="InactivityShutdownTimeout" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">02:00:00</Value>
     </Setting>
   </Settings>

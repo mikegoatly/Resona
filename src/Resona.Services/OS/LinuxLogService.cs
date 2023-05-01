@@ -11,19 +11,19 @@ namespace Resona.Services.OS
 {
     public interface ILogService
     {
-        Task<float?> GetLogSizeAsyncMb();
+        Task ClearLogsAsync();
+        Task<float?> GetLogSizeMbAsync();
     }
 
-    public class LogService : ILogService
+    public class LinuxLogService : ILogService
     {
-        // Regext to match a number using the current culture
-        private static readonly Regex defaultSinkRegex = new(@"take up (?<SizeMb>[^\w]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex defaultSinkRegex = new(@"take up (?<SizeMb>[^a-z]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly LoggingLevelSwitch loggingLevelSwitch;
 
-        private readonly ILogger logger = Log.ForContext<LogService>();
+        private readonly ILogger logger = Log.ForContext<LinuxLogService>();
 
-        public LogService()
+        public LinuxLogService()
         {
             Settings.Default.SettingsSaving += this.OnSettingsChanged;
 
@@ -36,12 +36,19 @@ namespace Resona.Services.OS
                 .CreateLogger();
         }
 
-        public async Task<float?> GetLogSizeAsyncMb()
+        public async Task<float?> GetLogSizeMbAsync()
         {
             return (await BashExecutor.ExecuteAsync<float?>(
                 "journalctl --user -u Resona.service --disk-usage",
                 this.ProcessDiskUsageLine,
                 default)).FirstOrDefault();
+        }
+
+        public async Task ClearLogsAsync()
+        {
+            await BashExecutor.ExecuteAsync(
+                "sudo journalctl --user -u Resona.service --rotate && sudo journalctl --user -u Resona.service --vacuum-size=1M",
+                default);
         }
 
         private void OnSettingsChanged(object sender, CancelEventArgs e)

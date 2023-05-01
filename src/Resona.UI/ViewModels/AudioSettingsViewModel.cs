@@ -13,6 +13,7 @@ namespace Resona.UI.ViewModels
     public class AudioSettingsViewModel : ReactiveObject
     {
 #if DEBUG
+        [Obsolete("Do not use outside of design time")]
         public AudioSettingsViewModel()
             : this(new DevAudioOutputService())
         {

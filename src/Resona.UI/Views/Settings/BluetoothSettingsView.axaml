@@ -9,6 +9,8 @@
 			 xmlns:local="using:Resona.UI.Views.Settings"
 			 xmlns:devices="using:Resona.Services.Bluetooth"
 			 xmlns:converters="using:Avalonia.Controls.Converters"
+			 x:CompileBindings="True"
+			 x:DataType="vm:BluetoothSettingsViewModel"
 			 x:Name="Root">
 	<Design.DataContext>
 		<vm:BluetoothSettingsViewModel />
@@ -91,6 +93,7 @@
 								Classes.disconnected="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.NotConnected}}"
 								Classes.connecting="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.Connecting}}">
 							<Button Background="Transparent"
+									x:CompileBindings="False"
 									Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
 									CommandParameter="{Binding}"
 									HorizontalAlignment="Stretch"

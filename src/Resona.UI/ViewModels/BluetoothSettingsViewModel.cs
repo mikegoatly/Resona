@@ -19,6 +19,7 @@ namespace Resona.UI.ViewModels
         private static readonly ILogger logger = Log.ForContext<BluetoothSettingsViewModel>();
 
 #if DEBUG
+        [Obsolete("Do not use outside of design time")]
         public BluetoothSettingsViewModel()
             : this(new DevBluetoothService())
         {

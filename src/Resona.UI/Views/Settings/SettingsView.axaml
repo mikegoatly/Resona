@@ -13,15 +13,18 @@
 	Margin="0,48,0,0">
 
 		</Border>
-	<TabControl Padding="0,20,0,0" Margin="0">
-		
-		<TabItem Header="Audio settings">
-			<local:AudioSettingsView DataContext="{Binding AudioSettings}" />
-		</TabItem>
-		<TabItem Header="Bluetooth devices">
-			<local:BluetoothSettingsView DataContext="{Binding BluetoothSettings}" />
-		</TabItem>
-	</TabControl>
+		<TabControl Padding="0,20,0,0" Margin="0">
+
+			<TabItem Header="Audio settings">
+				<local:AudioSettingsView />
+			</TabItem>
+			<TabItem Header="Bluetooth devices">
+				<local:BluetoothSettingsView />
+			</TabItem>
+			<TabItem Header="Advanced">
+				<local:AdvancedSettingsView />
+			</TabItem>
+		</TabControl>
 
 	</Grid>
 

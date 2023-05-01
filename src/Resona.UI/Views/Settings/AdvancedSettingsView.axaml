@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:vm="using:Resona.UI.ViewModels"
+			 xmlns:converters="using:Avalonia.Controls.Converters"
+			 xmlns:audio="using:Resona.Services.Audio"
+			 x:Name="Root"
+			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 x:CompileBindings="True"
+			 x:DataType="vm:AdvancedSettingsViewModel"
+             x:Class="Resona.UI.Views.Settings.AdvancedSettingsView">
+	<Design.DataContext>
+		<vm:AdvancedSettingsViewModel />
+	</Design.DataContext>
+
+	<StackPanel Orientation="Vertical" Spacing="5" Margin="16,0">
+		<StackPanel.Styles>
+			<Style Selector="StackPanel > :is(Control)">
+				<Setter Property="VerticalAlignment" Value="Center" />
+				<Setter Property="Margin" Value="0" />
+			</Style>
+
+			<Style Selector="StackPanel > Button">
+				<Setter Property="VerticalAlignment" Value="Stretch" />
+			</Style>
+
+			<Style Selector="Label">
+				<Setter Property="Margin" Value="0,0,5,0" />
+			</Style>
+		</StackPanel.Styles>
+
+		<StackPanel Orientation="Horizontal"  DockPanel.Dock="Top">
+			<Label Target="LogLevel">Logging level:</Label>
+			<ComboBox
+				MinWidth="180"
+				x:Name="LogLevel"
+				ItemsSource="{Binding LogLevelOptions}"
+				  SelectedItem="{Binding LogLevel}">
+			</ComboBox>
+		</StackPanel>
+
+		<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+			<Label>Current log file size:</Label>
+			<TextBlock Text="{Binding LogSize, FallbackValue='-'}" />
+			<TextBlock Text="Mb" Margin="5,0,0,0"/>
+
+			<Button Command="{Binding RefreshLogSizeCommand}" Margin="5,0,0,0" Classes="secondary">
+				<icon:Icon Value="fa fa-arrows-rotate" />
+			</Button>
+
+			<Button Command="{Binding ClearLogsCommand}" Margin="10,0,0,0" Classes="danger">
+				<DockPanel>
+					<icon:Icon Value="fa fa-trash" Margin="0,0,5,0" />
+					<TextBlock>Clear logs</TextBlock>
+				</DockPanel>
+			</Button>
+		</StackPanel>
+	</StackPanel>
+</UserControl>

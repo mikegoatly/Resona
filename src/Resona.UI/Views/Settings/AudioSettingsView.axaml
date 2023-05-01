@@ -7,6 +7,8 @@
 			 xmlns:converters="using:Avalonia.Controls.Converters"
 			 xmlns:audio="using:Resona.Services.Audio"
 			 x:Name="Root"
+			 x:CompileBindings="True"
+			 x:DataType="vm:AudioSettingsViewModel"
 			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
              x:Class="Resona.UI.Views.Settings.AudioSettingsView">
 	<Design.DataContext>
@@ -23,6 +25,7 @@
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
 						<Button Classes="secondary"
+								x:CompileBindings="False"
 								Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
 								CommandParameter="{Binding}"
 								Height="50"
