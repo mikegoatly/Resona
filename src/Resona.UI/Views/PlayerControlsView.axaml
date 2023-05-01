@@ -13,6 +13,7 @@
 			 xmlns:converters="using:Resona.UI.Converters"
 			 x:Name="Root"
 			 Height="140"
+			 x:CompileBindings="True"
 			 Background="#120810"
 			 ClipToBounds="False">
 	<Design.DataContext>
@@ -56,6 +57,7 @@
 							<i:Interaction.Behaviors>
 								<ia:EventTriggerBehavior EventName="Tapped">
 									<ia:InvokeCommandAction
+										x:CompileBindings="False"
 										Command="{Binding DataContext.NavigateToPlaying, ElementName=Root}"/>
 								</ia:EventTriggerBehavior>
 							</i:Interaction.Behaviors>

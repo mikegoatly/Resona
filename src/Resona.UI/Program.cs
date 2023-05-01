@@ -98,8 +98,7 @@ namespace Resona.UI
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToTrace()
-                .WithIcons(container => container
-                .Register<FontAwesomeIconProvider>())
+                .WithIcons(container => container.Register<FontAwesomeIconProvider>())
                 .UseReactiveUI();
         }
     }

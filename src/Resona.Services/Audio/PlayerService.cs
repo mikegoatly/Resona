@@ -76,6 +76,8 @@ namespace Resona.Services.Audio
                     {
                         if (x != null)
                         {
+                            logger.Debug("Initializing player service from last played content");
+
                             // Don't startle anyone by starting the audio playback from the last position as soon
                             // as the app is opened
                             this.Paused = true;

@@ -13,12 +13,14 @@ using Resona.Services;
 using Resona.Services.Audio;
 using Resona.Services.Libraries;
 
-using Splat;
+using Serilog;
 
 namespace Resona.UI.ViewModels
 {
     public class PlayerControlsViewModel : RoutableViewModelBase
     {
+        private static readonly ILogger logger = Log.ForContext<PlayerControlsViewModel>();
+
         private AudioTrack? audioTrack;
         private double position;
         private AudioContent? audioContent;
@@ -44,6 +46,8 @@ namespace Resona.UI.ViewModels
             SleepOptionsViewModel sleepOptions)
             : base(router, hostScreen, "player")
         {
+            logger.Verbose("Constructing player controls view model");
+
             this.playerService = playerService;
             this.audioRepository = audioRepository;
             this.imageProvider = imageProvider;
@@ -76,7 +80,7 @@ namespace Resona.UI.ViewModels
                         {
                             if (this.CurrentlyViewingViewModel<TrackListViewModel>(x => x.Model?.Id == this.audioContent.Id) == false)
                             {
-                                var viewModel = Locator.Current.GetRequiredService<TrackListViewModel>();
+                                var viewModel = Splat.Locator.Current.GetRequiredService<TrackListViewModel>();
                                 await viewModel.SetAudioContentAsync(this.audioContent.Id, default);
                                 return this.Router.Navigate.Execute(viewModel);
                             }
@@ -84,6 +88,8 @@ namespace Resona.UI.ViewModels
 
                         return Observable.Empty<IRoutableViewModel>();
                     }));
+
+            logger.Verbose("Constructed player controls view model");
         }
 
         private void UpdatePlayingTrack(PlayingTrack state)

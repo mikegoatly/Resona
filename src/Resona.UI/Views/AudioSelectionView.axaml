@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:Resona.UI.ViewModels"
 			 xmlns:con="using:Resona.UI.Converters"
+			 x:CompileBindings="False"
+			 x:DataType="vm:AudioSelectionViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Resona.UI.Views.AudioSelectionView">
 

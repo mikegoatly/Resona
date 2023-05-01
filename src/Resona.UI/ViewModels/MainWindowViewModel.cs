@@ -28,7 +28,7 @@ namespace Resona.UI.ViewModels
 
         public MainWindowViewModel(RoutingState router, ITimerManager timerManager)
         {
-            logger.Debug("Constructing view model");
+            logger.Verbose("Constructing main view model");
 
             this.Router = router;
             this.timerManager = timerManager;
@@ -61,6 +61,7 @@ namespace Resona.UI.ViewModels
                 .DistinctUntilChanged()
                 .Subscribe(x => this.ShowSettingsButton = x != typeof(SettingsViewModel));
 
+            logger.Verbose("Main view model created");
         }
 
         public RoutingState Router { get; }
