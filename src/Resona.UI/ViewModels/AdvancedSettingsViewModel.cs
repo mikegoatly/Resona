@@ -5,7 +5,9 @@ using System.Reactive.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
+using Resona.Persistence;
 using Resona.Services;
+using Resona.Services.Libraries;
 using Resona.Services.OS;
 
 namespace Resona.UI.ViewModels
@@ -18,12 +20,12 @@ namespace Resona.UI.ViewModels
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public AdvancedSettingsViewModel()
-            : this(new FakeLogService())
+            : this(new FakeLogService(), new FakeLibrarySyncer())
         {
         }
 #endif
 
-        public AdvancedSettingsViewModel(ILogService logService)
+        public AdvancedSettingsViewModel(ILogService logService, ILibrarySyncer librarySyncer)
         {
             this.logService = logService;
             this.RefreshLogSizeCommand = ReactiveCommand.Create(this.RefreshLogSize);
@@ -35,6 +37,12 @@ namespace Resona.UI.ViewModels
                 });
 
             this.RefreshLogSize();
+
+            this.RebuildLibraryDataCommand = ReactiveCommand.Create(() =>
+            {
+                ResonaDb.Reset();
+                librarySyncer.StartSync();
+            });
         }
 
         public ReactiveCommand<Unit, Unit> RefreshLogSizeCommand { get; }
@@ -55,6 +63,7 @@ namespace Resona.UI.ViewModels
 
         [Reactive]
         public float? LogSize { get; set; }
+        public ReactiveCommand<Unit, Unit> RebuildLibraryDataCommand { get; }
 
         private void RefreshLogSize()
         {

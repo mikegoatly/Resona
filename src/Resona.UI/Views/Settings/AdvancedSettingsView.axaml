@@ -31,6 +31,8 @@
 			</Style>
 		</StackPanel.Styles>
 
+		<TextBlock Classes="header">Logging</TextBlock>
+
 		<StackPanel Orientation="Horizontal"  DockPanel.Dock="Top">
 			<Label Target="LogLevel">Logging level:</Label>
 			<ComboBox
@@ -56,6 +58,20 @@
 					<TextBlock>Clear logs</TextBlock>
 				</DockPanel>
 			</Button>
+		</StackPanel>
+
+		<TextBlock Classes="header">Audio Library</TextBlock>
+		
+		<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+			<Button Command="{Binding RebuildLibraryDataCommand}" Classes="danger">
+				<DockPanel>
+					<icon:Icon Value="fa fa-trowel-bricks" Margin="0,0,5,0" />
+					<TextBlock>Rebuild library database</TextBlock>
+				</DockPanel>
+			</Button>
+
+			<TextBlock Margin="10,0,0,0">Caution - All your audiobooks positions will be lost!</TextBlock>
+			
 		</StackPanel>
 	</StackPanel>
 </UserControl>

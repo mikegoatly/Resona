@@ -37,7 +37,10 @@
 			</StackPanel>
 			<TabControl>
 				<TabItem Header="Foo">
-					<TextBlock Margin="10">Hello world</TextBlock>
+					<StackPanel Orientation="Vertical">
+						<TextBlock Margin="10" Classes="header">Hello world</TextBlock>
+						<TextBlock Margin="10">Hello world</TextBlock>
+					</StackPanel>
 				</TabItem>
 				<TabItem Header="Bar">
 
@@ -105,6 +108,12 @@
 	<Style Selector="TextBlock">
 		<Setter Property="FontSize" Value="20" />
 		<Setter Property="FontFamily" Value="resm:Resona.UI.Fonts.Acme-Regular.ttf?assembly=Resona.UI#Acme" />
+
+		<Style Selector="^.header">
+			<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
+			<Setter Property="FontSize" Value="24" />
+			<Setter Property="Margin" Value="0,10,0,0" />
+		</Style>
 	</Style>
 
 	<Style Selector="Label">
