@@ -182,13 +182,10 @@ namespace Resona.Services.Audio
             get => this.currentStream == 0 ? 0 : Bass.ChannelGetPosition(this.currentStream) / this.channelLength;
             set
             {
-                if (Math.Round(this.Position, 3) != Math.Round(value, 3))
-                {
-                    var positionInBytes = (long)(this.channelLength * value);
-                    logger.Debug("Setting position to {PositionInBytes} ({PositionAsPercent}%)", positionInBytes, value);
+                var positionInBytes = (long)(this.channelLength * value);
+                logger.Debug("Setting position to {PositionInBytes} ({PositionAsPercent}%)", positionInBytes, value);
 
-                    Bass.ChannelSetPosition(this.currentStream, positionInBytes);
-                }
+                Bass.ChannelSetPosition(this.currentStream, positionInBytes);
             }
         }
 

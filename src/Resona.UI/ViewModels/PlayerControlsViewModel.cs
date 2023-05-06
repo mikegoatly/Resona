@@ -117,7 +117,13 @@ namespace Resona.UI.ViewModels
         private void UpdatePlayerState(PlaybackState state)
         {
             this.IsPlaying = state.Kind == PlaybackStateKind.Playing;
-            this.Position = state.Position;
+
+            // When receiving position updates from the player service we set the underlying field directly
+            // to avoid the property setter to trigger a call back to the player service.
+            // This way only direct interactions with the slider control bound to the Position property
+            // will cause the player service to seek to a new position.
+            this.position = state.Position;
+            this.RaisePropertyChanged(nameof(this.Position));
         }
 
         public string? Album => this.audioContent?.Name;
@@ -153,9 +159,9 @@ namespace Resona.UI.ViewModels
             }
         }
 
-        public ReactiveCommand<Unit, Unit> MovePreviousCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit>? MovePreviousCommand { get; private set; }
 
-        public ReactiveCommand<Unit, Unit> MoveNextCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit>? MoveNextCommand { get; private set; }
 
         [Reactive]
         public bool CanMoveNext { get; set; }
@@ -169,9 +175,9 @@ namespace Resona.UI.ViewModels
         public bool CanPlay => this.audioTrack != null;
 
         // Command to play/pause the current track
-        public ReactiveCommand<Unit, Unit> PlayPauseCommand { get; private set; }
-        public ReactiveCommand<Unit, IObservable<IRoutableViewModel>> NavigateToPlaying { get; }
-        public SleepOptionsViewModel SleepOptions { get; }
+        public ReactiveCommand<Unit, Unit>? PlayPauseCommand { get; private set; }
+        public ReactiveCommand<Unit, IObservable<IRoutableViewModel>>? NavigateToPlaying { get; }
+        public SleepOptionsViewModel? SleepOptions { get; }
 
         private void LoadCover(AudioContent? audioContent)
         {
