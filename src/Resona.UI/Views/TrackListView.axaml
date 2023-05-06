@@ -49,8 +49,7 @@
 							<i:Interaction.Behaviors>
 								<ia:EventTriggerBehavior EventName="Tapped">
 									<ia:InvokeCommandAction 
-										x:CompileBindings="False"
-										Command="{Binding DataContext.PlayTrack, ElementName=Root}"
+										Command="{ReflectionBinding ViewModel.PlayTrack, ElementName=Root}"
 										CommandParameter="{Binding}"/>
 								</ia:EventTriggerBehavior>
 							</i:Interaction.Behaviors>

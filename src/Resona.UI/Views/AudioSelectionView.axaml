@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:Resona.UI.ViewModels"
 			 xmlns:con="using:Resona.UI.Converters"
-			 x:CompileBindings="False"
+			 x:CompileBindings="True"
+			 x:Name="Root"
+			 xmlns:local="using:Resona.UI.Views"
 			 x:DataType="vm:AudioSelectionViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Resona.UI.Views.AudioSelectionView">
@@ -20,10 +22,10 @@
 			<StackLayout Orientation="Horizontal" />
 		</ItemsRepeater.Layout>
 		<ItemsRepeater.ItemTemplate>
-			<DataTemplate>
+			<DataTemplate x:DataType="vm:AudioKindInfo">
 
 				<Button
-					Command="{Binding $parent[ItemsRepeater].DataContext.AudioKindSelected}"
+					Command="{ReflectionBinding	ViewModel.AudioKindSelected, ElementName=Root}"
 					CommandParameter="{Binding Kind}"
 					Background="#4999"
 					CornerRadius="200"

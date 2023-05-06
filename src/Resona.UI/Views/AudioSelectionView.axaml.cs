@@ -9,11 +9,6 @@ namespace Resona.UI.Views
     {
         public AudioSelectionView()
         {
-            this.InitializeComponent();
-        }
-
-        private void InitializeComponent()
-        {
             AvaloniaXamlLoader.Load(this);
         }
     }

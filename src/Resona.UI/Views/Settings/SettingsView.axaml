@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Resona.UI.Views.Settings.SettingsView"
+			 x:CompileBindings="True"
              xmlns:local="using:Resona.UI.Views.Settings">
 	<Grid Margin="80,20" MaxWidth="800">
 		<Border

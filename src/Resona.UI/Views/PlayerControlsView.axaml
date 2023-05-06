@@ -57,8 +57,7 @@
 							<i:Interaction.Behaviors>
 								<ia:EventTriggerBehavior EventName="Tapped">
 									<ia:InvokeCommandAction
-										x:CompileBindings="False"
-										Command="{Binding DataContext.NavigateToPlaying, ElementName=Root}"/>
+										Command="{ReflectionBinding ViewModel.NavigateToPlaying, ElementName=Root}"/>
 								</ia:EventTriggerBehavior>
 							</i:Interaction.Behaviors>
 						</Image>
@@ -95,7 +94,6 @@
 
 				<Button Classes="primary circle"
 						Command="{Binding PlayPauseCommand}"
-						x:CompileBindings="False"
 						Width="100"
 						IsEnabled="{Binding CanPlay}"
 						Height="85"

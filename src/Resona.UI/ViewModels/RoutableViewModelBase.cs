@@ -40,7 +40,7 @@ namespace Resona.UI.ViewModels
 
         private bool CheckViewModelTypeAndPredicate<T>(object viewModel, Func<T, bool> predicate) where T : class
         {
-            return viewModel is T typedViewModel ? predicate(typedViewModel) : false;
+            return viewModel is T typedViewModel && predicate(typedViewModel);
         }
     }
 }

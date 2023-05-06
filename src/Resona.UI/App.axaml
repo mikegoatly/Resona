@@ -1,13 +1,8 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:Resona.UI"
              x:Class="Resona.UI.App"
 			 xmlns:sys="using:System"
 			 RequestedThemeVariant="Dark">
-    <Application.DataTemplates>
-        <local:DataTemplateViewLocator/>
-    </Application.DataTemplates>
-
 	<Application.Resources>
 		<sys:Double x:Key="PlayerHeight">100</sys:Double>
 		<Color x:Key="WarningColorDark">#99664b00</Color>
@@ -20,8 +15,8 @@
 		<Color x:Key="SecondaryColor">#638763</Color>
 		<Color x:Key="SuccessColor">Green</Color>
 	</Application.Resources>
-	
-    <Application.Styles>
+
+	<Application.Styles>
 		<FluentTheme />
 		<StyleInclude Source="/Styles/Styles.axaml"/>
 	</Application.Styles>

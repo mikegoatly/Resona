@@ -49,31 +49,30 @@
 								</Style.Animations>
 							</Style>
 						</ListBoxItem.Styles>
-						
+
 						<i:Interaction.Behaviors>
 							<ia:EventTriggerBehavior EventName="Tapped">
-								<ia:InvokeCommandAction 
-									x:CompileBindings="False"
-									Command="{Binding DataContext.AudioContentSelected, ElementName=Root}"
+								<ia:InvokeCommandAction
+									Command="{ReflectionBinding ViewModel.AudioContentSelected, ElementName=Root}"
 															   CommandParameter="{Binding}"/>
 							</ia:EventTriggerBehavior>
 						</i:Interaction.Behaviors>
 
 						<Grid>
-						<Image Source="{Binding Cover^}" HorizontalAlignment="Stretch" Height="245"
-							   Width="245"
-							   Stretch="UniformToFill" VerticalAlignment="Top"
-							   Opacity="0.7"/>
-						<Border VerticalAlignment="Bottom"
-							HorizontalAlignment="Stretch"
-								Background="#BFFF"
-								Padding="5,0">
-							<TextBlock
-								TextWrapping="Wrap"
-								TextAlignment="Center"
-								Foreground="Black"
-								 Text="{Binding Name}" />
-						</Border>
+							<Image Source="{Binding Cover^}" HorizontalAlignment="Stretch" Height="245"
+								   Width="245"
+								   Stretch="UniformToFill" VerticalAlignment="Top"
+								   Opacity="0.7"/>
+							<Border VerticalAlignment="Bottom"
+								HorizontalAlignment="Stretch"
+									Background="#BFFF"
+									Padding="5,0">
+								<TextBlock
+									TextWrapping="Wrap"
+									TextAlignment="Center"
+									Foreground="Black"
+									 Text="{Binding Name}" />
+							</Border>
 						</Grid>
 					</ListBoxItem>
 				</DataTemplate>

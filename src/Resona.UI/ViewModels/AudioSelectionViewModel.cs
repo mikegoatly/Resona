@@ -40,7 +40,7 @@ namespace Resona.UI.ViewModels
         };
 
         public ReactiveCommand<AudioKind, IRoutableViewModel> AudioKindSelected { get; }
-
-        public record AudioKindInfo(AudioKind Kind, string Title, string ImageSource);
     }
+
+    public record AudioKindInfo(AudioKind Kind, string Title, string ImageSource);
 }

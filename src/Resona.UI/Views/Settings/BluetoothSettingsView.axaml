@@ -93,8 +93,7 @@
 								Classes.disconnected="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.NotConnected}}"
 								Classes.connecting="{Binding Status, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static devices:DeviceStatus.Connecting}}">
 							<Button Background="Transparent"
-									x:CompileBindings="False"
-									Command="{Binding DataContext.ConnectDeviceCommand, ElementName=Root}"
+									Command="{ReflectionBinding ViewModel.ConnectDeviceCommand, ElementName=Root}"
 									CommandParameter="{Binding}"
 									HorizontalAlignment="Stretch"
 									VerticalAlignment="Stretch">
