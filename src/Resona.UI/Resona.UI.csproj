@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<AssemblyName>Resona</AssemblyName>
 		<LangVersion>latest</LangVersion>
+		<TieredPGO>true</TieredPGO>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -51,7 +52,7 @@
 		<PackageReference Include="Avalonia.LinuxFramebuffer" Version="11.0.0-preview6" />
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview6" />
 		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview6" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.3.23174.2">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -60,8 +61,9 @@
 		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.0-preview6" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
 		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
-		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.5.0-preview6" />
+		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.6.0-preview6" />
 		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview6" />
+		<PackageReference Include="runtime.linux-arm64.Microsoft.DotNet.ILCompiler" Version="8.0.0-preview.3.23174.8" />
 		<PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="14.6.8" />
 	</ItemGroup>
 	<ItemGroup>
