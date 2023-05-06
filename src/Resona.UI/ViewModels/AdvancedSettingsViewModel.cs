@@ -20,7 +20,7 @@ namespace Resona.UI.ViewModels
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
         public AdvancedSettingsViewModel()
-            : this(new FakeLogService(), new FakeLibrarySyncer())
+            : this(new DevLogService(), new FakeLibrarySyncer())
         {
         }
 #endif

@@ -23,7 +23,7 @@ namespace Resona.Services
             {
                 services.AddSingleton<IBluetoothService, DevBluetoothService>();
                 services.AddSingleton<IAudioOutputService, DevAudioOutputService>();
-                services.AddSingleton<ILogService>(new FakeLogService());
+                services.AddSingleton<ILogService>(new DevLogService());
             }
 
             services.AddScoped<IAudioRepository, AudioRepository>();

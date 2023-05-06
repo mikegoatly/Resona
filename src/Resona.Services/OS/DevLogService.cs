@@ -1,7 +1,6 @@
 ﻿namespace Resona.Services.OS
 {
-#if DEBUG
-    public class FakeLogService : ILogService
+    public class DevLogService : ILogService
     {
         public Task ClearLogsAsync()
         {
@@ -13,5 +12,4 @@
             return Task.FromResult<float?>(100F);
         }
     }
-#endif
 }
