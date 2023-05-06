@@ -14,6 +14,8 @@ param (
     $DebugBuild = $false
 )
 
+$ErrorActionPreference = "Stop"
+
 $Folder = "./publish"
 $Project = ".\src\Resona.UI\Resona.UI.csproj"
 
@@ -34,6 +36,10 @@ if (-not $NoBuild) {
         dotnet publish $Project -o $Folder -r "linux-arm" -c Release -f net7.0 -p:PublishReadyToRun=true `
             -p:PublishSingleFile=true -p:PublishTrimmed=false `
             --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true
+    }
+
+    if (!$?) {
+        throw "Build failed"
     }
 }
 
