@@ -63,7 +63,6 @@
 		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.5.0-preview6" />
 		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview6" />
 		<PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="14.6.8" />
-		<PackageReference Include="Splat.Serilog" Version="14.6.8" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Fonts\Acme-Regular.ttf" />

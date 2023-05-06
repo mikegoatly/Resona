@@ -1,11 +1,9 @@
-﻿using System.ComponentModel;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 
 namespace Resona.Services.OS
 {
@@ -15,28 +13,11 @@ namespace Resona.Services.OS
         Task<float?> GetLogSizeMbAsync();
     }
 
-    public class LinuxLogService : ILogService
+    public class LinuxLogService : BaseLogService
     {
         private static readonly Regex defaultSinkRegex = new(@"take up (?<SizeMb>[^a-z]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private readonly LoggingLevelSwitch loggingLevelSwitch;
-
-        private readonly ILogger logger = Log.ForContext<LinuxLogService>();
-
-        public LinuxLogService()
-        {
-            Settings.Default.SettingsSaving += this.OnSettingsChanged;
-
-            this.loggingLevelSwitch = new LoggingLevelSwitch(this.GetCurrentLogLevel());
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.ControlledBy(this.loggingLevelSwitch)
-                .Enrich.FromLogContext()
-                .WriteTo.Console(new JournalLogLevelCustomFormatter())
-                .CreateLogger();
-        }
-
-        public async Task<float?> GetLogSizeMbAsync()
+        public override async Task<float?> GetLogSizeMbAsync()
         {
             return (await BashExecutor.ExecuteAsync<float?>(
                 "journalctl --user -u Resona.service --disk-usage",
@@ -44,28 +25,16 @@ namespace Resona.Services.OS
                 default)).FirstOrDefault();
         }
 
-        public async Task ClearLogsAsync()
+        public override async Task ClearLogsAsync()
         {
             await BashExecutor.ExecuteAsync(
                 "sudo journalctl --user -u Resona.service --rotate && sudo journalctl --user -u Resona.service --vacuum-size=1M",
                 default);
         }
 
-        private void OnSettingsChanged(object sender, CancelEventArgs e)
+        protected override LoggerConfiguration ConfigureLogOutput(LoggerConfiguration loggingConfig)
         {
-            this.loggingLevelSwitch.MinimumLevel = this.GetCurrentLogLevel();
-        }
-
-        private LogEventLevel GetCurrentLogLevel()
-        {
-            var parsedLogLevel = Enum.TryParse<LogEventLevel>(Settings.Default.LogLevel, out var logLevel);
-            if (!parsedLogLevel)
-            {
-                logLevel = LogEventLevel.Warning;
-                this.logger.Error("Unable to parse log level {LogLevel} - defaulting to Warning", Settings.Default.LogLevel);
-            }
-
-            return logLevel;
+            return loggingConfig.WriteTo.Console(new JournalLogLevelCustomFormatter());
         }
 
         private bool ProcessDiskUsageLine(string line, [NotNullWhen(true)] out float? result)
@@ -81,7 +50,7 @@ namespace Resona.Services.OS
                 }
                 else
                 {
-                    this.logger.Warning("Unable to parse log size from value {RawValue} - line was {LineText}", match.Groups["SizeMb"].Value, line);
+                    Trace.TraceWarning("Unable to parse log size from value {RawValue} - line was {LineText}", match.Groups["SizeMb"].Value, line);
                 }
             }
 

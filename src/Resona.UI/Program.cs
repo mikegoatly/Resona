@@ -18,9 +18,7 @@ using Resona.UI.ViewModels;
 
 using Serilog;
 
-using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
-using Splat.Serilog;
 
 namespace Resona.UI
 {
@@ -39,7 +37,6 @@ namespace Resona.UI
 
             services.AddSingleton((s) => new RoutingState());
             services.UseMicrosoftDependencyResolver();
-            Locator.CurrentMutable.UseSerilogFullLogger();
 
             // Initialize the DB - this will perform any required migrations
             if (ResonaDb.Initialize() == false)
