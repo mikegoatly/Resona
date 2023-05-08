@@ -85,5 +85,17 @@ namespace Resona.Services {
                 this["InactivityShutdownTimeout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HostWebClient {
+            get {
+                return ((bool)(this["HostWebClient"]));
+            }
+            set {
+                this["HostWebClient"] = value;
+            }
+        }
     }
 }

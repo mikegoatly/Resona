@@ -18,9 +18,8 @@ demand for it - I'd also be happy to receive contributions.
 
 I've a couple of things I still want to do:
 
-* Expose a web application from the device that parents can use to upload new content, rather than using `scp` 😊
+* Expose a web application from the device that parents can use to upload new content, rather than using `scp` 😊 (In progress - see the experimental web host section below)
 * Allow for more configuration options to allow kids to personalize things a bit, including the main icons for the home screen.
-
 
 # Features
 
@@ -102,6 +101,12 @@ Publishing will:
 * Stop and disable the service on the Pi (which will kill the app if it's running via the service)
 * Copy the updated artifacts
 * Re-enable and start the service on the Pi (if installed) - the app will auto run ready for you to play with it.
+
+## Experimental web host
+
+Some work has been done to expose a React-based web interface from the Pi. It's turned off by default but can be enabled from the advanced settings page.
+
+Once enabled, you can access the web interface from any device on the same network as the Pi by navigating to `http://<PiName>:8080`.
 
 ### Touchscreen installation
 

@@ -61,6 +61,17 @@ namespace Resona.UI.ViewModels
             }
         }
 
+        public bool WebHostEnabled
+        {
+            get => Settings.Default.HostWebClient;
+            set
+            {
+                Settings.Default.HostWebClient = value;
+                Settings.Default.Save();
+                this.RaisePropertyChanged();
+            }
+        }
+
         [Reactive]
         public float? LogSize { get; set; }
         public ReactiveCommand<Unit, Unit> RebuildLibraryDataCommand { get; }

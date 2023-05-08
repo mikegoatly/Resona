@@ -61,7 +61,7 @@
 		</StackPanel>
 
 		<TextBlock Classes="header">Audio Library</TextBlock>
-		
+
 		<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
 			<Button Command="{Binding RebuildLibraryDataCommand}" Classes="danger">
 				<DockPanel>
@@ -71,7 +71,18 @@
 			</Button>
 
 			<TextBlock Margin="10,0,0,0">Caution - All your audiobooks positions will be lost!</TextBlock>
-			
+
+		</StackPanel>
+
+		<TextBlock Classes="header">Experimental</TextBlock>
+
+		<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+			<Label Target="WebHostEnabled">Web client (served on port 8080):</Label>
+			<ToggleSwitch
+				x:Name="WebHostEnabled"
+				  IsChecked="{Binding WebHostEnabled}">
+			</ToggleSwitch>
+			<TextBlock FontSize="16" Margin="10,0,0,0">(Changing requires restart)</TextBlock>
 		</StackPanel>
 	</StackPanel>
 </UserControl>

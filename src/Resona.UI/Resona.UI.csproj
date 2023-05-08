@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
@@ -6,6 +6,11 @@
 		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<AssemblyName>Resona</AssemblyName>
 		<LangVersion>latest</LangVersion>
+
+		<DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
+		<SpaRoot>ClientApp\</SpaRoot>
+		<SpaProxyServerUrl>http://localhost:5002</SpaProxyServerUrl>
+		<SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -19,7 +24,7 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<AvaloniaResource Include="Assets\**" />
 		<AvaloniaResource Remove="Assets\acme.woff2" />
@@ -52,8 +57,8 @@
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview6" />
 		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="ReactiveUI.Fody" Version="18.4.34" />
 		<PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
@@ -63,12 +68,22 @@
 		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.5.0-preview6" />
 		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview6" />
 		<PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="14.6.8" />
+		<PackageReference Include="Splat.Serilog" Version="14.6.8" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.5" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Don't publish the SPA source files, but do show them in the project files list -->
+		<Content Remove="$(SpaRoot)**" />
+		<None Remove="$(SpaRoot)**" />
+		<None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<EmbeddedResource Include="Fonts\Acme-Regular.ttf" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Resona.Services\Resona.Services.csproj" />
+		<ProjectReference Include="..\Resona.Services\Resona.Services.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Properties\Resources.Designer.cs">
@@ -80,10 +95,10 @@
 			<DependentUpon>PlayerControlsView.axaml</DependentUpon>
 		</Compile>
 		<Compile Update="Views\PowerOptions.axaml.cs">
-		  <DependentUpon>PowerOptions.axaml</DependentUpon>
+			<DependentUpon>PowerOptions.axaml</DependentUpon>
 		</Compile>
 		<Compile Update="Views\Settings\AdvancedSettingsView.axaml.cs">
-		  <DependentUpon>AdvancedSettingsView.axaml</DependentUpon>
+			<DependentUpon>AdvancedSettingsView.axaml</DependentUpon>
 		</Compile>
 	</ItemGroup>
 	<ItemGroup>
@@ -106,5 +121,31 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+
+	<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
+		<!-- Ensure Node.js is installed -->
+		<Exec Command="node --version" ContinueOnError="true">
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+		</Exec>
+		<Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+		<Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+	</Target>
+
+	<Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+		<!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
+
+		<!-- Include the newly-built files in the publish output -->
+		<ItemGroup>
+			<DistFiles Include="$(SpaRoot)dist\**; $(SpaRoot)dist-server\**" />
+			<ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+				<RelativePath>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
+				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+				<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			</ResolvedFileToPublish>
+		</ItemGroup>
+	</Target>
 
 </Project>

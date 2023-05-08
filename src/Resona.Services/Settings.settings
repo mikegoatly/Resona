@@ -20,5 +20,8 @@
     <Setting Name="InactivityShutdownTimeout" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">02:00:00</Value>
     </Setting>
+    <Setting Name="HostWebClient" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
