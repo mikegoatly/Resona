@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,17 +41,19 @@ namespace Resona.UI
                 ResonaDb.Reset();
             }
 
-            var avaloniaTask = StartAvaloniaAsync(args);
+            var applicationExitCancellationTokenSource = new CancellationTokenSource();
+
+            var avaloniaTask = StartAvaloniaAsync(args, applicationExitCancellationTokenSource.Token);
 
             if (Settings.Default.HostWebClient)
             {
-                StartWebApp(args);
+                StartWebApp(args, applicationExitCancellationTokenSource);
             }
 
             return await avaloniaTask;
         }
 
-        private static void StartWebApp(string[] args)
+        private static void StartWebApp(string[] args, CancellationTokenSource applicationExitCancellationTokenSource)
         {
             try
             {
@@ -79,6 +82,9 @@ namespace Resona.UI
                     app.Run("http://0.0.0.0:8080");
 
                     Log.Information("Web application exited");
+
+                    // Signal to the main UI task that the web app has exited and the application should shut down
+                    applicationExitCancellationTokenSource.Cancel();
                 })
                 {
                     IsBackground = true
@@ -90,9 +96,11 @@ namespace Resona.UI
             }
         }
 
-        private static Task<int> StartAvaloniaAsync(string[] args)
+        private static async Task<int> StartAvaloniaAsync(string[] args, CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            var barrier = new SemaphoreSlim(0);
+            var exitCode = 0;
+            new Thread(() =>
             {
                 Log.Debug("Building Avalonia app");
 
@@ -101,12 +109,29 @@ namespace Resona.UI
                 {
                     SilenceConsole();
                     Log.Information("Starting in DRM mode");
-                    return builder.StartLinuxDrm(args, scaling: 1);
+                    exitCode = builder.StartLinuxDrm(args, scaling: 1);
                 }
 
                 Log.Information("Starting in desktop mode");
-                return builder.StartWithClassicDesktopLifetime(args);
-            });
+                exitCode = builder.StartWithClassicDesktopLifetime(args);
+
+                barrier.Release();
+            })
+            {
+                IsBackground = true
+            }.Start();
+
+            try
+            {
+                await barrier.WaitAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Information("Application exit detected");
+                Process.GetCurrentProcess().Kill();
+            }
+
+            return exitCode;
         }
 
         private static void RegisterServices()
