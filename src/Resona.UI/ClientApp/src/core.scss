@@ -1,0 +1,31 @@
+:root {
+    --primary: #9F6BA0;
+    --secondary: #638763;
+    --dark: #30362F;
+    --success: green;
+    --warning: DarkGoldenrod;
+    --danger: red;
+
+    --primary-dark: darken(#9F6BA0, 50%);
+    --secondary-dark: darken(#638763, 50%);
+    --dark-dark: darken(#30362F, 50%);
+    --success-dark: darken(green, 50%);
+    --warning-dark: darken(DarkGoldenrod, 50%);
+    --danger-dark: darken(red, 50%);
+}
+
+// Font
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+// #root {
+//     height: 100vh;
+//     width: 100vw;
+//     display: flex;
+// }

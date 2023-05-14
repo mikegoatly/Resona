@@ -8,6 +8,8 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 using Projektanker.Icons.Avalonia;
@@ -65,16 +67,13 @@ namespace Resona.UI
                     Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", "Microsoft.AspNetCore.SpaProxy");
 
                     var builder = WebApplication.CreateBuilder(args);
-
-                    // Expose the same singleton instance of the audio repository to the web app
-                    builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAudioRepository>());
+                    ConfigureSharedServices(builder);
 
                     var app = builder.Build();
 
                     app.UseStaticFiles();
 
-                    // This is just a test api to prove connectivity between the SPA client app and the main app 
-                    app.MapGet("/api", async (IAudioRepository audioRepository, CancellationToken cancellationToken) => (await audioRepository.GetLastPlayedContentAsync(cancellationToken))?.Name);
+                    MapApis(app);
 
                     app.MapFallbackToFile("index.html");
 
@@ -94,6 +93,27 @@ namespace Resona.UI
             {
                 Log.ForContext<App>().Fatal(ex, "Error starting web application");
             }
+        }
+
+        private static void ConfigureSharedServices(WebApplicationBuilder builder)
+        {
+            // Expose the same singleton instance of the audio repository to the web app
+            builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAudioRepository>());
+            builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAlbumImageProvider>());
+        }
+
+        private static void MapApis(WebApplication app)
+        {
+            app.MapGet("/api/library/{audioKind}", async (IAudioRepository audioRepository, [FromRoute] string audioKind, CancellationToken cancellationToken) =>
+            {
+                return await audioRepository.GetAllAsync(Enum.Parse<AudioKind>(audioKind, true), cancellationToken);
+            });
+
+            app.MapGet("/api/library/{albumId:int}/image", async (IAudioRepository audioRepository, IAlbumImageProvider imageProvider, [FromRoute] int albumId, CancellationToken cancellationToken) =>
+            {
+                var audio = await audioRepository.GetByIdAsync(albumId, cancellationToken);
+                return Results.Stream(imageProvider.GetImageStream(audio));
+            });
         }
 
         private static async Task<int> StartAvaloniaAsync(string[] args, CancellationToken cancellationToken)

@@ -1,24 +1,26 @@
-import logo from './Resona.png'
-import './App.css'
-import { useQuery } from '@tanstack/react-query'
+import { BrowserRouter, Route, Routes, } from 'react-router-dom'
+import LibraryView from './pages/LibraryView'
+import { useState } from 'react'
+import Navigation from './components/Navigation';
+import PageContainer from './components/PageContainer'
 
 function App() {
-    const { isLoading, error, data } = useQuery({
-        queryFn: () =>
-            fetch('/api').then(
-                (res) => res.text(),
-            ),
-    })
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggle = () => setIsOpen(!isOpen);
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    { isLoading ? "Loading..." : "Last played: " + data }
-                </p>
-            </header>
-        </div>
+        <BrowserRouter>
+            <div id="root">
+                <Navigation />
+
+                <PageContainer>
+                    <Routes>
+                        <Route path="/library/:audioKind" Component={LibraryView} />
+                    </Routes>
+                </PageContainer>
+            </div>
+        </BrowserRouter>
     )
 }
 

@@ -1,0 +1,10 @@
+// .page-container {
+//     width: 100vw;
+//     flex: 1;
+// }
+
+.page-container > * {
+    max-width: 1000px;
+    margin: 1em auto calc(1em + 64px) auto;
+    padding: 0 1em;
+}

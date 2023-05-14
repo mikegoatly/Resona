@@ -1,0 +1,38 @@
+.library-view {
+    // height: 100%;
+    // display: flex;
+    // flex-direction: column;
+
+    // .library-items {
+    //     flex-grow: 1;
+    //     overflow-y: auto;
+    //     padding: 0 1em;
+    // }
+
+    .library-entry {
+        display: flex;
+        flex-direction: row;
+        margin: .5em 0;
+        padding: 0.2em;
+        align-items: center;
+
+        img {
+            margin-right: 1em;
+        }
+    }
+
+    .library-actions {
+        top: auto;
+        bottom: 0;
+        position: fixed;
+
+        .add {
+            position: absolute;
+            z-index: 1;
+            top: -30px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+        }
+    }
+}

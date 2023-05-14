@@ -1,0 +1,22 @@
+.app-bar {
+    img {
+        margin-right: .5em;
+    }
+
+    & a:first-of-type {
+        margin-right: 1em;
+    }
+
+    a {
+        height: 64px;
+        color: var(--light);
+
+        &:hover {
+            color: var(--dark);
+        }
+
+        &.active {
+            background: var(--secondary);
+        }
+    }
+}
