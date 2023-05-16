@@ -4,7 +4,6 @@ import Spinner from '../components/Spinner';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import './LibraryView.scss'
-import Button from '@mui/material/Button';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Fab from '@mui/material/Fab';

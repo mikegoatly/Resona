@@ -1,0 +1,44 @@
+.upload-view {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    input[type="file"] {
+        display: none;
+    }
+
+    .pick-files {
+        margin-top: 2em;
+        font-size: 1.1rem;
+    }
+
+    .upload-container {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        margin-bottom: 1em;
+        
+        .upload-controls {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 1em;
+
+            >* {
+                margin-right: 1em;
+            }
+
+            margin-top: 1em;
+
+            input[type="text"] {
+                padding: 0.2em;
+            }
+        }
+
+        .file-progress {
+            flex-grow: 1;
+
+            overflow: auto;
+        }
+    }
+}

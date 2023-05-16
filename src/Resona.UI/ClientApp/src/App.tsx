@@ -3,6 +3,7 @@ import LibraryView from './pages/LibraryView'
 import { useState } from 'react'
 import Navigation from './components/Navigation';
 import PageContainer from './components/PageContainer'
+import UploadView from './pages/UploadView';
 
 function App() {
     const [isOpen, setIsOpen] = useState(false);
@@ -11,11 +12,12 @@ function App() {
 
     return (
         <BrowserRouter>
-            <div id="root">
+            <div id="main">
                 <Navigation />
 
                 <PageContainer>
                     <Routes>
+                        <Route path="/library/:audioKind/add" Component={UploadView} />
                         <Route path="/library/:audioKind" Component={LibraryView} />
                     </Routes>
                 </PageContainer>
