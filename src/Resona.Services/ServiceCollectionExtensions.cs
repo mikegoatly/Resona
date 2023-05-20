@@ -31,6 +31,7 @@ namespace Resona.Services
             services.AddSingleton<IPlayerService, PlayerService>();
             services.AddSingleton<IAlbumImageProvider, AlbumImageProvider>();
             services.AddSingleton<ILibrarySyncer, LibrarySyncer>();
+            services.AddSingleton<ILibraryFileManager, LibraryFileManager>();
             services.AddSingleton<ILibraryFileWatcher, LibraryFileWatcher>();
             services.AddSingleton<IOsCommandExecutor, OsCommandExecutor>();
             services.AddSingleton<ITimerManager, TimerManager>();

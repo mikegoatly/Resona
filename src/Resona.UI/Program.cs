@@ -8,6 +8,7 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,6 +68,10 @@ namespace Resona.UI
                     Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", "Microsoft.AspNetCore.SpaProxy");
 
                     var builder = WebApplication.CreateBuilder(args);
+
+                    // Set the max request size to 100MB
+                    builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 100_000_000);
+
                     ConfigureSharedServices(builder);
 
                     var app = builder.Build();
@@ -100,19 +105,46 @@ namespace Resona.UI
             // Expose the same singleton instance of the audio repository to the web app
             builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAudioRepository>());
             builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAlbumImageProvider>());
+            builder.Services.AddSingleton(Locator.Current.GetRequiredService<ILibraryFileManager>());
         }
 
         private static void MapApis(WebApplication app)
         {
-            app.MapGet("/api/library/{audioKind}", async (IAudioRepository audioRepository, [FromRoute] string audioKind, CancellationToken cancellationToken) =>
+            app.MapGet("/api/library/{audioKind}", async (
+                [FromServices] IAudioRepository audioRepository,
+                [FromRoute] string audioKind,
+                CancellationToken cancellationToken) =>
             {
                 return await audioRepository.GetAllAsync(Enum.Parse<AudioKind>(audioKind, true), cancellationToken);
             });
 
-            app.MapGet("/api/library/{albumId:int}/image", async (IAudioRepository audioRepository, IAlbumImageProvider imageProvider, [FromRoute] int albumId, CancellationToken cancellationToken) =>
+            app.MapGet("/api/library/{albumId:int}/image", async (
+                [FromServices] IAudioRepository audioRepository,
+                [FromServices] IAlbumImageProvider imageProvider,
+                [FromRoute] int albumId,
+                CancellationToken cancellationToken) =>
             {
                 var audio = await audioRepository.GetByIdAsync(albumId, cancellationToken);
                 return Results.Stream(imageProvider.GetImageStream(audio));
+            });
+
+            app.MapPost("/api/library/{audioKind}", async (
+                [FromServices] ILibraryFileManager fileManager,
+                [FromRoute] string audioKind,
+                HttpContext httpContext,
+                CancellationToken cancellationToken) =>
+            {
+                var form = await httpContext.Request.ReadFormAsync(cancellationToken);
+                var albumName = form["albumName"].ToString();
+                var file = form.Files["file"] ?? throw new InvalidOperationException("No file sent");
+
+                await fileManager.UploadFileAsync(
+                    Enum.Parse<AudioKind>(audioKind, true),
+                    albumName,
+                    file.FileName,
+                    file.Length,
+                    file.OpenReadStream(),
+                    cancellationToken);
             });
         }
 

@@ -14,6 +14,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.0",
     "@tanstack/react-query": "^4.29.5",
+    "axios": "^1.4.0",
     "mp3tag.js": "^3.3.2",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",

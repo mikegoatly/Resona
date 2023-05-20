@@ -38,23 +38,21 @@ const LibraryView = () => {
         return (<Spinner />)
     }
 
-    if (data == null || data.length === 0) {
-        return (<p>Nothing in this part of the library</p>)
-    }
-
     return (<div className="library-view">
         <section className="library-items">
-            {data.map((entry) => (
-                <Card variant="elevation" className="library-entry" key={entry.id}>
-                    <img loading="lazy" title={`Album art for ${entry.name}`} width={50} height={50} src={`/api/library/${entry.id}/image`} />
-                    <Typography variant='body1'> {entry.name}</Typography>
-                </Card>
-            ))}
+            {data == null || data.length === 0
+                ? (<p>There's nothing here yet - add something by tapping on the add button.</p>)
+                : data.map((entry) => (
+                    <Card variant="elevation" className="library-entry" key={entry.id}>
+                        <img loading="lazy" title={`Album art for ${entry.name}`} width={50} height={50} src={`/api/library/${entry.id}/image`} />
+                        <Typography variant='body1'> {entry.name}</Typography>
+                    </Card>
+                ))}
         </section>
         <AppBar color="primary" className="library-actions" >
             <Toolbar>
-                <Fab className="add" color="secondary" aria-label="add">
-                    <AddIcon onClick={() => navigate(`/library/${audioKind}/add`)} />
+                <Fab className="add" color="secondary" aria-label="add" onClick={() => navigate(`/library/${audioKind}/add`)}>
+                    <AddIcon />
                 </Fab>
             </Toolbar>
         </AppBar>

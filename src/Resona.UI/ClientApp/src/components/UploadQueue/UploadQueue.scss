@@ -1,0 +1,17 @@
+.upload-state {
+    background-color: var(--secondary);
+    width: 250px;
+    padding: 0.1em 0.5em;
+
+    div { 
+        padding: 0.1em 0;
+        font-size: 0.6em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    span {
+        margin: 0.4em 0 0 0;
+    }
+}

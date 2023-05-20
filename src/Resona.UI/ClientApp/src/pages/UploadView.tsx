@@ -4,32 +4,32 @@ import { useRef, useState } from "react";
 import MP3Tag from "mp3tag.js";
 import { useParams } from "react-router-dom";
 import "./UploadView.scss"
-import Paper from "@mui/material/Paper";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { useUploadContext } from "../components/UploadQueue/UploadContext";
+import { Fab } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import UploadIcon from '@mui/icons-material/UploadFile';
 
-interface State {
-    files: {
-        file: File;
-        progress: number;
-    }[]
+interface AlbumFiles {
+    files: File[];
     albumName: string;
 }
 
 const UploadView = () => {
-    const [state, setState] = useState<State>();
+    const [state, setState] = useState<AlbumFiles[]>([]);
     const { audioKind } = useParams()
+    const { enqueueUploadFiles } = useUploadContext();
 
     const ref = useRef<HTMLInputElement>(null);
 
-    const albumTitle = audioKind === "audiobook" ? "Audiobook name" : audioKind === "music" ? "Album title" : "Sleep track title";
+    const albumTitle = audioKind === "audiobook" ? "Audiobook" : audioKind === "music" ? "Album" : "Sleep track";
     const audioKindText = audioKind === "audiobook" ? "audiobook" : audioKind === "music" ? "album" : "sleep track";
 
     async function filesChanged(files: FileList | null): Promise<void> {
-        if (files == null) {
-            setState(undefined);
+        if (files == null || files.length === 0) {
+            return;
         }
         else {
-            const fileArray = [];
+            const fileArray: File[] = [];
             let title: undefined | string = undefined;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
@@ -44,15 +44,29 @@ const UploadView = () => {
                 fileArray.push(file);
             }
 
-            setState({
-                files: fileArray.map(file => ({ file, progress: 0 })),
-                albumName: title ?? "New upload"
-            });
+            setState(s => [
+                ...s, {
+                    files: fileArray,
+                    albumName: title ?? "New upload"
+                }]);
+
+            if (ref.current != null) {
+                ref.current.value = "";
+            }
         }
     }
 
-    // Upload the files to the server using react-query, one at a time. Progress is reported for each file.
+    const uploadFiles = () => {
+        if (state == null || audioKind == null) {
+            return;
+        }
 
+        for (let albumFiles of state) {
+            enqueueUploadFiles(albumFiles.files, albumFiles.albumName, audioKind);
+        }
+
+        setState([]);
+    }
 
     return (
         <div className="upload-view">
@@ -64,6 +78,7 @@ const UploadView = () => {
             <Button className="pick-files" variant="contained" onClick={() => ref.current?.click()}>Select files...</Button>
 
             <input
+                placeholder="Select files..."
                 type="file"
                 id="file"
                 name="file"
@@ -75,30 +90,39 @@ const UploadView = () => {
             {state != null &&
                 (
                     <div className="upload-container">
-                        <div className="upload-controls">
-                            <label htmlFor="album-title">{albumTitle}</label>
-                            <input
-                                title={albumTitle}
-                                type="text"
-                                value={state.albumName}
-                                onChange={e => setState({ ...state, albumName: e.target.value })}
-                            />
-                            <Button className="upload" variant="contained" onClick={uploadFiles}>Upload</Button>
-                        </div>
-                        <AutoSizer>
-                            {({ height, width }) => (
-                                <Paper className="file-progress" style={{ height, width }}>
-
-                                    <ul>
-                                        {
-                                            state.files.map(({ f: { name } }) => (
-                                                <li key={name}>{name}</li>
-                                            ))
+                        <div className="">
+                            {state.map((albumFile, index) => (
+                                <div key={index} className="upload-controls">
+                                    <label htmlFor="album-title">{albumTitle}</label>
+                                    <input
+                                        title={albumTitle}
+                                        type="text"
+                                        value={albumFile.albumName}
+                                        onChange={e => setState(s => {
+                                            const updated = [...s];
+                                            updated[index] = { ...s[index], albumName: e.target.value };
+                                            return updated;
                                         }
-                                    </ul>
-                                </Paper>
-                            )}
-                        </AutoSizer>
+                                        )}
+                                    />
+                                    <Typography>
+                                        {albumFile.files.length} {albumFile.files.length === 1 ? "file" : "files"}
+                                    </Typography>
+                                    <Fab color="secondary" aria-label="delete" onClick={() => setState(s => s.filter((_, i) => i !== index))}>
+                                        <DeleteIcon />
+                                    </Fab>
+                                </div>
+                            ))}
+                        </div>
+
+                        {state.length > 0 && (
+                            <Button className="upload" variant="contained" onClick={uploadFiles}>
+                                <UploadIcon />
+                                <Typography>
+                                    Upload
+                                </Typography>
+                            </Button>
+                        )}
                     </div>
                 )}
 

@@ -21,25 +21,19 @@ namespace Resona.Services.Libraries
         private readonly SemaphoreSlim syncLock = new(1);
         private bool requiresResync;
         private readonly IAlbumImageProvider thumbnailProvider;
-
-        private readonly (string path, AlbumKind kind)[] audioPaths;
+        private readonly ILibraryFileManager libraryFileManager;
 
         public LibrarySyncer(
             ILibraryFileWatcher libraryFileWatcher,
-            IAlbumImageProvider thumbnailProvider)
+            IAlbumImageProvider thumbnailProvider,
+            ILibraryFileManager libraryFileManager)
         {
-            this.audioPaths = new[]
-            {
-                (Settings.Default.AudiobooksFolder, AlbumKind.AudioBook),
-                (Settings.Default.MusicFolder, AlbumKind.Music),
-                (Settings.Default.SleepFolder, AlbumKind.Sleep),
-            };
-
             // Use the library file watcher to automate resyncs when files change
-            libraryFileWatcher.Initialize(this.audioPaths.Select(x => x.path));
+            libraryFileWatcher.Initialize(libraryFileManager.AudioPaths.Select(x => x.path));
             libraryFileWatcher.ChangesDetected += this.StartSync;
 
             this.thumbnailProvider = thumbnailProvider;
+            this.libraryFileManager = libraryFileManager;
         }
 
         public Action<AudioKind>? LibraryChanged { get; set; }
@@ -90,7 +84,7 @@ namespace Resona.Services.Libraries
                 // we'll immediately perform another sync once the first completes.
                 this.requiresResync = false;
 
-                foreach (var (path, kind) in this.audioPaths)
+                foreach (var (path, kind) in this.libraryFileManager.AudioPaths)
                 {
                     var directory = new DirectoryInfo(path);
                     if (!directory.Exists)
@@ -104,7 +98,7 @@ namespace Resona.Services.Libraries
 
                     if (changesDetected)
                     {
-                        this.LibraryChanged?.Invoke((AudioKind)kind);
+                        this.LibraryChanged?.Invoke(kind);
                     }
                 }
 
@@ -118,7 +112,7 @@ namespace Resona.Services.Libraries
             Log.Information("Database synchronization complete");
         }
 
-        private bool SynchronizeAlbums(DirectoryInfo directory, AlbumKind kind, ResonaDb dataContext)
+        private bool SynchronizeAlbums(DirectoryInfo directory, AudioKind kind, ResonaDb dataContext)
         {
             var changesDetected = false;
 
@@ -161,21 +155,21 @@ namespace Resona.Services.Libraries
             return changesDetected;
         }
 
-        private static AlbumRaw CreateAlbum(DirectoryInfo albumDirectory, string albumName, AlbumKind kind)
+        private static AlbumRaw CreateAlbum(DirectoryInfo albumDirectory, string albumName, AudioKind kind)
         {
             return new AlbumRaw
             {
                 Name = albumName,
                 Path = albumDirectory.FullName,
                 Tracks = new List<TrackRaw>(),
-                Kind = kind
+                Kind = (AlbumKind)kind
             };
         }
 
-        private bool DeleteObsoleteAlbums(DirectoryInfo directory, AlbumKind kind, ResonaDb dataContext)
+        private bool DeleteObsoleteAlbums(DirectoryInfo directory, AudioKind kind, ResonaDb dataContext)
         {
             var persistedAlbumInfo = dataContext.Albums
-                .Where(x => x.Kind == kind)
+                .Where(x => x.Kind == (AlbumKind)kind)
                 .Select(x => new { x.AlbumId, x.Path })
                 .ToList();
 

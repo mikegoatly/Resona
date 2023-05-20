@@ -1,28 +1,29 @@
 import { BrowserRouter, Route, Routes, } from 'react-router-dom'
 import LibraryView from './pages/LibraryView'
-import { useState } from 'react'
 import Navigation from './components/Navigation';
 import PageContainer from './components/PageContainer'
 import UploadView from './pages/UploadView';
+import { UploadContext, createUploadContext } from './components/UploadQueue/UploadContext';
 
 function App() {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const toggle = () => setIsOpen(!isOpen);
+    const uploadContext = createUploadContext();
 
     return (
         <BrowserRouter>
-            <div id="main">
-                <Navigation />
+            <UploadContext.Provider value={uploadContext}>
+                <div id="main">
+                    <Navigation />
 
-                <PageContainer>
-                    <Routes>
-                        <Route path="/library/:audioKind/add" Component={UploadView} />
-                        <Route path="/library/:audioKind" Component={LibraryView} />
-                    </Routes>
-                </PageContainer>
-            </div>
-        </BrowserRouter>
+                    <PageContainer>
+                        <Routes>
+                            <Route path="/library/:audioKind/add" Component={UploadView} />
+                            <Route path="/library/:audioKind" Component={LibraryView} />
+                        </Routes>
+                    </PageContainer>
+                </div>
+            </UploadContext.Provider>
+        </BrowserRouter >
+
     )
 }
 
