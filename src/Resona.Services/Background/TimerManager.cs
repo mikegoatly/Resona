@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reactive.Subjects;
+﻿using System.Reactive.Subjects;
 
 using Resona.Services.OS;
 
@@ -61,7 +60,7 @@ namespace Resona.Services.Background
             this.RestartTimer();
             this.osCommandExecutor = osCommandExecutor;
 
-            Settings.Default.SettingsSaving += this.SettingsChanged;
+            Settings.Default.SettingsChanged += this.SettingsChanged;
         }
 
         private void ScreenDimTimerTick(object? state)
@@ -110,7 +109,7 @@ namespace Resona.Services.Background
             this.OnSleepTimerCompleted();
         }
 
-        private void SettingsChanged(object sender, CancelEventArgs e)
+        private void SettingsChanged()
         {
             logger.Debug("Detected settings changed, resetting timers");
             this.ResetInactivityTimers();

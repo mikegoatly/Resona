@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 
@@ -9,6 +11,8 @@ using Resona.Persistence;
 using Resona.Services;
 using Resona.Services.Libraries;
 using Resona.Services.OS;
+
+using Serilog.Events;
 
 namespace Resona.UI.ViewModels
 {
@@ -48,9 +52,15 @@ namespace Resona.UI.ViewModels
         public ReactiveCommand<Unit, Unit> RefreshLogSizeCommand { get; }
         public ReactiveCommand<Unit, Unit> ClearLogsCommand { get; }
 
-        public string[] LogLevelOptions { get; } = new[] { "Verbose", "Debug", "Information", "Warning", "Error" };
+        public LogEventLevel[] LogLevelOptions { get; } = new[] {
+            LogEventLevel.Verbose,
+            LogEventLevel.Debug,
+            LogEventLevel.Information,
+            LogEventLevel.Warning,
+            LogEventLevel.Error,
+        };
 
-        public string LogLevel
+        public LogEventLevel LogLevel
         {
             get => Settings.Default.LogLevel;
             set

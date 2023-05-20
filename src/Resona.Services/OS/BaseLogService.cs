@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
-
-using Serilog;
+﻿using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -11,7 +8,7 @@ namespace Resona.Services.OS
     {
         protected BaseLogService()
         {
-            Settings.Default.SettingsSaving += this.OnSettingsChanged;
+            Settings.Default.SettingsChanged += this.OnSettingsChanged;
 
             this.LoggingLevelSwitch = new LoggingLevelSwitch(this.GetCurrentLogLevel());
 
@@ -34,17 +31,10 @@ namespace Resona.Services.OS
 
         private LogEventLevel GetCurrentLogLevel()
         {
-            var parsedLogLevel = Enum.TryParse<LogEventLevel>(Settings.Default.LogLevel, out var logLevel);
-            if (!parsedLogLevel)
-            {
-                logLevel = LogEventLevel.Warning;
-                Trace.WriteLine("Unable to parse log level {LogLevel} - defaulting to Warning", Settings.Default.LogLevel);
-            }
-
-            return logLevel;
+            return Settings.Default.LogLevel;
         }
 
-        private void OnSettingsChanged(object sender, CancelEventArgs e)
+        private void OnSettingsChanged()
         {
             this.LoggingLevelSwitch.MinimumLevel = this.GetCurrentLogLevel();
         }

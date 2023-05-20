@@ -26,7 +26,6 @@
 		<PackageReference Include="System.Reactive" Version="5.0.0" />
 		<PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
 		<PackageReference Include="Serilog" Version="2.12.0" />
-		<PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
 	</ItemGroup>
 
@@ -36,11 +35,6 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>Resources.resx</DependentUpon>
 	  </Compile>
-	  <Compile Update="Settings.Designer.cs">
-	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
-	    <DependentUpon>Settings.settings</DependentUpon>
-	    <AutoGen>True</AutoGen>
-	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -48,13 +42,6 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Settings.settings">
-	    <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-	    <Generator>PublicSettingsSingleFileGenerator</Generator>
-	  </None>
 	</ItemGroup>
 
 </Project>
