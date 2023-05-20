@@ -29,26 +29,41 @@ const UploadView = () => {
             return;
         }
         else {
-            const fileArray: File[] = [];
-            let title: undefined | string = undefined;
+            const newAlbumFiles = new Map<string, File[]>();
+            let unallocatedFiles = new Array<File>();
+
+            let currentTitle: string | null = null;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
 
-                if (file.type === "audio/mpeg" && title == null) {
+                if (file.type === "audio/mpeg") {
                     var mp3tag = new MP3Tag(await file.arrayBuffer())
                     mp3tag.read();
 
-                    title = mp3tag.tags.album;
+                    if (mp3tag.tags.album != null) {
+                        currentTitle = mp3tag.tags.album;
+                    }
                 }
 
-                fileArray.push(file);
+                if (currentTitle == null) {
+                    unallocatedFiles.push(file);
+                }
+                else {
+                    if (!newAlbumFiles.has(currentTitle)) {
+                        // Start the album off with any files that haven't been allocated yet
+                        newAlbumFiles.set(currentTitle, unallocatedFiles);
+                        unallocatedFiles = new Array<File>();
+                    }
+
+                    newAlbumFiles.get(currentTitle)?.push(file);
+                }
             }
 
             setState(s => [
-                ...s, {
-                    files: fileArray,
-                    albumName: title ?? "New upload"
-                }]);
+                ...s, 
+                ...[...newAlbumFiles.entries()]
+                    .map(([albumName, files]) => ({ albumName, files }))
+            ]);
 
             if (ref.current != null) {
                 ref.current.value = "";
@@ -71,8 +86,8 @@ const UploadView = () => {
     return (
         <div className="upload-view">
             <Typography variant="body1">
-                Select the files that you want to upload. These should all be for the same {audioKindText}.
-                You can upload MP3 files, and an image file called image.jpeg or image.png.
+                {albumTitle}s will automatically be detected from the MP3 tags in the files.
+                Feel free to change them, and if need you to merge two sets of files just make sure they have the same {audioKindText} name before uploading.
             </Typography>
 
             <Button className="pick-files" variant="contained" onClick={() => ref.current?.click()}>Select files...</Button>
