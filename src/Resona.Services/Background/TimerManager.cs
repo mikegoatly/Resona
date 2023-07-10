@@ -54,6 +54,8 @@ namespace Resona.Services.Background
 
         public TimerManager(IOsCommandExecutor osCommandExecutor)
         {
+            logger.Debug("Timer manager starting");
+
             this.timer = new Timer(this.TimerTick);
             this.screenDimTimer = new Timer(this.ScreenDimTimerTick);
             this.ResetInactivityTimers();
@@ -70,6 +72,8 @@ namespace Resona.Services.Background
 
         private void RestartTimer()
         {
+            logger.Debug("Restarting timer");
+
             this.timer.Change(
                 TimeSpan.FromSeconds(0.1),
                 TimeSpan.FromMinutes(1));
@@ -85,6 +89,8 @@ namespace Resona.Services.Background
         {
             var now = DateTime.UtcNow;
             this.shutDownTime = now.Add(Settings.Default.InactivityShutdownTimeout);
+
+            logger.Debug("Shut down time is now {ShutDownTime}", this.shutDownTime);
 
             this.screenDimTimer.Change(Settings.Default.ScreenDimTimeout, Timeout.InfiniteTimeSpan);
 
@@ -132,7 +138,16 @@ namespace Resona.Services.Background
                 }
             }
 
-            if (now > this.shutDownTime)
+            if (now > this.shutDownTime.AddMinutes(30))
+            {
+                // Sometimes the app seems to resume without the process being started. After a clean Pi reboot,
+                // the journal logs just continue from where they left off. I have no clue.
+                // To mitigate this, we detect a massive overrun in the timer and reset them.
+                logger.Warning("Current time {Now} greatly exceeds shutdown time {ShutDownTime} - assuming system has resumed. Resetting sleep timer.", now, this.shutDownTime);
+
+                this.ResetInactivityTimers();
+            }
+            else if (now > this.shutDownTime)
             {
                 logger.Information("Current time {Now} exceeded shutdown time {ShutDownTime}", now, this.shutDownTime);
 
