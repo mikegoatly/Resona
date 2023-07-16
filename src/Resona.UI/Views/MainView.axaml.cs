@@ -1,6 +1,8 @@
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 
+using ReactiveUI;
+
 using Resona.UI.ViewModels;
 
 using Serilog;
@@ -14,6 +16,8 @@ namespace Resona.UI.Views
         public MainView()
         {
             Log.Information("Main view starting");
+
+            this.WhenActivated(disposables => { });
 
             AvaloniaXamlLoader.Load(this);
             this.ViewModel = Locator.Current.GetService<MainWindowViewModel>();

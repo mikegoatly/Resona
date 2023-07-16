@@ -1,6 +1,8 @@
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 
+using ReactiveUI;
+
 using Resona.UI.ViewModels;
 
 namespace Resona.UI.Views
@@ -9,6 +11,7 @@ namespace Resona.UI.Views
     {
         public AudioSelectionView()
         {
+            this.WhenActivated(disposables => { });
             AvaloniaXamlLoader.Load(this);
         }
     }

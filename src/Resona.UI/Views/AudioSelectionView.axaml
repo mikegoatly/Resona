@@ -17,7 +17,7 @@
 	<Design.DataContext>
 		<vm:AudioSelectionViewModel />
 	</Design.DataContext>
-	<ItemsRepeater Items="{Binding AudioKinds}" VerticalAlignment="Center" HorizontalAlignment="Center">
+	<ItemsRepeater ItemsSource="{Binding AudioKinds}" VerticalAlignment="Center" HorizontalAlignment="Center">
 		<ItemsRepeater.Layout>
 			<StackLayout Orientation="Horizontal" />
 		</ItemsRepeater.Layout>

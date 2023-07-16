@@ -21,7 +21,7 @@
 
 	<Grid>
 		<ScrollViewer MaxWidth="600">
-			<ItemsControl Items="{Binding AudioDevices}" >
+			<ItemsControl ItemsSource="{Binding AudioDevices}" >
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
 						<Button Classes="secondary"

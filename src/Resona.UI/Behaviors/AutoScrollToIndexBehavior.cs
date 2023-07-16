@@ -114,7 +114,7 @@ namespace Resona.UI.Behaviors
                         }
                     }
 
-                }, DispatcherPriority.Layout);
+                }, DispatcherPriority.Render);
             }
         }
     }

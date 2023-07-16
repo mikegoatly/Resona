@@ -85,7 +85,7 @@
 		</DockPanel>
 
 		<ScrollViewer Margin="0,10,0,0" Grid.Row="1">
-			<ItemsControl Items="{Binding BluetoothDevices}">
+			<ItemsControl ItemsSource="{Binding BluetoothDevices}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
 						<Border Classes="device"

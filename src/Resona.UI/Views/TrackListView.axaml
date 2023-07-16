@@ -34,7 +34,7 @@
 		</Grid.Styles>
 		<ScrollViewer Margin="80,20">
 			<ItemsControl
-				Items="{Binding Tracks}"
+				ItemsSource="{Binding Tracks}"
 				>
 				<i:Interaction.Behaviors>
 					<behaviors:AutoScrollToIndexBehavior 

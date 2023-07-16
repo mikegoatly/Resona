@@ -17,7 +17,7 @@
 			Margin="0,5,0,5"
 			Text="Stop playing after:" />
 		
-		<ItemsControl Items="{Binding SleepCommands}">
+		<ItemsControl ItemsSource="{Binding SleepCommands}">
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
 					<Button Classes="primary" Command="{Binding Command}"

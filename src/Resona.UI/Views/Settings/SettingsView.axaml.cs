@@ -1,5 +1,7 @@
 using Avalonia.ReactiveUI;
 
+using ReactiveUI;
+
 using Resona.UI.ViewModels;
 
 namespace Resona.UI.Views.Settings
@@ -8,6 +10,7 @@ namespace Resona.UI.Views.Settings
     {
         public SettingsView()
         {
+            this.WhenActivated(disposables => { });
             this.InitializeComponent();
         }
     }

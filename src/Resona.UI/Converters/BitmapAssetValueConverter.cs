@@ -1,19 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
-
-using Avalonia;
-using Avalonia.Data.Converters;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-
-using Resona.Services.Libraries;
-using Resona.UI.ViewModels;
-
-using Splat;
-
-namespace Resona.UI.Converters
+﻿namespace Resona.UI.Converters
 {
     public class AudioKindImageConverter : IValueConverter
     {
@@ -73,9 +58,7 @@ namespace Resona.UI.Converters
                 var uri = rawUri.StartsWith("avares://") ? new Uri(rawUri) : new Uri($"avares://{assemblyName}{rawUri}");
 
                 // Allow for assembly overrides
-
-                var assets = AvaloniaLocator.Current.GetService<IAssetLoader>()!;
-                    var asset = assets.Open(uri);
+                var asset = AssetLoader.Open(uri);
 
                 return new Bitmap(asset);
             }
