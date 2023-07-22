@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:Resona.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="140"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="140"
 			  xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
 			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
@@ -72,8 +72,12 @@
 							</Style>
 						</Styles>
 					</StackPanel.Styles>
-					<TextBlock Text="{Binding Album}" />
-					<TextBlock Text="{Binding Title}" />
+					<TextBlock Text="{Binding Album}" 
+							   Foreground="{StaticResource SecondaryColor}"
+							   TextWrapping="WrapWithOverflow" 
+							   MaxWidth="480" MaxLines="2" />
+					<TextBlock Text="{Binding Title}" 
+							   MaxWidth="480"/>
 				</StackPanel>
 			</DockPanel>
 

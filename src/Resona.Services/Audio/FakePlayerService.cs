@@ -7,7 +7,7 @@ namespace Resona.Services.Audio
 #if DEBUG
     public class FakePlayerService : IPlayerService
     {
-        private static readonly AudioContent content = new(1, AudioKind.Audiobook, "Test album", "Artist", null, Array.Empty<AudioTrack>(), null, null);
+        private static readonly AudioContent content = new(1, AudioKind.Audiobook, "Captain Underpants - Big Bad Battle Of The Bionic Booger Boy", "Artist", null, Array.Empty<AudioTrack>(), null, null);
         private static readonly AudioTrack track = new(1, "", "Test track", "Artist", 1);
 
         public PlayingTrack? Current => new(content, track);
