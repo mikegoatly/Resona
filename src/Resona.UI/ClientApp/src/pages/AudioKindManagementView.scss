@@ -1,0 +1,16 @@
+.audio-kind-management {
+    input[type="file"] {
+        display: none;
+    }
+
+    .library-kind {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        
+        span {
+            margin: 0 10px;
+        }
+    }
+}

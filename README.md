@@ -19,7 +19,7 @@ demand for it - I'd also be happy to receive contributions.
 I've a couple of things I still want to do:
 
 * ~~Expose a web application from the device that parents can use to upload new content, rather than using `scp` 😊~~ In progress - see the experimental web host section below
-* Allow for more configuration options to allow kids to personalize things a bit, including the main icons for the home screen.
+* ~~Allow for more configuration options to allow kids to personalize things a bit, including the main icons for the home screen.~~ Can be done using the web interface 😊
 
 # Features
 

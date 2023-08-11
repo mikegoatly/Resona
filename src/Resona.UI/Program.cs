@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Avalonia;
+using Avalonia.Controls.Documents;
 using Avalonia.ReactiveUI;
 
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +22,7 @@ using ReactiveUI;
 using Resona.Persistence;
 using Resona.Services;
 using Resona.Services.Libraries;
+using Resona.UI.ApiModels;
 using Resona.UI.ViewModels;
 
 using Serilog;
@@ -104,12 +106,24 @@ namespace Resona.UI
         {
             // Expose the same singleton instance of the audio repository to the web app
             builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAudioRepository>());
-            builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAlbumImageProvider>());
+            builder.Services.AddSingleton(Locator.Current.GetRequiredService<IImageProvider>());
             builder.Services.AddSingleton(Locator.Current.GetRequiredService<ILibraryFileManager>());
         }
 
         private static void MapApis(WebApplication app)
         {
+            app.MapGet("/api/library", (
+                [FromServices] IImageProvider imageProvider,
+                CancellationToken cancellationToken) =>
+            {
+                return new[]
+                {
+                    new AudioKindDetails(AudioKind.Audiobook.ToString(), imageProvider.HasCustomLibraryIcon(AudioKind.Audiobook)),
+                    new AudioKindDetails(AudioKind.Music.ToString(), imageProvider.HasCustomLibraryIcon(AudioKind.Music)),
+                    new AudioKindDetails(AudioKind.Sleep.ToString(), imageProvider.HasCustomLibraryIcon(AudioKind.Sleep))
+                };
+            });
+
             app.MapGet("/api/library/{audioKind}", async (
                 [FromServices] IAudioRepository audioRepository,
                 [FromRoute] string audioKind,
@@ -118,9 +132,50 @@ namespace Resona.UI
                 return await audioRepository.GetAllAsync(Enum.Parse<AudioKind>(audioKind, true), cancellationToken);
             });
 
+            app.MapGet("/api/library/{audioKind}/image", (
+                [FromServices] IImageProvider imageProvider,
+                [FromRoute] string audioKind,
+                CancellationToken cancellationToken) =>
+            {
+                var stream = imageProvider.GetLibraryIconImageStream(Enum.Parse<AudioKind>(audioKind));
+                
+                // If stream is null, return not found, otherwise return it
+                if (stream == null)
+                {
+                    return Results.NotFound();
+                }
+
+                return Results.Stream(stream);
+            });
+
+            app.MapPost("/api/library/{audioKind}/image", async (
+                [FromServices] IImageProvider imageProvider,
+                [FromRoute] string audioKind,
+                HttpContext httpContext,
+                CancellationToken cancellationToken) =>
+            {
+                var form = await httpContext.Request.ReadFormAsync(cancellationToken);
+                var file = form.Files["file"] ?? throw new InvalidOperationException("No file sent");
+
+                await imageProvider.UploadLibraryIconImageAsync(
+                    Enum.Parse<AudioKind>(audioKind, true),
+                    file.OpenReadStream(),
+                    cancellationToken);
+            });
+
+            app.MapDelete("/api/library/{audioKind}/image", (
+                [FromServices] IImageProvider imageProvider,
+                [FromRoute] string audioKind,
+                CancellationToken cancellationToken) =>
+            {
+                imageProvider.RemoveLibraryIconImage(
+                    Enum.Parse<AudioKind>(audioKind, true),
+                    cancellationToken);
+            });
+
             app.MapGet("/api/library/{albumId:int}/image", async (
                 [FromServices] IAudioRepository audioRepository,
-                [FromServices] IAlbumImageProvider imageProvider,
+                [FromServices] IImageProvider imageProvider,
                 [FromRoute] int albumId,
                 CancellationToken cancellationToken) =>
             {

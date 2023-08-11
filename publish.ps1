@@ -54,7 +54,7 @@ if ($NoClean) {
     scp $(Join-Path $Folder "Resona*") "$($Server):bin"
 }
 else {
-    ssh $Server "cd ~/bin && find . -type f ! -name 'resona.db*' | xargs rm -f"
+    ssh $Server "cd ~/bin && find . -type f ! -name 'resona.db*' ! -path './images/*' | xargs rm -f"
     scp -r -p "$($Folder)/*" "$($Server):bin"
 }
 

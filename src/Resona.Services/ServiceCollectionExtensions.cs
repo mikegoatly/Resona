@@ -29,7 +29,7 @@ namespace Resona.Services
             services.AddScoped<IAudioRepository, AudioRepository>();
 
             services.AddSingleton<IPlayerService, PlayerService>();
-            services.AddSingleton<IAlbumImageProvider, AlbumImageProvider>();
+            services.AddSingleton<IImageProvider, ImageProvider>();
             services.AddSingleton<ILibrarySyncer, LibrarySyncer>();
             services.AddSingleton<ILibraryFileManager, LibraryFileManager>();
             services.AddSingleton<ILibraryFileWatcher, LibraryFileWatcher>();

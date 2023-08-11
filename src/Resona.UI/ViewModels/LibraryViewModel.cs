@@ -17,7 +17,7 @@ namespace Resona.UI.ViewModels
         private AudioKind kind;
         private Task<List<AudioContentViewModel>>? audioContent;
         private readonly IAudioRepository audioProvider;
-        private readonly IAlbumImageProvider imageProvider;
+        private readonly IImageProvider imageProvider;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
@@ -44,7 +44,7 @@ namespace Resona.UI.ViewModels
             RoutingState router,
             IScreen hostScreen,
             IAudioRepository audioProvider,
-            IAlbumImageProvider imageProvider,
+            IImageProvider imageProvider,
             ILibrarySyncer librarySyncer)
                 : base(router, hostScreen, "library")
         {

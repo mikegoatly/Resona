@@ -20,12 +20,12 @@ namespace Resona.Services.Libraries
         private static readonly ILogger logger = Log.ForContext<LibrarySyncer>();
         private readonly SemaphoreSlim syncLock = new(1);
         private bool requiresResync;
-        private readonly IAlbumImageProvider thumbnailProvider;
+        private readonly IImageProvider thumbnailProvider;
         private readonly ILibraryFileManager libraryFileManager;
 
         public LibrarySyncer(
             ILibraryFileWatcher libraryFileWatcher,
-            IAlbumImageProvider thumbnailProvider,
+            IImageProvider thumbnailProvider,
             ILibraryFileManager libraryFileManager)
         {
             // Use the library file watcher to automate resyncs when files change

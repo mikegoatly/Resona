@@ -1,4 +1,9 @@
-﻿using Resona.Persistence;
+﻿using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Avalonia;
+using System.Reflection;
+
+using Resona.Persistence;
 
 using Serilog;
 
@@ -6,16 +11,71 @@ using TagLib;
 
 namespace Resona.Services.Libraries
 {
-    public interface IAlbumImageProvider
+    public interface IImageProvider
     {
+        Stream? GetLibraryIconImageStream(AudioKind audioKind);
+
         Stream GetImageStream(AudioContentSummary audioContent);
 
         void UpdateThumbnail(AlbumRaw album);
+
+        Task UploadLibraryIconImageAsync(AudioKind audioKind, Stream stream, CancellationToken cancellationToken);
+        bool HasCustomLibraryIcon(AudioKind audioKind);
+        void RemoveLibraryIconImage(AudioKind audioKind, CancellationToken cancellationToken);
     }
 
-    public class AlbumImageProvider : IAlbumImageProvider
+    public class ImageProvider : IImageProvider
     {
+        private static readonly string entryPath = AppContext.BaseDirectory;
+        private static readonly string assemblyName = Assembly.GetEntryAssembly()!.GetName().Name!;
+        private static Dictionary<AudioKind, (string physicalPath, string defaultResource)> imagePaths = new Dictionary<AudioKind, (string, string)>
+        {
+            { AudioKind.Audiobook, (Path.Combine(entryPath, "images/audiobooks.png"), $"avares://{assemblyName}/Images/audiobooks.png") },
+            { AudioKind.Music, (Path.Combine(entryPath, "images/music.png"), $"avares://{assemblyName}/Images/music.png") },
+            { AudioKind.Sleep, (Path.Combine(entryPath, "images/sleep.png"), $"avares://{assemblyName}/Images/sleep.png") }
+        };
+
         private static readonly ILogger logger = Log.ForContext<LibrarySyncer>();
+
+        public Stream? GetLibraryIconImageStream(AudioKind audioKind)
+        {
+            if (!imagePaths.TryGetValue(audioKind, out var paths))
+            {
+                return null;
+            }
+
+            if (Path.Exists(paths.physicalPath))
+            {
+                return System.IO.File.OpenRead(paths.physicalPath);
+            }
+
+            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>()!;
+            return assets.Open(new Uri(paths.defaultResource));
+        }
+
+        public bool HasCustomLibraryIcon(AudioKind audioKind)
+        {
+            if (!imagePaths.TryGetValue(audioKind, out var paths))
+            {
+                return false;
+            }
+
+            return Path.Exists(paths.physicalPath);
+        }
+
+        public async Task UploadLibraryIconImageAsync(AudioKind audioKind, Stream stream, CancellationToken cancellationToken)
+        {
+            if (!imagePaths.TryGetValue(audioKind, out var paths))
+            {
+                return;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(paths.physicalPath)!);
+
+            // Write the stream to the file
+            using var fileStream = System.IO.File.Create(paths.physicalPath);
+            await stream.CopyToAsync(fileStream, cancellationToken);
+        }
 
         public void UpdateThumbnail(AlbumRaw album)
         {
@@ -127,9 +187,12 @@ namespace Resona.Services.Libraries
             return imageFile;
         }
 
-        public Stream GetImageStream(AlbumRaw album)
+        public void RemoveLibraryIconImage(AudioKind audioKind, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (imagePaths.TryGetValue(audioKind, out var paths) && Path.Exists(paths.physicalPath))
+            {
+                System.IO.File.Delete(paths.physicalPath);
+            }
         }
     }
 }

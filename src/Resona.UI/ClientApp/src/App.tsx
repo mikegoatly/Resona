@@ -4,6 +4,7 @@ import Navigation from './components/Navigation';
 import PageContainer from './components/PageContainer'
 import UploadView from './pages/UploadView';
 import { UploadContext, createUploadContext } from './components/UploadQueue/UploadContext';
+import AudioKindManagementView from './pages/AudioKindManagementView';
 
 function App() {
     const uploadContext = createUploadContext();
@@ -18,6 +19,7 @@ function App() {
                         <Routes>
                             <Route path="/library/:audioKind/add" Component={UploadView} />
                             <Route path="/library/:audioKind" Component={LibraryView} />
+                            <Route path="/" Component={AudioKindManagementView} />
                         </Routes>
                     </PageContainer>
                 </div>

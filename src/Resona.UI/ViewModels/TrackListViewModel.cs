@@ -20,7 +20,7 @@ namespace Resona.UI.ViewModels
     {
         private Task<Bitmap>? cover;
         private readonly IAudioRepository audioProvider;
-        private readonly IAlbumImageProvider imageProvider;
+        private readonly IImageProvider imageProvider;
         private readonly IPlayerService playerService;
         private IReadOnlyList<AudioTrackViewModel>? tracks;
 
@@ -37,7 +37,7 @@ namespace Resona.UI.ViewModels
             RoutingState router,
             IScreen hostScreen,
             IAudioRepository audioProvider,
-            IAlbumImageProvider imageProvider,
+            IImageProvider imageProvider,
             IPlayerService playerService)
             : base(router, hostScreen, "track-list")
         {

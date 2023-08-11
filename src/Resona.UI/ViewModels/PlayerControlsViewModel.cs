@@ -26,7 +26,7 @@ namespace Resona.UI.ViewModels
         private AudioContent? audioContent;
         private readonly IPlayerService playerService;
         private readonly IAudioRepository audioRepository;
-        private readonly IAlbumImageProvider imageProvider;
+        private readonly IImageProvider imageProvider;
 
 
 #if DEBUG
@@ -42,7 +42,7 @@ namespace Resona.UI.ViewModels
             IScreen hostScreen,
             IPlayerService playerService,
             IAudioRepository audioRepository,
-            IAlbumImageProvider imageProvider,
+            IImageProvider imageProvider,
             SleepOptionsViewModel sleepOptions)
             : base(router, hostScreen, "player")
         {
