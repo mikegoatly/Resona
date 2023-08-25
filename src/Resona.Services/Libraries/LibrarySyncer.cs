@@ -227,21 +227,29 @@ namespace Resona.Services.Libraries
 
         private static void UpdateTrack(AlbumRaw album, TrackRaw track, FileInfo file)
         {
-            var tagFile = TagLib.File.Create(file.FullName);
-            var tags = tagFile.GetTag(TagTypes.Id3v2, false);
-
-            track.LastModifiedUtc = file.LastWriteTimeUtc;
-            track.TrackNumber = tags.Track;
-            track.Name = DeriveSongName(file, tags);
-            track.Artist = DeriveArtist(tags);
-            track.Duration = tagFile.Properties.Duration;
-
-            var albumTag = tags.Album;
-            if (track.TrackNumber == 1 && !string.IsNullOrWhiteSpace(albumTag))
+            try
             {
-                // Also update the album name from this track; it means that the folder name doesn't
-                // have to be nicely formatted
-                album.Name = albumTag;
+                var tagFile = TagLib.File.Create(file.FullName);
+                var tags = tagFile.GetTag(TagTypes.Id3v2, false);
+
+                track.LastModifiedUtc = file.LastWriteTimeUtc;
+                track.TrackNumber = tags.Track;
+                track.Name = DeriveSongName(file, tags);
+                track.Artist = DeriveArtist(tags);
+                track.Duration = tagFile.Properties.Duration;
+
+                var albumTag = tags.Album;
+                if (track.TrackNumber == 1 && !string.IsNullOrWhiteSpace(albumTag))
+                {
+                    // Also update the album name from this track; it means that the folder name doesn't
+                    // have to be nicely formatted
+                    album.Name = albumTag;
+                }
+            }
+            catch (CorruptFileException)
+            {
+                // Ignore corrupt files
+                logger.Error("Corrupt file encountered: {File}", file.FullName);
             }
         }
 

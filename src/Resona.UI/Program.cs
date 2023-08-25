@@ -183,6 +183,16 @@ namespace Resona.UI
                 return Results.Stream(imageProvider.GetImageStream(audio));
             });
 
+            app.MapDelete("/api/library/{albumId:int}/image", async (
+                [FromServices] IAudioRepository audioRepository,
+                [FromServices] IAlbumImageProvider imageProvider,
+                [FromRoute] int albumId,
+                CancellationToken cancellationToken) =>
+            {
+                var audio = await audioRepository.GetByIdAsync(albumId, cancellationToken);
+                return Results.Stream(imageProvider.GetImageStream(audio));
+            });
+
             app.MapPost("/api/library/{audioKind}", async (
                 [FromServices] ILibraryFileManager fileManager,
                 [FromRoute] string audioKind,
