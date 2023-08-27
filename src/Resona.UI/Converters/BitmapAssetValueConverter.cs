@@ -1,4 +1,18 @@
-﻿namespace Resona.UI.Converters
+﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+
+using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+
+using Resona.Services.Libraries;
+using Resona.UI.ViewModels;
+
+using Splat;
+
+namespace Resona.UI.Converters
 {
     public class AudioKindImageConverter : IValueConverter
     {

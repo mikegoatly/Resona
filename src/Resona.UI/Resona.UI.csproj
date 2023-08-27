@@ -52,24 +52,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.0.0" />
-		<PackageReference Include="Avalonia.LinuxFramebuffer" Version="11.0.0" />
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0" />
-		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
+		<PackageReference Include="Avalonia" Version="11.0.4" />
+		<PackageReference Include="Avalonia.LinuxFramebuffer" Version="11.0.4" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" />
+		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />
-		<PackageReference Include="Avalonia.Desktop" Version="11.0.0" />
-		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.0" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.0.4" />
+		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.4" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0" />
-		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.6.0" />
-		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0" />
-		<PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="14.6.37" />
-		<PackageReference Include="Splat.Serilog" Version="14.6.37" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.9" />
+		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.4" />
+		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="8.2.0" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.4" />
+		<PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="14.7.1" />
+		<PackageReference Include="Splat.Serilog" Version="14.7.1" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>

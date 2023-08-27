@@ -1,7 +1,6 @@
-﻿using Avalonia.Media.Imaging;
+﻿using System.Reflection;
+
 using Avalonia.Platform;
-using Avalonia;
-using System.Reflection;
 
 using Resona.Persistence;
 
@@ -28,7 +27,7 @@ namespace Resona.Services.Libraries
     {
         private static readonly string entryPath = AppContext.BaseDirectory;
         private static readonly string assemblyName = Assembly.GetEntryAssembly()!.GetName().Name!;
-        private static Dictionary<AudioKind, (string physicalPath, string defaultResource)> imagePaths = new Dictionary<AudioKind, (string, string)>
+        private static readonly Dictionary<AudioKind, (string physicalPath, string defaultResource)> imagePaths = new()
         {
             { AudioKind.Audiobook, (Path.Combine(entryPath, "images/audiobooks.png"), $"avares://{assemblyName}/Images/audiobooks.png") },
             { AudioKind.Music, (Path.Combine(entryPath, "images/music.png"), $"avares://{assemblyName}/Images/music.png") },
@@ -44,23 +43,14 @@ namespace Resona.Services.Libraries
                 return null;
             }
 
-            if (Path.Exists(paths.physicalPath))
-            {
-                return System.IO.File.OpenRead(paths.physicalPath);
-            }
-
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>()!;
-            return assets.Open(new Uri(paths.defaultResource));
+            return Path.Exists(paths.physicalPath)
+                ? System.IO.File.OpenRead(paths.physicalPath)
+                : AssetLoader.Open(new Uri(paths.defaultResource));
         }
 
         public bool HasCustomLibraryIcon(AudioKind audioKind)
         {
-            if (!imagePaths.TryGetValue(audioKind, out var paths))
-            {
-                return false;
-            }
-
-            return Path.Exists(paths.physicalPath);
+            return imagePaths.TryGetValue(audioKind, out var paths) && Path.Exists(paths.physicalPath);
         }
 
         public async Task UploadLibraryIconImageAsync(AudioKind audioKind, Stream stream, CancellationToken cancellationToken)
