@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Avalonia;
-using Avalonia.Controls.Documents;
 using Avalonia.ReactiveUI;
 
 using Microsoft.AspNetCore.Builder;
@@ -138,14 +137,9 @@ namespace Resona.UI
                 CancellationToken cancellationToken) =>
             {
                 var stream = imageProvider.GetLibraryIconImageStream(Enum.Parse<AudioKind>(audioKind));
-                
-                // If stream is null, return not found, otherwise return it
-                if (stream == null)
-                {
-                    return Results.NotFound();
-                }
 
-                return Results.Stream(stream);
+                // If stream is null, return not found, otherwise return it
+                return stream == null ? Results.NotFound() : Results.Stream(stream);
             });
 
             app.MapPost("/api/library/{audioKind}/image", async (
@@ -185,7 +179,7 @@ namespace Resona.UI
 
             app.MapDelete("/api/library/{albumId:int}/image", async (
                 [FromServices] IAudioRepository audioRepository,
-                [FromServices] IAlbumImageProvider imageProvider,
+                [FromServices] IImageProvider imageProvider,
                 [FromRoute] int albumId,
                 CancellationToken cancellationToken) =>
             {
