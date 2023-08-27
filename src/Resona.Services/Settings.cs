@@ -1,9 +1,13 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Serilog.Events;
 
 namespace Resona.Services
 {
+    [JsonSerializable(typeof(Dictionary<string, JsonElement>))]
+    internal partial class SettingsSerializationContext : JsonSerializerContext { }
+
     public sealed class Settings
     {
         private static readonly JsonSerializerOptions saveSerializationOptions = new() { WriteIndented = true };
@@ -16,7 +20,7 @@ namespace Resona.Services
             if (settingsFile.Exists)
             {
                 using var stream = settingsFile.OpenRead();
-                settingsDict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(stream);
+                settingsDict = JsonSerializer.Deserialize(stream, SettingsSerializationContext.Default.DictionaryStringJsonElement);
             }
 
             settingsDict ??= new Dictionary<string, JsonElement>();
@@ -77,7 +81,10 @@ namespace Resona.Services
                 ["HostWebClient"] = this.HostWebClient
             };
 
-            var jsonString = JsonSerializer.Serialize(settingsData, saveSerializationOptions);
+            var jsonString = JsonSerializer.Serialize(
+                settingsData,
+                typeof(Dictionary<string, JsonElement>),
+                SettingsSerializationContext.Default);
 
             File.WriteAllText(settingsFile.FullName, jsonString);
         }

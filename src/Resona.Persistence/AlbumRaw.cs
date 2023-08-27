@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -17,12 +18,15 @@ namespace Resona.Persistence
 
         public required AlbumKind Kind { get; set; }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026")]
         [MaxLength(100)]
         public required string Name { get; set; }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026")]
         [MaxLength(250)]
         public required string Path { get; set; }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026")]
         [MaxLength(100)]
         public string? Artist { get; set; }
 
@@ -40,6 +44,7 @@ namespace Resona.Persistence
             set => this.tracks = value;
         }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026")]
         [MaxLength(350)]
         public string? ThumbnailFile { get; set; }
     }
