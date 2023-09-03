@@ -116,6 +116,32 @@ And also upload new content:
 
 ![Web interface upload view](docs/web-upload.png)
 
+### Additional configuration
+
+If you want to add a splash screen and get rid of all the scrolling boot up text the Pi shows, follow these steps:
+
+1. Add the line `disable_splash=1` to `/boot/config.txt`.
+1. Add `logo.nologo consoleblank=0 loglevel=1 quiet splash` to `/boot/cmdline.txt`.
+1. Add a splashscreen
+	1. Install `fbi` with `sudo apt install fbi`
+	1. Create a splash screen image and save it as `/home/pi/splash.png`
+	1. `sudo nano /etc/systemd/system/splashscreen.service` and enter
+		```
+		[Unit]
+		Description=Splash screen
+		After=local-fs.target
+
+		[Service]
+		ExecStart=/usr/bin/fbi -d /dev/fb0 --noverbose -a /home/pi/splash.png
+		StandardInput=tty
+		StandardOutput=tty
+
+		[Install]
+		WantedBy=sysinit.target
+		```
+	1. `sudo systemctl enable splashscreen.service`
+1. Disable getty so no user prompt appears: `sudo systemctl disable getty@tty1.service` **Important:** This will disable the 
+command prompt on the Pi's display. You'll need to SSH in to the Pi to run commands.
 
 ### Touchscreen installation
 

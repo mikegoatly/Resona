@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo sh -c "cat <<\EOT > /lib/systemd/user/Resona.service
+sudo sh -c "cat <<\EOT > /etc/systemd/system/Resona.service
 [Unit]
 Description=Resona
 ConditionPathExists=/home/pi/bin
@@ -10,15 +10,16 @@ StandardOutput=journal
 StandardError=journal
 ExecStart=/home/pi/bin/Resona --drm
 WorkingDirectory=/home/pi/bin
+User=pi
 Restart=always
 RestartSec=0s
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 EOT"
 
-systemctl --user daemon-reload
+sudo systemctl daemon-reload
 
-systemctl --user enable Resona.service
+sudo systemctl enable Resona.service
 
-systemctl --user start Resona.service
+sudo systemctl start Resona.service
