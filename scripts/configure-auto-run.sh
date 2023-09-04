@@ -5,14 +5,17 @@ Description=Resona
 ConditionPathExists=/home/pi/bin
 
 [Service]
-# You can use 'journalctl --user -u Resona.service' to view the logs
+# You can use 'journalctl Resona.service' to view the logs
 StandardOutput=journal
 StandardError=journal
 ExecStart=/home/pi/bin/Resona --drm
 WorkingDirectory=/home/pi/bin
 User=pi
 Restart=always
-RestartSec=0s
+RestartSec=2s
+StartLimitBurst=3
+StartLimitIntervalSec=30
+StartLimitAction=reboot
 
 [Install]
 WantedBy=multi-user.target
