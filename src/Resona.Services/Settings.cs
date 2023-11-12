@@ -5,7 +5,13 @@ using Serilog.Events;
 
 namespace Resona.Services
 {
-    [JsonSerializable(typeof(Dictionary<string, JsonElement>))]
+    internal record SettingsData(
+        LogEventLevel? LogEventLevel = null,
+        TimeSpan? ScreenDimTimeout = null,
+        TimeSpan? InactivityShutdownTimeout = null,
+        bool? HostWebClient = null);
+
+    [JsonSerializable(typeof(SettingsData))]
     internal partial class SettingsSerializationContext : JsonSerializerContext { }
 
     public sealed class Settings
@@ -15,43 +21,20 @@ namespace Resona.Services
 
         public static Settings Load()
         {
-            Dictionary<string, JsonElement>? settingsDict = null;
+            SettingsData? settingsData = null;
 
             if (settingsFile.Exists)
             {
                 using var stream = settingsFile.OpenRead();
-                settingsDict = JsonSerializer.Deserialize(stream, SettingsSerializationContext.Default.DictionaryStringJsonElement);
-            }
-
-            settingsDict ??= new Dictionary<string, JsonElement>();
-
-            T GetValue<T>(string key, T defaultValue)
-            {
-                if (settingsDict.TryGetValue(key, out var value))
-                {
-                    return value switch
-                    {
-                        T result => result,
-                        { ValueKind: JsonValueKind.String } when typeof(T).IsEnum
-                            && Enum.TryParse(typeof(T), value.GetString(), out var enumValue) => (T)enumValue,
-                        { ValueKind: JsonValueKind.String } when typeof(T) == typeof(TimeSpan)
-                            && TimeSpan.TryParse(value.GetString(), out var timeSpanValue) => (T)(object)timeSpanValue,
-                        { ValueKind: JsonValueKind.False or JsonValueKind.True } when typeof(T) == typeof(bool)
-                            => (T)(object)value.GetBoolean(),
-                        _ => defaultValue,
-                    };
-                }
-
-                // Key not found, return default value
-                return defaultValue;
+                settingsData = JsonSerializer.Deserialize(stream, SettingsSerializationContext.Default.SettingsData);
             }
 
             return new Settings
             {
-                LogLevel = GetValue("LogLevel", LogEventLevel.Warning),
-                ScreenDimTimeout = GetValue("ScreenDimTimeout", TimeSpan.FromSeconds(30)),
-                InactivityShutdownTimeout = GetValue("InactivityShutdownTimeout", TimeSpan.FromHours(2)),
-                HostWebClient = GetValue("HostWebClient", false),
+                LogLevel = settingsData?.LogEventLevel ?? LogEventLevel.Warning,
+                ScreenDimTimeout = settingsData?.ScreenDimTimeout ?? TimeSpan.FromSeconds(30),
+                InactivityShutdownTimeout = settingsData?.InactivityShutdownTimeout ?? TimeSpan.FromHours(2),
+                HostWebClient = settingsData?.HostWebClient ?? false,
             };
         }
 
@@ -73,18 +56,15 @@ namespace Resona.Services
 
         public void Save()
         {
-            var settingsData = new Dictionary<string, object>
-            {
-                ["LogLevel"] = this.LogLevel.ToString(),
-                ["ScreenDimTimeout"] = this.ScreenDimTimeout.ToString(),
-                ["InactivityShutdownTimeout"] = this.InactivityShutdownTimeout.ToString(),
-                ["HostWebClient"] = this.HostWebClient
-            };
+            var settingsData = new SettingsData(
+                this.LogLevel,
+                ScreenDimTimeout: this.ScreenDimTimeout,
+                InactivityShutdownTimeout: this.InactivityShutdownTimeout,
+                HostWebClient: this.HostWebClient);
 
             var jsonString = JsonSerializer.Serialize(
                 settingsData,
-                typeof(Dictionary<string, JsonElement>),
-                SettingsSerializationContext.Default);
+                SettingsSerializationContext.Default.SettingsData);
 
             File.WriteAllText(settingsFile.FullName, jsonString);
         }
