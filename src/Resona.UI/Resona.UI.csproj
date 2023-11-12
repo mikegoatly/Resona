@@ -100,6 +100,9 @@
 		<Compile Update="Views\Settings\AdvancedSettingsView.axaml.cs">
 			<DependentUpon>AdvancedSettingsView.axaml</DependentUpon>
 		</Compile>
+		<Compile Update="Views\BatteryView.axaml.cs">
+		  <DependentUpon>BatteryView.axaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Update="Properties\Resources.resx">
@@ -136,7 +139,7 @@
 		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
 	</Target>
 
-	<Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+    <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition=" '$(NoSpaBuild)' != 'true' ">
 		<!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
 		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
 		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />

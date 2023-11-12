@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
+using PiJuiceSharp;
+
 using Resona.Services.Audio;
 using Resona.Services.Background;
+using Resona.Services.Battery;
 using Resona.Services.Bluetooth;
 using Resona.Services.Libraries;
 using Resona.Services.OS;
@@ -18,12 +21,18 @@ namespace Resona.Services
                 services.AddSingleton<IBluetoothService, LinuxBluetoothService>();
                 services.AddSingleton<IAudioOutputService, PulseAudioOutputService>();
                 services.AddSingleton<ILogService>(new LinuxLogService());
+
+                services.AddSingleton<PiJuiceInterface>();
+                services.AddSingleton<PiJuiceStatus>();
+                services.AddSingleton<IBatteryStateProvider, BatteryStateProvider>();
             }
             else
             {
                 services.AddSingleton<IBluetoothService, DevBluetoothService>();
                 services.AddSingleton<IAudioOutputService, DevAudioOutputService>();
                 services.AddSingleton<ILogService>(new DevLogService());
+
+                services.AddSingleton<IBatteryStateProvider, FakeBatteryStateProvider>();
             }
 
             services.AddScoped<IAudioRepository, AudioRepository>();

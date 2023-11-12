@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="80" d:DesignHeight="12"
+			 xmlns:vm="using:Resona.UI.ViewModels"
+			 xmlns:converters="using:Resona.UI.Converters"
+			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+             x:Class="Resona.UI.Views.BatteryView"
+			  x:DataType="vm:BatteryViewModel"
+			 x:CompileBindings="True">
+	<UserControl.Resources>
+		<converters:BatteryLevelColorConverter x:Key="BatteryLevelColorConverter"/>
+	</UserControl.Resources>
+	
+	<Design.DataContext>
+		<vm:BatteryViewModel />
+	</Design.DataContext>
+
+	<Grid IsVisible="{Binding HasBattery}" ColumnDefinitions="Auto,22">
+
+		<icon:Icon Value="fa fa-plug" FontSize="8" Margin="0,0,5,0" 
+				   IsVisible="{Binding IsCharging}"/>
+
+		<Grid ColumnDefinitions="20,2" Height="12" Grid.Column="2">
+			<Border
+				Grid.Column="0"
+				HorizontalAlignment="Stretch"
+				BorderBrush="{StaticResource PrimaryColorDark}"
+				BorderThickness="2">
+			</Border>
+
+			<ProgressBar Maximum="100"
+						 Minimum="0"
+						 Value="{Binding BatteryLevel^}"
+						 
+						 Foreground="{Binding BatteryLevel^, Converter={StaticResource BatteryLevelColorConverter}}"
+						 Grid.Column="0"
+						 Height="12"
+						 MinWidth="10"/>
+
+			<Border Grid.Column="1" Width="3" Height="8"
+					BorderBrush="{StaticResource PrimaryColorDark}"
+					BorderThickness="2"/>
+		</Grid>
+	</Grid>
+
+</UserControl>

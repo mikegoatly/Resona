@@ -73,22 +73,27 @@
 				<icon:Icon Value="fa fa-arrow-left" />
 			</Button>
 
-			<Grid 
+			<Grid
 				HorizontalAlignment="Right"
 				VerticalAlignment="Stretch">
-				<Button Classes="danger circle" VerticalAlignment="Top">
-					<icon:Icon Value="fa fa-power-off" />
-					<Button.Flyout>
-						<Flyout Placement="BottomEdgeAlignedRight">
-							<local:PowerOptions />
-						</Flyout>
-					</Button.Flyout>
-				</Button>
-				<Button Classes="secondary circle" 
+
+				<Grid ColumnDefinitions="*,Auto" VerticalAlignment="Top">
+					<Button Classes="danger circle" Grid.Column="1">
+						<icon:Icon Value="fa fa-power-off" />
+						<Button.Flyout>
+							<Flyout Placement="BottomEdgeAlignedRight">
+								<local:PowerOptions />
+							</Flyout>
+						</Button.Flyout>
+					</Button>
+					<local:BatteryView Grid.Column="0" Margin="0,0,5,0" VerticalAlignment="Top"/>
+				</Grid>
+				<Button Classes="secondary circle"
 						Classes.bounce-hidden="{Binding !ShowSettingsButton}"
 						Classes.bounce-visible="{Binding ShowSettingsButton}"
 						Command="{Binding NavigateToSettingsCommand}"
-						VerticalAlignment="Bottom">
+						VerticalAlignment="Bottom"
+						HorizontalAlignment="Right">
 					<icon:Icon Value="fa fa-gear" />
 				</Button>
 			</Grid>

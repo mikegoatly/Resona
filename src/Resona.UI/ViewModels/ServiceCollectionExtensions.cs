@@ -20,6 +20,7 @@ namespace Resona.UI.ViewModels
             services.AddSingleton<PowerOptionsViewModel>();
             services.AddSingleton<SleepOptionsViewModel>();
             services.AddSingleton<BluetoothSettingsViewModel>();
+            services.AddSingleton<BatteryViewModel>();
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<AudioSettingsViewModel>();
             services.AddSingleton<AdvancedSettingsViewModel>();
