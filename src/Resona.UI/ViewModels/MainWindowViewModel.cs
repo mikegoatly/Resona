@@ -71,7 +71,7 @@ namespace Resona.UI.ViewModels
         public ReactiveCommand<Unit, IRoutableViewModel> GoHome { get; }
 
         // The command that navigates a user back.
-        public ReactiveCommand<Unit, IRoutableViewModel?> GoBack => this.Router.NavigateBack;
+        public ReactiveCommand<Unit, IRoutableViewModel> GoBack => this.Router.NavigateBack;
 
         [Reactive]
         public double ScreenDimPercentage { get; set; }
