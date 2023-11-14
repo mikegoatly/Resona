@@ -68,15 +68,9 @@ namespace Resona.UI.ViewModels
         public ICommand CancelSleep { get; }
     }
 
-    public class SleepOption
+    public class SleepOption(string name, ICommand command)
     {
-        public SleepOption(string name, ICommand command)
-        {
-            this.Name = name;
-            this.Command = command;
-        }
-
-        public string Name { get; }
-        public ICommand Command { get; }
+        public string Name { get; } = name;
+        public ICommand Command { get; } = command;
     }
 }

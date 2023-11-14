@@ -56,11 +56,15 @@ namespace Resona.UI.ViewModels
             this.Model = await this.audioProvider.GetByIdAsync(id, cancellationToken);
             var isCurrentContent = this.IsCurrentContent;
             var currentTrackIndex = this.playerService.Current?.Track.TrackIndex;
+            var lastPlayedTrack = this.Model.LastPlayedTrack;
             this.Tracks = this.Model.Tracks.Select(
-                t => new AudioTrackViewModel(t, isCurrentContent && currentTrackIndex == t.TrackIndex))
+                t => new AudioTrackViewModel(
+                    t,
+                    isPlaying: isCurrentContent && currentTrackIndex == t.TrackIndex,
+                    isResumeTrack: !isCurrentContent && t == lastPlayedTrack))
                 .ToList();
 
-            this.CurrentTrack = this.Tracks.FirstOrDefault(x => x.IsPlaying);
+            this.CurrentTrack = this.Tracks.FirstOrDefault(x => x.IsPlaying || x.IsResumeTrack);
 
             this.Cover = this.LoadCoverAsync(this.Model, cancellationToken);
 
@@ -116,7 +120,15 @@ namespace Resona.UI.ViewModels
         {
             if (this.Model != null)
             {
-                this.playerService.Play(this.Model, track.Model, 0, true);
+                if (track.IsResumeTrack)
+                {
+                    track.IsResumeTrack = false;
+                    this.playerService.Play(this.Model, track.Model, this.Model.LastPlayedTrackPosition ?? 0, true);
+                }
+                else
+                {
+                    this.playerService.Play(this.Model, track.Model, 0, true);
+                }
             }
         }
 

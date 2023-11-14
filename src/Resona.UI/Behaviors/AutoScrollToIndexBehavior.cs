@@ -81,13 +81,13 @@ namespace Resona.UI.Behaviors
             this.animationCancellationTokenSource?.Cancel();
             this.animationCancellationTokenSource = new CancellationTokenSource();
 
-            if (this.AssociatedObject.ContainerFromIndex(index) is Control container)
+            // Wait for the control to be materialized and its position to be updated
+            await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                // Wait for the control to be materialized and its position to be updated
-                await Dispatcher.UIThread.InvokeAsync(async () =>
-                {
-                    await Task.Delay(10);
+                await Task.Delay(10);
 
+                if (this.AssociatedObject.ContainerFromIndex(index) is Control container)
+                {
                     // Get the position of the container relative to the top of the ItemsControl
                     var point = container.TranslatePoint(new Point(0, 0), this.AssociatedObject);
                     if (point.HasValue)
@@ -113,9 +113,8 @@ namespace Resona.UI.Behaviors
                             scrollViewer.Offset = targetOffset;
                         }
                     }
-
-                }, DispatcherPriority.Render);
-            }
+                }
+            }, DispatcherPriority.Render);
         }
     }
 }

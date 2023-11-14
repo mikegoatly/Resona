@@ -30,6 +30,10 @@
 				<Style Selector="^.playing">
 					<Setter Property="Foreground" Value="Yellow" />
 				</Style>
+
+				<Style Selector="^.isResume">
+					<Setter Property="Foreground" Value="GreenYellow" />
+				</Style>
 			</Style>
 		</Grid.Styles>
 		<ScrollViewer Margin="80,20">
@@ -56,6 +60,7 @@
 							<TextBlock
 								HorizontalAlignment="Center"
 								Classes.playing="{Binding IsPlaying}"
+								Classes.isResume="{Binding IsResumeTrack}"
 								Text="{Binding Title}" />
 						</StackPanel>
 					</DataTemplate>

@@ -9,8 +9,6 @@ using Avalonia.ReactiveUI;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 using Projektanker.Icons.Avalonia;
@@ -21,7 +19,6 @@ using ReactiveUI;
 using Resona.Persistence;
 using Resona.Services;
 using Resona.Services.Libraries;
-using Resona.UI.ApiModels;
 using Resona.UI.ViewModels;
 
 using Serilog;
@@ -31,7 +28,7 @@ using Splat.Microsoft.Extensions.DependencyInjection;
 
 namespace Resona.UI
 {
-    internal class Program
+    internal partial class Program
     {
         [STAThread]
         public static async Task<int> Main(string[] args)
@@ -107,104 +104,6 @@ namespace Resona.UI
             builder.Services.AddSingleton(Locator.Current.GetRequiredService<IAudioRepository>());
             builder.Services.AddSingleton(Locator.Current.GetRequiredService<IImageProvider>());
             builder.Services.AddSingleton(Locator.Current.GetRequiredService<ILibraryFileManager>());
-        }
-
-        private static void MapApis(WebApplication app)
-        {
-            app.MapGet("/api/library", (
-                [FromServices] IImageProvider imageProvider,
-                CancellationToken cancellationToken) =>
-            {
-                return new[]
-                {
-                    new AudioKindDetails(AudioKind.Audiobook.ToString(), imageProvider.HasCustomLibraryIcon(AudioKind.Audiobook)),
-                    new AudioKindDetails(AudioKind.Music.ToString(), imageProvider.HasCustomLibraryIcon(AudioKind.Music)),
-                    new AudioKindDetails(AudioKind.Sleep.ToString(), imageProvider.HasCustomLibraryIcon(AudioKind.Sleep))
-                };
-            });
-
-            app.MapGet("/api/library/{audioKind}", async (
-                [FromServices] IAudioRepository audioRepository,
-                [FromRoute] string audioKind,
-                CancellationToken cancellationToken) =>
-            {
-                return await audioRepository.GetAllAsync(Enum.Parse<AudioKind>(audioKind, true), cancellationToken);
-            });
-
-            app.MapGet("/api/library/{audioKind}/image", (
-                [FromServices] IImageProvider imageProvider,
-                [FromRoute] string audioKind,
-                CancellationToken cancellationToken) =>
-            {
-                var stream = imageProvider.GetLibraryIconImageStream(Enum.Parse<AudioKind>(audioKind));
-
-                // If stream is null, return not found, otherwise return it
-                return stream == null ? Results.NotFound() : Results.Stream(stream);
-            });
-
-            app.MapPost("/api/library/{audioKind}/image", async (
-                [FromServices] IImageProvider imageProvider,
-                [FromRoute] string audioKind,
-                HttpContext httpContext,
-                CancellationToken cancellationToken) =>
-            {
-                var form = await httpContext.Request.ReadFormAsync(cancellationToken);
-                var file = form.Files["file"] ?? throw new InvalidOperationException("No file sent");
-
-                await imageProvider.UploadLibraryIconImageAsync(
-                    Enum.Parse<AudioKind>(audioKind, true),
-                    file.OpenReadStream(),
-                    cancellationToken);
-            });
-
-            app.MapDelete("/api/library/{audioKind}/image", (
-                [FromServices] IImageProvider imageProvider,
-                [FromRoute] string audioKind,
-                CancellationToken cancellationToken) =>
-            {
-                imageProvider.RemoveLibraryIconImage(
-                    Enum.Parse<AudioKind>(audioKind, true),
-                    cancellationToken);
-            });
-
-            app.MapGet("/api/library/{albumId:int}/image", async (
-                [FromServices] IAudioRepository audioRepository,
-                [FromServices] IImageProvider imageProvider,
-                [FromRoute] int albumId,
-                CancellationToken cancellationToken) =>
-            {
-                var audio = await audioRepository.GetByIdAsync(albumId, cancellationToken);
-                return Results.Stream(imageProvider.GetImageStream(audio));
-            });
-
-            app.MapDelete("/api/library/{albumId:int}/image", async (
-                [FromServices] IAudioRepository audioRepository,
-                [FromServices] IImageProvider imageProvider,
-                [FromRoute] int albumId,
-                CancellationToken cancellationToken) =>
-            {
-                var audio = await audioRepository.GetByIdAsync(albumId, cancellationToken);
-                return Results.Stream(imageProvider.GetImageStream(audio));
-            });
-
-            app.MapPost("/api/library/{audioKind}", async (
-                [FromServices] ILibraryFileManager fileManager,
-                [FromRoute] string audioKind,
-                HttpContext httpContext,
-                CancellationToken cancellationToken) =>
-            {
-                var form = await httpContext.Request.ReadFormAsync(cancellationToken);
-                var albumName = form["albumName"].ToString();
-                var file = form.Files["file"] ?? throw new InvalidOperationException("No file sent");
-
-                await fileManager.UploadFileAsync(
-                    Enum.Parse<AudioKind>(audioKind, true),
-                    albumName,
-                    file.FileName,
-                    file.Length,
-                    file.OpenReadStream(),
-                    cancellationToken);
-            });
         }
 
         private static async Task<int> StartAvaloniaAsync(string[] args, CancellationToken cancellationToken)

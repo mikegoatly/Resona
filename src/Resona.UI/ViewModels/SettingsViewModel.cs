@@ -2,13 +2,9 @@
 
 namespace Resona.UI.ViewModels
 {
-    public class SettingsViewModel : RoutableViewModelBase
+    public class SettingsViewModel(
+        RoutingState router,
+        IScreen hostScreen) : RoutableViewModelBase(router, hostScreen, "settings")
     {
-        public SettingsViewModel(
-            RoutingState router,
-            IScreen hostScreen)
-            : base(router, hostScreen, "settings")
-        {
-        }
     }
 }

@@ -1,26 +1,20 @@
 ﻿using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 using Resona.Services.Libraries;
 
 namespace Resona.UI.ViewModels
 {
-    public class AudioTrackViewModel : ReactiveObject
+    public class AudioTrackViewModel(AudioTrack track, bool isPlaying, bool isResumeTrack) : ReactiveObject
     {
-        private bool isPlaying;
-
-        public AudioTrackViewModel(AudioTrack track, bool isPlaying)
-        {
-            this.Model = track;
-            this.IsPlaying = isPlaying;
-        }
         public string Title => this.Model.Title;
         public int Index => this.Model.TrackIndex;
-        public AudioTrack Model { get; }
+        public AudioTrack Model { get; } = track;
 
-        public bool IsPlaying
-        {
-            get => this.isPlaying;
-            set => this.RaiseAndSetIfChanged(ref this.isPlaying, value);
-        }
+        [Reactive]
+        public bool IsResumeTrack { get; set; } = isResumeTrack;
+
+        [Reactive]
+        public bool IsPlaying { get; set; } = isPlaying;
     }
 }
