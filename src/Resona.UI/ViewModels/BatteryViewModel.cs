@@ -30,7 +30,7 @@ namespace Resona.UI.ViewModels
 
             batteryState.ChargingStatus.Subscribe(status =>
             {
-                this.HasBattery = status.BatteryStatus != BatteryStatus.NotPresent;
+                this.HasBattery = status.BatteryStatus is not (BatteryStatus.NotPresent or BatteryStatus.NoPiJuice);
                 this.IsCharging = status.BatteryStatus is BatteryStatus.ChargingFrom5vIo or BatteryStatus.ChargingFromIn;
             });
         }

@@ -9,10 +9,10 @@ namespace Resona.Services.Battery
     public class BatteryStateProvider : IBatteryStateProvider
     {
         private static readonly ILogger logger = Log.ForContext<BatteryStateProvider>();
-        private readonly PiJuiceStatus piJuiceStatus;
+        private readonly IPiJuiceStatus piJuiceStatus;
 
         public BatteryStateProvider(
-            PiJuiceStatus piJuiceStatus)
+            IPiJuiceStatus piJuiceStatus)
         {
             this.piJuiceStatus = piJuiceStatus;
 

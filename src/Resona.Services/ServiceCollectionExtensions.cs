@@ -22,8 +22,7 @@ namespace Resona.Services
                 services.AddSingleton<IAudioOutputService, PulseAudioOutputService>();
                 services.AddSingleton<ILogService>(new LinuxLogService());
 
-                services.AddSingleton<PiJuiceInterface>();
-                services.AddSingleton<PiJuiceStatus>();
+                services.AddSingleton<IPiJuiceStatus>(PiJuiceStatus.Create());
                 services.AddSingleton<IBatteryStateProvider, BatteryStateProvider>();
             }
             else
