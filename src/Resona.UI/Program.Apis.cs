@@ -48,7 +48,7 @@ namespace Resona.UI
             return await audioRepository.GetAllAsync(Enum.Parse<AudioKind>(audioKind, true), cancellationToken);
         }
 
-        private static IActionResult GetLibraryIconImage(
+        private static IResult GetLibraryIconImage(
             [FromServices] IImageProvider imageProvider,
             [FromRoute] string audioKind,
             CancellationToken cancellationToken)
@@ -56,7 +56,7 @@ namespace Resona.UI
             var stream = imageProvider.GetLibraryIconImageStream(Enum.Parse<AudioKind>(audioKind));
 
             // If stream is null, return not found, otherwise return it
-            return (IActionResult)(stream == null ? Results.NotFound() : Results.Stream(stream));
+            return stream == null ? Results.NotFound() : Results.Stream(stream);
         }
 
         private static async Task UploadLibraryIconImage(
@@ -84,14 +84,14 @@ namespace Resona.UI
                 cancellationToken);
         }
 
-        private static async Task<IActionResult> GetLibraryAlbumImage(
+        private static async Task<IResult> GetLibraryAlbumImage(
             [FromServices] IAudioRepository audioRepository,
             [FromServices] IImageProvider imageProvider,
             [FromRoute] int albumId,
             CancellationToken cancellationToken)
         {
             var audio = await audioRepository.GetByIdAsync(albumId, cancellationToken);
-            return (IActionResult)Results.Stream(imageProvider.GetImageStream(audio));
+            return Results.Stream(imageProvider.GetImageStream(audio));
         }
 
         private static async Task<IResult> RemoveLibraryAlbumImage(
