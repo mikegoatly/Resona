@@ -37,6 +37,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{188E7350-3
 		docs\track-selection.png = docs\track-selection.png
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resona.UI.Web", "src\Resona.UI.Web\Resona.UI.Web.csproj", "{B6BB1DC4-BCC2-47B8-9C20-401667839FC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{E194272C-FFEF-4B57-8F70-9DEED424BB1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E194272C-FFEF-4B57-8F70-9DEED424BB1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E194272C-FFEF-4B57-8F70-9DEED424BB1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6BB1DC4-BCC2-47B8-9C20-401667839FC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6BB1DC4-BCC2-47B8-9C20-401667839FC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6BB1DC4-BCC2-47B8-9C20-401667839FC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6BB1DC4-BCC2-47B8-9C20-401667839FC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

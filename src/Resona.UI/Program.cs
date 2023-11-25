@@ -8,7 +8,6 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 using Projektanker.Icons.Avalonia;
@@ -20,6 +19,7 @@ using Resona.Persistence;
 using Resona.Services;
 using Resona.Services.Libraries;
 using Resona.UI.ViewModels;
+using Resona.UI.Web;
 
 using Serilog;
 
@@ -63,22 +63,16 @@ namespace Resona.UI
                     Log.Debug("Starting web application");
 
                     // Get ASP.NET Core to use the SPA proxy assembly to serve the SPA client app
-                    Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", "Microsoft.AspNetCore.SpaProxy");
+                    //Environment.SetEnvironmentVariable("ASPNETCORE_HOSTINGSTARTUPASSEMBLIES", "Microsoft.AspNetCore.SpaProxy");
 
                     var builder = WebApplication.CreateBuilder(args);
-
-                    // Set the max request size to 100MB
-                    builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 100_000_000);
+                    WebClientInitialization.ConfigureServices(builder.Services);
 
                     ConfigureSharedServices(builder);
 
                     var app = builder.Build();
 
-                    app.UseStaticFiles();
-
-                    MapApis(app);
-
-                    app.MapFallbackToFile("index.html");
+                    WebClientInitialization.ConfigureApplication(app);
 
                     // Running on 0.0.0.0 allows the web app to be accessed from other devices on the network
                     app.Run("http://0.0.0.0:8080");

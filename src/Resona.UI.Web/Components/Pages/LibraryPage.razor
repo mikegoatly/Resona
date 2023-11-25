@@ -1,0 +1,40 @@
+﻿@page "/library/{Kind}"
+@using Resona.Services.Libraries
+
+<PageTitle>@Kind</PageTitle>
+
+<section class="library">
+    @if (this.AudioContent != null)
+    {
+        @foreach (var audioContent in this.AudioContent)
+        {
+            <div class="audio">
+                <h3>@audioContent.Name</h3>
+                <p>@audioContent.Artist</p>
+                <img loading="lazy"
+                    class="img"
+                     title=@($"Album art for {audioContent.Name}")
+                     width="50"
+                     height="50"
+                     src=@($"/api/library/{audioContent.Id}/image") />
+            </div>
+        }
+    }
+</section>
+
+@code {
+    // Parameter of type AudioKind
+    [Parameter]
+    public string Kind { get; set; } = null!;
+
+    [Inject]
+    public IAudioRepository AudioRepository { get; set; } = null!;
+
+    private IReadOnlyList<AudioContentSummary>? AudioContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var kind = Enum.Parse<AudioKind>(this.Kind);
+        this.AudioContent = await this.AudioRepository.GetAllAsync(kind, default);
+    }
+}
