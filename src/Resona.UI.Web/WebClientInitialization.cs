@@ -9,6 +9,7 @@ public static class WebClientInitialization
     public static void ConfigureServices(IServiceCollection services)
     {
         services.AddRazorComponents()
+            .AddInteractiveWebAssemblyComponents()
             .AddInteractiveServerComponents();
     }
 
@@ -35,6 +36,7 @@ public static class WebClientInitialization
         app.UseAntiforgery();
 
         app.MapRazorComponents<Components.App>()
+            .AddInteractiveWebAssemblyRenderMode()
             .AddInteractiveServerRenderMode();
 
         MapApis(app);

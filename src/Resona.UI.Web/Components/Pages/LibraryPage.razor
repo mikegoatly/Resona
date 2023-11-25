@@ -3,27 +3,30 @@
 
 <PageTitle>@Kind</PageTitle>
 
-<section class="library">
+<main class="library">
     @if (this.AudioContent != null)
     {
         @foreach (var audioContent in this.AudioContent)
         {
             <div class="audio">
-                <h3>@audioContent.Name</h3>
-                <p>@audioContent.Artist</p>
                 <img loading="lazy"
-                    class="img"
+                     class="img"
                      title=@($"Album art for {audioContent.Name}")
                      width="50"
                      height="50"
                      src=@($"/api/library/{audioContent.Id}/image") />
+
+                <p>@audioContent.Name</p>
             </div>
         }
     }
-</section>
+</main>
+
+<footer class="library">
+    <NavLink class="footer-button" href=@($"/library/{Kind}/add")>➕ New</NavLink>
+</footer>
 
 @code {
-    // Parameter of type AudioKind
     [Parameter]
     public string Kind { get; set; } = null!;
 

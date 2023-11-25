@@ -88,12 +88,8 @@ namespace Resona.Services.Libraries
             var album = await dataContext.Tracks
                 .Where(x => x.TrackId == trackId)
                 .Select(x => x.Album)
-                .FirstOrDefaultAsync();
-
-            if (album == null)
-            {
-                throw new ResonaException($"Can't find track with id {trackId}");
-            }
+                .FirstOrDefaultAsync(cancellationToken)
+                ?? throw new ResonaException($"Can't find track with id {trackId}");
 
             album.LastPlayedTrackPosition = position;
             album.LastPlayedDateUtc = DateTime.UtcNow;

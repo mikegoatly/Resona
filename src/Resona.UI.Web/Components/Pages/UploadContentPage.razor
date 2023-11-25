@@ -1,0 +1,76 @@
+﻿@page "/library/{Kind}/add"
+
+@using Resona.Services.Libraries
+@rendermode InteractiveWebAssembly
+
+<PageTitle>Upload new @Kind</PageTitle>
+
+<main class="upload">
+    <label>
+        <InputFile OnChange="@OnInputFileChange" multiple />
+        <input @onchange="@OnTextChange" value="hello" />
+    </label>
+
+    <section class="file-list">
+        @foreach (var file in files)
+        {
+            <div class="file">
+                <p>@file.Name</p>
+            </div>
+        }
+    </section>
+</main>
+
+@code {
+    private bool shouldRender;
+    private List<IBrowserFile> files = new();
+    // private List<UploadResult> uploadResults = new();
+
+    [Parameter]
+    public string Kind { get; set; } = null!;
+
+    [Inject]
+    public IAudioRepository AudioRepository { get; set; } = null!;
+
+    protected override bool ShouldRender() => shouldRender;
+
+    protected override Task OnInitializedAsync()
+    {
+        var kind = Enum.Parse<AudioKind>(this.Kind);
+        return Task.CompletedTask;
+    }
+
+    private Task OnTextChange(ChangeEventArgs e)
+    {
+        Console.WriteLine("Hello");
+        return Task.CompletedTask;
+    }
+
+    private Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        shouldRender = false;
+        using var content = new MultipartFormDataContent();
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            files.Add(file);
+        }
+
+        // if (upload)
+        // {
+        //     var response = await Http.PostAsync("/Filesave", content);
+
+        //     var newUploadResults = await response.Content
+        //         .ReadFromJsonAsync<IList<UploadResult>>();
+
+        //     if (newUploadResults is not null)
+        //     {
+        //         uploadResults = uploadResults.Concat(newUploadResults).ToList();
+        //     }
+        // }
+
+        shouldRender = true;
+
+        return Task.CompletedTask;
+    }
+}
