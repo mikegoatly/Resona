@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,8 +13,18 @@ namespace Resona.UI.Behaviors
 {
     public static class ScrollViewerExtensions
     {
+        private static readonly ConcurrentDictionary<ScrollViewer, CancellationTokenSource> scrollViewerCancellationTokens = new();
+
         public static async Task AnimateOffsetAsync(this ScrollViewer scrollViewer, Vector targetOffset, TimeSpan duration, Easing? easing = null, CancellationToken cancellationToken = default)
         {
+            if (scrollViewerCancellationTokens.TryGetValue(scrollViewer, out var cancellationTokenSource))
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            scrollViewerCancellationTokens[scrollViewer] = cancellationTokenSource;
+
             var animation = new Animation
             {
                 Duration = duration,
@@ -39,7 +50,7 @@ namespace Resona.UI.Behaviors
                 }
             };
 
-            await animation.RunAsync(scrollViewer, cancellationToken: cancellationToken);
+            await animation.RunAsync(scrollViewer, cancellationToken: cancellationTokenSource.Token);
         }
     }
 }

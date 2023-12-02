@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 using Resona.Services.Libraries;
 
@@ -18,6 +19,7 @@ namespace Resona.UI.ViewModels
         private Task<List<AudioContentViewModel>>? audioContent;
         private readonly IAudioRepository audioProvider;
         private readonly IImageProvider imageProvider;
+        private QuickJumpViewModel? currentQuickJump;
 
 #if DEBUG
         [Obsolete("Do not use outside of design time")]
@@ -27,13 +29,13 @@ namespace Resona.UI.ViewModels
             this.AudioContent = Task.FromResult(
                 new List<AudioContentViewModel>
                 {
-                    new AudioContentViewModel(
+                    new(
                         new AudioContentSummary(1, AudioKind.Audiobook, "Some book", "Me", null),
                         this.imageProvider),
-                     new AudioContentViewModel(
+                     new(
                         new AudioContentSummary(2, AudioKind.Audiobook, "Another book", "Me", null),
                         this.imageProvider),
-                      new AudioContentViewModel(
+                      new(
                         new AudioContentSummary(3, AudioKind.Audiobook, "Last book", "Me", null),
                         this.imageProvider)
                 });
@@ -84,14 +86,64 @@ namespace Resona.UI.ViewModels
         private async Task<List<AudioContentViewModel>> GetAudioContent(AudioKind kind)
         {
             var audio = await this.audioProvider.GetAllAsync(kind, default);
+
+            var uniqueLetters = audio.Where(a => a.Name.Length > 0)
+                .Select(a => char.ToUpperInvariant(a.Name[0]))
+                .Where(c => c is >= 'A' and <= 'Z')
+                .ToHashSet();
+
+            this.AvailableQuickJumps = this.QuickJumpList
+                .Where(q => uniqueLetters.Contains(q.Match))
+                .ToDictionary(c => c.Match);
+
+            foreach (var quickJump in this.QuickJumpList)
+            {
+                quickJump.IsAvailable = this.AvailableQuickJumps.ContainsKey(quickJump.Match);
+            }
+
             return audio.Select(x => new AudioContentViewModel(x, this.imageProvider))
                 .ToList();
         }
+
+        [Reactive]
+        public AudioContentViewModel? FirstVisibleItem { get; set; }
 
         public Task<List<AudioContentViewModel>>? AudioContent
         {
             get => this.audioContent;
             protected set => this.RaiseAndSetIfChanged(ref this.audioContent, value);
+        }
+
+        public List<QuickJumpViewModel> QuickJumpList { get; } = BuildQuickJumpList().ToList();
+
+        private static IEnumerable<QuickJumpViewModel> BuildQuickJumpList()
+        {
+            for (var i = 'A'; i <= 'Z'; i++)
+            {
+                yield return new(i);
+            }
+        }
+
+        public Dictionary<char, QuickJumpViewModel>? AvailableQuickJumps { get; private set; }
+
+        public QuickJumpViewModel CurrentQuickJump
+        {
+            get => this.currentQuickJump ?? this.QuickJumpList[0];
+            set
+            {
+                var current = this.CurrentQuickJump;
+                if (current != null && value != current)
+                {
+                    current.IsCurrent = false;
+                }
+
+                if (value != null)
+                {
+                    value.IsCurrent = true;
+                }
+
+                this.RaiseAndSetIfChanged(ref this.currentQuickJump, value);
+            }
         }
 
         public AudioKind Kind
@@ -102,5 +154,4 @@ namespace Resona.UI.ViewModels
 
         public ReactiveCommand<AudioContentViewModel, IObservable<IRoutableViewModel>> AudioContentSelected { get; }
     }
-
 }

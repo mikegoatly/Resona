@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -17,7 +16,6 @@ namespace Resona.UI.Behaviors
     /// </summary>
     public class AutoScrollToIndexBehavior : Behavior<ItemsControl>
     {
-        private CancellationTokenSource? animationCancellationTokenSource;
         private IDisposable? propertyChangeSubscription;
 
         public static readonly AttachedProperty<int> CurrentIndexProperty = AvaloniaProperty.RegisterAttached<AutoScrollToIndexBehavior, ItemsControl, int>("CurrentIndex", 0, false);
@@ -77,10 +75,6 @@ namespace Resona.UI.Behaviors
                 return;
             }
 
-            // Cancel any existing scroll animation
-            this.animationCancellationTokenSource?.Cancel();
-            this.animationCancellationTokenSource = new CancellationTokenSource();
-
             // Wait for the control to be materialized and its position to be updated
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
@@ -105,8 +99,7 @@ namespace Resona.UI.Behaviors
                             await scrollViewer.AnimateOffsetAsync(
                                 targetOffset,
                                 this.ScrollDuration ?? TimeSpan.FromSeconds(1),
-                                this.Easing,
-                                this.animationCancellationTokenSource.Token);
+                                this.Easing);
                         }
                         else
                         {

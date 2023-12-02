@@ -41,11 +41,15 @@ namespace Resona.Services.Libraries
         {
             using var dataContext = new ResonaDb();
 
-            return await dataContext.Albums
+            var results = await dataContext.Albums
                 .Where(x => x.Kind == (AlbumKind)kind)
-                .OrderBy(x => x.Name)
                 .Select(x => new AudioContentSummary(x.AlbumId, kind, x.Name, x.Artist, x.ThumbnailFile))
                 .ToListAsync(cancellationToken);
+
+            // Sort the results in place, case insensitively
+            results.Sort((x, y) => string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase));
+
+            return results;
         }
 
         public async Task<AudioContent> GetByIdAsync(int id, CancellationToken cancellationToken)
