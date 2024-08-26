@@ -18,13 +18,13 @@ namespace Resona.Services.Audio
         Task SetActiveDeviceAsync(AudioDevice device, CancellationToken cancellationToken);
     }
 
-    public class PulseAudioOutputService : IAudioOutputService
+    public partial class PulseAudioOutputService : IAudioOutputService
     {
         private static readonly ILogger logger = Log.ForContext<PulseAudioOutputService>();
 
-        private static readonly Regex bluezSinkOutputRegex = new(@"^(?<Number>\d+)\s+(?<Name>(bluez_sink\.(?<Mac>[0-9a-f_]+)[^\s]+|[^\s]+))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex defaultSinkRegex = new("^Default Sink: (?<Name>.+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex getNameOutputRegex = new(@"^\s+Device name: (?<DeviceName>.*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex bluezSinkOutputRegex = BluezSinkOutputRegex();
+        private static readonly Regex defaultSinkRegex = DefaultSinkRegex();
+        private static readonly Regex getNameOutputRegex = GetNameOutputRegex();
 
         private static readonly ConcurrentDictionary<string, string> deviceNameLookup = new(StringComparer.OrdinalIgnoreCase);
 
@@ -250,5 +250,12 @@ namespace Resona.Services.Audio
             result = default;
             return false;
         }
+
+        [GeneratedRegex(@"^(?<Number>\d+)\s+(?<Name>(bluez_sink\.(?<Mac>[0-9a-f_]+)[^\s]+|[^\s]+))", RegexOptions.IgnoreCase)]
+        private static partial Regex BluezSinkOutputRegex();
+        [GeneratedRegex(@"^\s+Device name: (?<DeviceName>.*)$", RegexOptions.IgnoreCase)]
+        private static partial Regex GetNameOutputRegex();
+        [GeneratedRegex("^Default Sink: (?<Name>.+)$", RegexOptions.IgnoreCase)]
+        private static partial Regex DefaultSinkRegex();
     }
 }
