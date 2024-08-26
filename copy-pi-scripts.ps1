@@ -8,4 +8,4 @@ param (
 scp -r "./scripts/*" "$($Server):"
 
 # Use SSH to mark the scripts as executable 
-ssh $Server "chmod +x *.sh"
+ssh $Server "dos2unix *.sh & chmod +x *.sh"
