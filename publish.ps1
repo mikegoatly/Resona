@@ -33,10 +33,10 @@ if (-not $NoBuild) {
     Get-ChildItem $Folder | Remove-Item -Recurse
 
     if ($DebugBuild) {
-        dotnet publish $Project -o $Folder -r "linux-arm" -c Debug -f net8.0 --self-contained true -p:NoSpaBuild=$NoSpaBuild
+        dotnet publish $Project -o $Folder -r "linux-arm" -c Debug -f net9.0 --self-contained true -p:NoSpaBuild=$NoSpaBuild
     }
     else {
-        dotnet publish $Project -o $Folder -r "linux-arm" -c Release -f net8.0 -p:PublishReadyToRun=true `
+        dotnet publish $Project -o $Folder -r "linux-arm" -c Release -f net9.0 -p:PublishReadyToRun=true `
             -p:PublishSingleFile=true -p:PublishTrimmed=false `
             --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true `
             -p:NoSpaBuild=$NoSpaBuild

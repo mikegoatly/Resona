@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 using Avalonia;
@@ -47,6 +48,7 @@ namespace Resona.UI.Behaviors
             base.OnDetaching();
         }
 
+        [RequiresUnreferencedCode("This method is called by Avalonia at runtime to set up the behavior.")]
         protected override void OnAttached()
         {
             base.OnAttached();
