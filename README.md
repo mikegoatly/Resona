@@ -120,8 +120,8 @@ And also upload new content:
 
 If you want to add a splash screen and get rid of all the scrolling boot up text the Pi shows, follow these steps:
 
-1. Add the line `disable_splash=1` to `/boot/config.txt`.
-1. Add `logo.nologo consoleblank=0 loglevel=1 quiet splash` to `/boot/cmdline.txt`.
+1. Add the line `disable_splash=1` to `/boot/firmware/config.txt`.
+1. Add `logo.nologo consoleblank=0 loglevel=1 quiet splash` to `/boot/firmware/cmdline.txt`.
 1. Add a splashscreen
 	1. Install `fbi` with `sudo apt install fbi`
 	1. Create a splash screen image and save it as `/home/pi/splash.png`
@@ -149,7 +149,7 @@ This section contains notes about the various touchscreens used during developme
 
 #### Wimaxit 7" Capacitive with sound
 
-Add this to the end of /boot/config.txt:
+Add this to the end of /boot/firmware/config.txt:
 
 ```
 hdmi_force_edid_audio=1
@@ -166,7 +166,7 @@ hdmi_cvt 1024 600 60 6 0 0 0
 Enable fkms to fix audio issues:
 
 ```
-sudo sed -i 's/dtoverlay=vc4-kms-v3d/dtoverlay=vc4-fkms-v3d/g' /boot/config.txt
+sudo sed -i 's/dtoverlay=vc4-kms-v3d/dtoverlay=vc4-fkms-v3d/g' /boot/firmware/config.txt
 ```
 
 #### 
