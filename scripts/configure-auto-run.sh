@@ -14,8 +14,6 @@ User=pi
 Restart=always
 RestartSec=2s
 StartLimitBurst=3
-StartLimitIntervalSec=30
-StartLimitAction=reboot
 Environment="PULSE_RUNTIME_PATH=/run/user/1000/pulse/"
 
 [Install]
