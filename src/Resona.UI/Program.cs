@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -19,6 +20,7 @@ using ReactiveUI;
 using Resona.Persistence;
 using Resona.Services;
 using Resona.Services.Libraries;
+using Resona.Services.OS;
 using Resona.UI.ViewModels;
 
 using Serilog;
@@ -110,7 +112,7 @@ namespace Resona.UI
         {
             var barrier = new SemaphoreSlim(0);
             var exitCode = 0;
-            new Thread(() =>
+            new Thread(async () =>
             {
                 Log.Debug("Building Avalonia app");
 
@@ -119,11 +121,15 @@ namespace Resona.UI
                 {
                     SilenceConsole();
                     Log.Information("Starting in DRM mode");
-                    exitCode = builder.StartLinuxDrm(args, scaling: 1);
-                }
 
-                Log.Information("Starting in desktop mode");
-                exitCode = builder.StartWithClassicDesktopLifetime(args);
+                    var drmCard = await DrmService.GetDrmCardAsync();
+                    exitCode = builder.StartLinuxDrm(args, drmCard, scaling: 1);
+                }
+                else
+                {
+                    Log.Information("Starting in desktop mode");
+                    exitCode = builder.StartWithClassicDesktopLifetime(args);
+                }
 
                 barrier.Release();
             })
