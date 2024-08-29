@@ -140,9 +140,6 @@ If you want to add a splash screen and get rid of all the scrolling boot up text
 		WantedBy=sysinit.target
 		```
 	1. `sudo systemctl enable splashscreen.service`
-1. (Not recommended) Disable getty so no user prompt appears: `sudo systemctl disable getty@tty1.service` **Important:** This will disable the 
-command prompt on the Pi's display and will also probably cause problems with detecting audio outputs using pulseaudio. 
-Regardless, you'll need to SSH in to the Pi to run commands.
 
 ### Touchscreen installation
 
