@@ -112,7 +112,8 @@ namespace Resona.UI
         {
             var barrier = new SemaphoreSlim(0);
             var exitCode = 0;
-            new Thread(async () =>
+            
+            var task = Task.Run(async () =>
             {
                 Log.Debug("Building Avalonia app");
 
@@ -132,10 +133,7 @@ namespace Resona.UI
                 }
 
                 barrier.Release();
-            })
-            {
-                IsBackground = true
-            }.Start();
+            });
 
             try
             {
