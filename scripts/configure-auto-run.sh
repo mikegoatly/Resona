@@ -3,6 +3,8 @@ sudo sh -c "cat <<\EOT > /etc/systemd/system/Resona.service
 [Unit]
 Description=Resona
 ConditionPathExists=/home/pi/bin
+After=sound.target pulseaudio.service user@1000.service
+Wants=pulseaudio.service user@1000.service
 
 [Service]
 # You can use 'journalctl Resona.service' to view the logs
