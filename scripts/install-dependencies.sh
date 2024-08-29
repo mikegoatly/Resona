@@ -6,7 +6,7 @@ sudo apt update
 sudo apt install libgbm1 libgl1-mesa-dri libegl1-mesa libinput10 libopenal1 -y
 
 # Resona dependencies
-sudo apt install uhubctl pulseaudio-module-bluetooth -y
+sudo apt install uhubctl pulseaudio-module-bluetooth bluetooth -y
 
 # Start pulseaudio
 systemctl --user start pulseaudio && sudo usermod -a -G bluetooth pi
