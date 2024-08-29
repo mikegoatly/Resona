@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 using Resona.Services.Bluetooth;
 using Resona.Services.OS;
@@ -72,16 +73,7 @@ namespace Resona.Services.Audio
             if (devices.Any(x => x.Active) == false && devices.Count > 0)
             {
                 logger.Information("No active audio device detected; switching to the speaker");
-                var speaker = devices.FirstOrDefault(x => x.Kind == AudioDeviceKind.Speaker);
-                if (speaker != null)
-                {
-                    await this.SetActiveDeviceAsync(speaker, cancellationToken);
-                }
-                else
-                {
-                    logger.Warning("No speaker found; switching to the first device in the list");
-                    await this.SetActiveDeviceAsync(devices[0], cancellationToken);
-                }
+                await this.SwitchToSpeakerOutputAsync(devices, cancellationToken);
             }
 
             if (logger.IsEnabled(Serilog.Events.LogEventLevel.Debug))
@@ -119,7 +111,7 @@ namespace Resona.Services.Audio
                 if (remainingOutputs.Any(x => x.Kind == AudioDeviceKind.AudioOut && x.Active))
                 {
                     logger.Information("Switching to speaker after bluetooth disconnect");
-                    await this.SetActiveDeviceAsync(remainingOutputs[0], default);
+                    await this.SwitchToSpeakerOutputAsync(devices, default);
                 }
                 else
                 {
@@ -130,6 +122,20 @@ namespace Resona.Services.Audio
             catch (Exception ex)
             {
                 logger.Error(ex, "Error refreshing audio device list after bluetooth disconnect");
+            }
+        }
+
+        private async Task SwitchToSpeakerOutputAsync(IReadOnlyList<AudioDevice> devices, CancellationToken cancellationToken)
+        {
+            var speaker = devices.FirstOrDefault(x => x.Kind == AudioDeviceKind.Speaker);
+            if (speaker != null)
+            {
+                await this.SetActiveDeviceAsync(speaker, cancellationToken);
+            }
+            else
+            {
+                logger.Warning("No speaker found; switching to the first device in the list");
+                await this.SetActiveDeviceAsync(devices[0], cancellationToken);
             }
         }
 
