@@ -50,19 +50,13 @@ namespace Resona.Services.Audio
 
         private async Task<IReadOnlyList<AudioDevice>> ListAsync(CancellationToken cancellationToken)
         {
-            logger.Verbose("Reading list of Pulse Audio devices");
-
-            var devices = await BashExecutor.ExecuteAsync<AudioDevice>(
-                "pactl list short sinks",
-                ProcessListOutputLine,
-                cancellationToken);
+            var devices = await GetAudioDevicesAsync(cancellationToken);
 
             var activeDevice = (await BashExecutor.ExecuteAsync<string>(
                 "pactl info",
                 ProcessActiveDeviceInfoOutputLine,
                 cancellationToken))
                 .FirstOrDefault();
-
 
             foreach (var device in devices)
             {
@@ -77,8 +71,17 @@ namespace Resona.Services.Audio
             // Special case - if no audio devices are selected then we pick the first one in the list and activate it.
             if (devices.Any(x => x.Active) == false && devices.Count > 0)
             {
-                logger.Information("No active audio device detected; switching to the default one");
-                await this.SetActiveDeviceAsync(devices[0], cancellationToken);
+                logger.Information("No active audio device detected; switching to the speaker");
+                var speaker = devices.FirstOrDefault(x => x.Kind == AudioDeviceKind.Speaker);
+                if (speaker != null)
+                {
+                    await this.SetActiveDeviceAsync(speaker, cancellationToken);
+                }
+                else
+                {
+                    logger.Warning("No speaker found; switching to the first device in the list");
+                    await this.SetActiveDeviceAsync(devices[0], cancellationToken);
+                }
             }
 
             if (logger.IsEnabled(Serilog.Events.LogEventLevel.Debug))
@@ -128,6 +131,37 @@ namespace Resona.Services.Audio
             {
                 logger.Error(ex, "Error refreshing audio device list after bluetooth disconnect");
             }
+        }
+
+        private static async Task<IReadOnlyList<AudioDevice>> GetAudioDevicesAsync(CancellationToken cancellationToken)
+        {
+            logger.Verbose("Reading list of Pulse Audio devices");
+
+            IReadOnlyList<AudioDevice> devices;
+
+            var retryCount = 0;
+            do
+            {
+                devices = await BashExecutor.ExecuteAsync<AudioDevice>(
+                    "pactl list short sinks",
+                    ProcessListOutputLine,
+                    cancellationToken);
+
+                if (devices.Count < 2)
+                {
+                    logger.Warning("{Count} audio devices found; expected at least 2. Retrying in 1 second", devices.Count);
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                    retryCount++;
+                }
+            }
+            while (devices.Count < 2 && retryCount < 60);
+
+            if (devices.Count == 0)
+            {
+                logger.Error("No audio devices found after 5 retries");
+            }
+
+            return devices;
         }
 
         private async void OnBluetoothDeviceConnected(BluetoothDevice device)
@@ -214,32 +248,32 @@ namespace Resona.Services.Audio
             if (match.Success && int.TryParse(match.Groups["Number"].Value, out var channelNumber))
             {
                 var mac = match.Groups["Mac"];
-                if (channelNumber > 1 && !mac.Success)
+                var hasMac = mac.Success;
+                var kind = match.Groups["Name"].Value switch
                 {
-                    logger.Error("MISSING BLUETOOTH MAC!");
+                    var name when name.StartsWith("bluez_sink.", StringComparison.OrdinalIgnoreCase) => AudioDeviceKind.Bluetooth,
+                    var name when name.Contains("analog-stereo", StringComparison.OrdinalIgnoreCase) => AudioDeviceKind.AudioOut,
+                    var name when name.Contains("digital-stereo", StringComparison.OrdinalIgnoreCase) => AudioDeviceKind.Speaker,
+                    _ => AudioDeviceKind.Undefined
+                };
+
+                if (kind == AudioDeviceKind.Undefined)
+                {
+                    Log.Warning("Unknown audio device: {Line}", line);
                     result = default;
                     return false;
                 }
 
                 result = new AudioDevice(
                     channelNumber,
-                    channelNumber switch
-                    {
-                        < 2 => null,
-                        _ => mac.Value.Replace('_', ':')
-                    },
+                    hasMac ? mac.Value.Replace('_', ':') : null,
                     match.Groups["Name"].Value,
-                    channelNumber switch
-                    {
-                        0 => AudioDeviceKind.Speaker,
-                        1 => AudioDeviceKind.AudioOut,
-                        _ => AudioDeviceKind.Bluetooth
-                    })
+                    kind)
                 {
-                    FriendlyName = channelNumber switch
+                    FriendlyName = kind switch
                     {
-                        0 => "Speaker",
-                        1 => "Audio out",
+                        AudioDeviceKind.Speaker => "Speaker",
+                        AudioDeviceKind.AudioOut => "Audio out",
                         _ => match.Groups["Name"].Value
                     }
                 };
