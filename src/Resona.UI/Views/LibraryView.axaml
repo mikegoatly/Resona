@@ -73,11 +73,13 @@
             MaxWidth="800"
             Margin="20,20,80,20"
             ScrollChanged="ScrollViewer_ScrollChanged">
-            <ItemsRepeater Background="Transparent" ItemsSource="{Binding AudioContent^}">
-                <ItemsRepeater.Layout>
-                    <UniformGridLayout MaximumRowsOrColumns="3" Orientation="Horizontal" />
-                </ItemsRepeater.Layout>
-                <ItemsRepeater.ItemTemplate>
+            <ItemsControl Background="Transparent" ItemsSource="{Binding AudioContent^}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <ListBoxItem
                             Width="245"
@@ -129,8 +131,8 @@
                             </Grid>
                         </ListBoxItem>
                     </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-            </ItemsRepeater>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </UserControl>

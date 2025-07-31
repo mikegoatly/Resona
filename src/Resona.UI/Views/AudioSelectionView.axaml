@@ -1,74 +1,80 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:vm="using:Resona.UI.ViewModels"
-			 xmlns:con="using:Resona.UI.Converters"
-			 x:CompileBindings="True"
-			 x:Name="Root"
-			 xmlns:local="using:Resona.UI.Views"
-			 x:DataType="vm:AudioSelectionViewModel"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Resona.UI.Views.AudioSelectionView">
+<UserControl
+    x:Class="Resona.UI.Views.AudioSelectionView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:con="using:Resona.UI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Resona.UI.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Resona.UI.ViewModels"
+    x:Name="Root"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:CompileBindings="True"
+    x:DataType="vm:AudioSelectionViewModel"
+    mc:Ignorable="d">
 
-	<UserControl.Resources>
-		<con:AudioKindImageConverter x:Key="audioKindImageConverter"/>
-	</UserControl.Resources>
-	<Design.DataContext>
-		<vm:AudioSelectionViewModel />
-	</Design.DataContext>
-	<ItemsRepeater ItemsSource="{Binding AudioKinds}" VerticalAlignment="Center" HorizontalAlignment="Center">
-		<ItemsRepeater.Layout>
-			<StackLayout Orientation="Horizontal" />
-		</ItemsRepeater.Layout>
-		<ItemsRepeater.ItemTemplate>
-			<DataTemplate x:DataType="vm:AudioKindInfo">
+    <UserControl.Resources>
+        <con:AudioKindImageConverter x:Key="audioKindImageConverter" />
+    </UserControl.Resources>
+    <Design.DataContext>
+        <vm:AudioSelectionViewModel />
+    </Design.DataContext>
+    <ItemsControl
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        ItemsSource="{Binding AudioKinds}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:AudioKindInfo">
 
-				<Button
-					Command="{ReflectionBinding	ViewModel.AudioKindSelected, ElementName=Root}"
-					CommandParameter="{Binding Kind}"
-					Background="#4999"
-					CornerRadius="200"
-					Margin="0,0,5,0"
-					>
-					<Image
-						Source="{Binding Kind, Converter={StaticResource audioKindImageConverter}}"
-						>
-						<Image.Transitions>
-							<Transitions>
-								<DoubleTransition Property="Width" Duration="0:0:0.1" />
-								<DoubleTransition Property="Height" Duration="0:0:0.1" />
-								<ThicknessTransition Property="Margin" Duration="0:0:0.1"/>
-							</Transitions>
-						</Image.Transitions>
-						<Image.Styles>
-							<Style Selector="Button > Image">
-								<Setter Property="Width" Value="280" />
-								<Setter Property="Height" Value="280" />
-								<Setter Property="Margin" Value="20" />
-							</Style>
-							<Style Selector="Button:pointerover > Image">
-								<Setter Property="Width" Value="320" />
-								<Setter Property="Height" Value="320" />
-								<Setter Property="Margin" Value="0" />
-							</Style>
-							<Style Selector="Button:pressed > Image">
-								<Setter Property="Width" Value="180" />
-								<Setter Property="Height" Value="180" />
-								<Setter Property="Margin" Value="70"/>
-							</Style>
-						</Image.Styles>
-					</Image>
-					<Button.Styles>
-						<Style Selector="Button:pointerover /template/ ContentPresenter">
-							<Setter Property="Background" Value="#4DDD" />
-						</Style>
-						<Style Selector="Button:pressed /template/ ContentPresenter">
-							<Setter Property="Background" Value="#4DDD" />
-						</Style>
-					</Button.Styles>
-				</Button>
-			</DataTemplate>
-		</ItemsRepeater.ItemTemplate>
-	</ItemsRepeater>
+                <Button
+                    Margin="0,0,5,0"
+                    Background="#4999"
+                    Command="{ReflectionBinding ViewModel.AudioKindSelected,
+                                                ElementName=Root}"
+                    CommandParameter="{Binding Kind}"
+                    CornerRadius="200">
+                    <Image Source="{Binding Kind, Converter={StaticResource audioKindImageConverter}}">
+                        <Image.Transitions>
+                            <Transitions>
+                                <DoubleTransition Property="Width" Duration="0:0:0.1" />
+                                <DoubleTransition Property="Height" Duration="0:0:0.1" />
+                                <ThicknessTransition Property="Margin" Duration="0:0:0.1" />
+                            </Transitions>
+                        </Image.Transitions>
+                        <Image.Styles>
+                            <Style Selector="Button > Image">
+                                <Setter Property="Width" Value="280" />
+                                <Setter Property="Height" Value="280" />
+                                <Setter Property="Margin" Value="20" />
+                            </Style>
+                            <Style Selector="Button:pointerover > Image">
+                                <Setter Property="Width" Value="320" />
+                                <Setter Property="Height" Value="320" />
+                                <Setter Property="Margin" Value="0" />
+                            </Style>
+                            <Style Selector="Button:pressed > Image">
+                                <Setter Property="Width" Value="180" />
+                                <Setter Property="Height" Value="180" />
+                                <Setter Property="Margin" Value="70" />
+                            </Style>
+                        </Image.Styles>
+                    </Image>
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#4DDD" />
+                        </Style>
+                        <Style Selector="Button:pressed /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#4DDD" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 </UserControl>
