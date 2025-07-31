@@ -111,7 +111,7 @@ namespace Resona.Services.Audio
                 if (remainingOutputs.Any(x => x.Kind == AudioDeviceKind.AudioOut && x.Active))
                 {
                     logger.Information("Switching to speaker after bluetooth disconnect");
-                    await this.SwitchToSpeakerOutputAsync(devices, default);
+                    await this.SwitchToSpeakerOutputAsync(remainingOutputs, default);
                 }
                 else
                 {
