@@ -4,8 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Resona.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-    xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
     xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
     xmlns:local="using:Resona.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -31,14 +29,14 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <i:Interaction.Behaviors>
-            <ia:EventTriggerBehavior EventName="PointerMoved">
-                <ia:InvokeCommandAction Command="{Binding ScreenInteraction}" />
-            </ia:EventTriggerBehavior>
-            <ia:EventTriggerBehavior EventName="PointerPressed">
-                <ia:InvokeCommandAction Command="{Binding ScreenInteraction}" />
-            </ia:EventTriggerBehavior>
-        </i:Interaction.Behaviors>
+        <Interaction.Behaviors>
+            <EventTriggerBehavior EventName="PointerMoved">
+                <InvokeCommandAction Command="{Binding ScreenInteraction}" />
+            </EventTriggerBehavior>
+            <EventTriggerBehavior EventName="PointerPressed">
+                <InvokeCommandAction Command="{Binding ScreenInteraction}" />
+            </EventTriggerBehavior>
+        </Interaction.Behaviors>
 
 
         <rxui:RoutedViewHost Router="{Binding Router}">
@@ -114,14 +112,14 @@
             Background="Black"
             IsVisible="{Binding ScreenDimPercentage, Converter={StaticResource DoubleToIsVisibleConverter}}"
             Opacity="{Binding ScreenDimPercentage}">
-            <i:Interaction.Behaviors>
-                <ia:EventTriggerBehavior EventName="PointerMoved">
-                    <ia:InvokeCommandAction Command="{Binding ScreenInteraction}" />
-                </ia:EventTriggerBehavior>
-                <ia:EventTriggerBehavior EventName="PointerPressed">
-                    <ia:InvokeCommandAction Command="{Binding ScreenInteraction}" />
-                </ia:EventTriggerBehavior>
-            </i:Interaction.Behaviors>
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="PointerMoved">
+                    <InvokeCommandAction Command="{Binding ScreenInteraction}" />
+                </EventTriggerBehavior>
+                <EventTriggerBehavior EventName="PointerPressed">
+                    <InvokeCommandAction Command="{Binding ScreenInteraction}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
             <Border.Transitions>
                 <Transitions>
                     <DoubleTransition Property="Opacity" Duration="0:00:00.100" />

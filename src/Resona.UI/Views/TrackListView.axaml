@@ -1,71 +1,68 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:vm="using:Resona.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-			 x:Name="Root"
-			 x:CompileBindings="True"
-			 x:DataType="vm:TrackListViewModel"
-			 xmlns:behaviors="using:Resona.UI.Behaviors"
-			 Classes="pagehost"
-             x:Class="Resona.UI.Views.TrackListView">
-	<Design.DataContext>
-		<vm:TrackListViewModel />
-	</Design.DataContext>
+<UserControl
+    x:Class="Resona.UI.Views.TrackListView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:Resona.UI.Behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Resona.UI.ViewModels"
+    x:Name="Root"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:CompileBindings="True"
+    x:DataType="vm:TrackListViewModel"
+    Classes="pagehost"
+    mc:Ignorable="d">
+    <Design.DataContext>
+        <vm:TrackListViewModel />
+    </Design.DataContext>
 
-	<Grid>
-		<Image 
-			Source="{Binding Cover^}"
-			Stretch="UniformToFill"
-			Opacity="0.3"/>
+    <Grid>
+        <Image
+            Opacity="0.3"
+            Source="{Binding Cover^}"
+            Stretch="UniformToFill" />
 
-		<Grid.Styles>
-			<Style Selector="TextBlock">
-				<Setter Property="FontSize" Value="28" />
-				<Setter Property="Margin" Value="0,0,0,5" />
+        <Grid.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="FontSize" Value="28" />
+                <Setter Property="Margin" Value="0,0,0,5" />
 
-				<Style Selector="^.playing">
-					<Setter Property="Foreground" Value="Yellow" />
-				</Style>
+                <Style Selector="^.playing">
+                    <Setter Property="Foreground" Value="Yellow" />
+                </Style>
 
-				<Style Selector="^.isResume">
-					<Setter Property="Foreground" Value="GreenYellow" />
-				</Style>
-			</Style>
-		</Grid.Styles>
-		<ScrollViewer Margin="80,20">
-			<ItemsControl
-				ItemsSource="{Binding Tracks}"
-				>
-				<i:Interaction.Behaviors>
-					<behaviors:AutoScrollToIndexBehavior 
-						CurrentIndex="{Binding CurrentTrack.Index}" 
-						Easing="QuinticEaseOut" 
-						ScrollDuration="0:0:1.0"/>
-				</i:Interaction.Behaviors>
-				
-				<ItemsControl.ItemTemplate>
-					<DataTemplate>
-						<StackPanel Background="Transparent">							
-							<i:Interaction.Behaviors>
-								<ia:EventTriggerBehavior EventName="Tapped">
-									<ia:InvokeCommandAction 
-										Command="{ReflectionBinding ViewModel.PlayTrack, ElementName=Root}"
-										CommandParameter="{Binding}"/>
-								</ia:EventTriggerBehavior>
-							</i:Interaction.Behaviors>
-							<TextBlock
-								HorizontalAlignment="Center"
-								Classes.playing="{Binding IsPlaying}"
-								Classes.isResume="{Binding IsResumeTrack}"
-								Text="{Binding Title}" />
-						</StackPanel>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-		</ScrollViewer>
-	</Grid>
+                <Style Selector="^.isResume">
+                    <Setter Property="Foreground" Value="GreenYellow" />
+                </Style>
+            </Style>
+        </Grid.Styles>
+        <ScrollViewer Margin="80,20">
+            <ItemsControl ItemsSource="{Binding Tracks}">
+                <Interaction.Behaviors>
+                    <behaviors:AutoScrollToIndexBehavior
+                        CurrentIndex="{Binding CurrentTrack.Index}"
+                        Easing="QuinticEaseOut"
+                        ScrollDuration="0:0:1.0" />
+                </Interaction.Behaviors>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Background="Transparent">
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="Tapped">
+                                    <InvokeCommandAction Command="{ReflectionBinding ViewModel.PlayTrack, ElementName=Root}" CommandParameter="{Binding}" />
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Classes.isResume="{Binding IsResumeTrack}"
+                                Classes.playing="{Binding IsPlaying}"
+                                Text="{Binding Title}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

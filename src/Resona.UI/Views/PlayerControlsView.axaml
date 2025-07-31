@@ -1,191 +1,195 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:vm="using:Resona.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="140"
-			  xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-			 xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-			 xmlns:local="using:Resona.UI.Views"
-             x:Class="Resona.UI.Views.PlayerControlsView"
-			 x:DataType="vm:PlayerControlsViewModel"
-			 xmlns:converters="using:Resona.UI.Converters"
-			 x:Name="Root"
-			 Height="140"
-			 x:CompileBindings="True"
-			 Background="#120810"
-			 ClipToBounds="False">
-	<Design.DataContext>
-		<vm:PlayerControlsViewModel/>
-	</Design.DataContext>
+<UserControl
+    x:Class="Resona.UI.Views.PlayerControlsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Resona.UI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+    xmlns:local="using:Resona.UI.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Resona.UI.ViewModels"
+    x:Name="Root"
+    Height="140"
+    d:DesignHeight="140"
+    d:DesignWidth="1024"
+    x:CompileBindings="True"
+    x:DataType="vm:PlayerControlsViewModel"
+    Background="#120810"
+    ClipToBounds="False"
+    mc:Ignorable="d">
+    <Design.DataContext>
+        <vm:PlayerControlsViewModel />
+    </Design.DataContext>
 
-	<UserControl.Resources>
-		<x:Double x:Key="SkipButtonSize">75</x:Double>
-		<converters:VolumeToFontAwesomeConverter x:Key="VolumeToFontAwesomeConverter" />
-	</UserControl.Resources>
+    <UserControl.Resources>
+        <x:Double x:Key="SkipButtonSize">75</x:Double>
+        <converters:VolumeToFontAwesomeConverter x:Key="VolumeToFontAwesomeConverter" />
+    </UserControl.Resources>
 
-	<Grid ClipToBounds="False">
-		<Slider Grid.Column="0"
-		IsEnabled="{Binding CanPlay}"
-		Grid.ColumnSpan="3"
-		Margin="131,-15,0,0"
-		VerticalAlignment="Top"
-		ClipToBounds="False"
-		Value="{Binding Position, Mode=TwoWay}"
-		Maximum="1"
-		Minimum="0" />
+    <Grid ClipToBounds="False">
+        <Slider
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="131,-15,0,0"
+            VerticalAlignment="Top"
+            ClipToBounds="False"
+            IsEnabled="{Binding CanPlay}"
+            Maximum="1"
+            Minimum="0"
+            Value="{Binding Position, Mode=TwoWay}" />
 
-		<DockPanel LastChildFill="True" Margin="0,30,0,0" Background="#1D0C19">
-			<DockPanel LastChildFill="True">
-				<Border BoxShadow="5 0 10 8 #4000"
-						Background="Transparent"
-						CornerRadius="0,40,0,0"
-						Margin="0,-30,20,0">
-					<Border ClipToBounds="True"
-							CornerRadius="0,40,0,0"
-							Width="140"
-							Height="140"
-							BoxShadow="5 0 10 10 Black"
-							HorizontalAlignment="Left"
-						
-						>
-						<Image Source="{Binding Cover^}"
-							   Stretch="UniformToFill"
-							   
-					   >
-							<i:Interaction.Behaviors>
-								<ia:EventTriggerBehavior EventName="Tapped">
-									<ia:InvokeCommandAction
-										Command="{ReflectionBinding ViewModel.NavigateToPlaying, ElementName=Root}"/>
-								</ia:EventTriggerBehavior>
-							</i:Interaction.Behaviors>
-						</Image>
-					</Border>
-				</Border>
+        <DockPanel
+            Margin="0,30,0,0"
+            Background="#1D0C19"
+            LastChildFill="True">
+            <DockPanel LastChildFill="True">
+                <Border
+                    Margin="0,-30,20,0"
+                    Background="Transparent"
+                    BoxShadow="5 0 10 8 #4000"
+                    CornerRadius="0,40,0,0">
+                    <Border
+                        Width="140"
+                        Height="140"
+                        HorizontalAlignment="Left"
+                        BoxShadow="5 0 10 10 Black"
+                        ClipToBounds="True"
+                        CornerRadius="0,40,0,0">
+                        <Image Source="{Binding Cover^}" Stretch="UniformToFill">
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="Tapped">
+                                    <InvokeCommandAction Command="{ReflectionBinding ViewModel.NavigateToPlaying, ElementName=Root}" />
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </Image>
+                    </Border>
+                </Border>
 
-				<StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Spacing="5">
-					<StackPanel.Styles>
-						<Styles>
-							<Style Selector="TextBlock">
-								<Setter Property="TextWrapping" Value="Wrap" />
-							</Style>
-						</Styles>
-					</StackPanel.Styles>
-					<TextBlock Text="{Binding Album}" 
-							   Foreground="{StaticResource SecondaryColor}"
-							   TextWrapping="WrapWithOverflow" 
-							   MaxWidth="480" MaxLines="2" />
-					<TextBlock Text="{Binding Title}" 
-							   MaxWidth="480"/>
-				</StackPanel>
-			</DockPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Orientation="Vertical"
+                    Spacing="5">
+                    <StackPanel.Styles>
+                        <Styles>
+                            <Style Selector="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                            </Style>
+                        </Styles>
+                    </StackPanel.Styles>
+                    <TextBlock
+                        MaxWidth="480"
+                        Foreground="{StaticResource SecondaryColor}"
+                        MaxLines="2"
+                        Text="{Binding Album}"
+                        TextWrapping="WrapWithOverflow" />
+                    <TextBlock MaxWidth="480" Text="{Binding Title}" />
+                </StackPanel>
+            </DockPanel>
 
-			<StackPanel Grid.Column="1"
-						VerticalAlignment="Center"
-						Orientation="Horizontal"
-						Margin="10"
-						HorizontalAlignment="Right"
-						Spacing="5">
+            <StackPanel
+                Grid.Column="1"
+                Margin="10"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="5">
 
-				<Button Classes="primary circle"
-						Width="{StaticResource SkipButtonSize}"
-						Height="{StaticResource SkipButtonSize}"
-					Command="{Binding MovePreviousCommand}">
-					<icon:Icon
-						Value="fa fa-backward" />
-				</Button>
+                <Button
+                    Width="{StaticResource SkipButtonSize}"
+                    Height="{StaticResource SkipButtonSize}"
+                    Classes="primary circle"
+                    Command="{Binding MovePreviousCommand}">
+                    <icon:Icon Value="fa fa-backward" />
+                </Button>
 
-				<Button Classes="primary circle"
-						Command="{Binding PlayPauseCommand}"
-						Width="100"
-						IsEnabled="{Binding CanPlay}"
-						Height="85"
-					>
-					<Button.Styles>
-						<Styles>
-							<Style Selector="icon|Icon">
-								<Style Selector="^.playing">
-									<Setter Property="Value" Value="fa fa-pause" />
-								</Style>
-								<Style Selector="^.paused">
-									<Setter Property="Value" Value="fa fa-play" />
-								</Style>
-							</Style>
-						</Styles>
-					</Button.Styles>
-					<icon:Icon
-						Classes.playing="{Binding IsPlaying}"
-						Classes.paused="{Binding !IsPlaying}"/>
+                <Button
+                    Width="100"
+                    Height="85"
+                    Classes="primary circle"
+                    Command="{Binding PlayPauseCommand}"
+                    IsEnabled="{Binding CanPlay}">
+                    <Button.Styles>
+                        <Styles>
+                            <Style Selector="icon|Icon">
+                                <Style Selector="^.playing">
+                                    <Setter Property="Value" Value="fa fa-pause" />
+                                </Style>
+                                <Style Selector="^.paused">
+                                    <Setter Property="Value" Value="fa fa-play" />
+                                </Style>
+                            </Style>
+                        </Styles>
+                    </Button.Styles>
+                    <icon:Icon Classes.paused="{Binding !IsPlaying}" Classes.playing="{Binding IsPlaying}" />
 
-				</Button>
+                </Button>
 
-				<Button Classes="primary circle"
-						Width="{StaticResource SkipButtonSize}"
-						Height="{StaticResource SkipButtonSize}"
-						Command="{Binding MoveNextCommand}">
-					<icon:Icon
-						Value="fa fa-forward" />
-				</Button>
+                <Button
+                    Width="{StaticResource SkipButtonSize}"
+                    Height="{StaticResource SkipButtonSize}"
+                    Classes="primary circle"
+                    Command="{Binding MoveNextCommand}">
+                    <icon:Icon Value="fa fa-forward" />
+                </Button>
 
-				<StackPanel Orientation="Vertical"
-							VerticalAlignment="Center">
+                <StackPanel VerticalAlignment="Center" Orientation="Vertical">
 
-					<Button Classes="primary circle"
-								Width="40"
-								Height="40"
-								Margin="0,0,0,10"
-								HorizontalAlignment="Right">
-						<icon:Icon Value="{Binding Volume, Converter={StaticResource VolumeToFontAwesomeConverter}}" />
+                    <Button
+                        Width="40"
+                        Height="40"
+                        Margin="0,0,0,10"
+                        HorizontalAlignment="Right"
+                        Classes="primary circle">
+                        <icon:Icon Value="{Binding Volume, Converter={StaticResource VolumeToFontAwesomeConverter}}" />
 
-						<Button.Flyout>
-							<Flyout Placement="TopEdgeAlignedRight">
-								<StackPanel Orientation="Vertical"
-											HorizontalAlignment="Center">
-									<icon:Icon Value="fa fa-volume-high" 
-											   FontSize="30"/>
-									<Slider 
-										Margin="0,5"
-										Value="{Binding Volume}"
-										Maximum="1"
-										Minimum="0"
-										Orientation="Vertical"
-										VerticalAlignment="Stretch" 
-										Height="200" />
-									<icon:Icon Value="fa fa-volume-off" 
-											   FontSize="20"/>
-								</StackPanel>
-							</Flyout>
-						</Button.Flyout>
-					</Button>
-					
-					<DockPanel MinWidth="80" LastChildFill="True">
-						<Border IsVisible="{Binding SleepOptions.SleepModeActive}"
-								BorderThickness="2"
-								BorderBrush="{StaticResource PrimaryColor}"
-								CornerRadius="10"
-									VerticalAlignment="Center"
-								Padding="5,0,20,0"
-								Margin="5,0,-15,0">
+                        <Button.Flyout>
+                            <Flyout Placement="TopEdgeAlignedRight">
+                                <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                    <icon:Icon FontSize="30" Value="fa fa-volume-high" />
+                                    <Slider
+                                        Height="200"
+                                        Margin="0,5"
+                                        VerticalAlignment="Stretch"
+                                        Maximum="1"
+                                        Minimum="0"
+                                        Orientation="Vertical"
+                                        Value="{Binding Volume}" />
+                                    <icon:Icon FontSize="20" Value="fa fa-volume-off" />
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
 
-							<TextBlock Text="{Binding SleepOptions.RemainingSleepTime, FallbackValue='1 hour'}" />
-						</Border>
-						<Button Classes="primary circle"
-								Width="40"
-								Height="40"
-								HorizontalAlignment="Right">
-							<icon:Icon Value="fa fa-stopwatch" />
+                    <DockPanel MinWidth="80" LastChildFill="True">
+                        <Border
+                            Margin="5,0,-15,0"
+                            Padding="5,0,20,0"
+                            VerticalAlignment="Center"
+                            BorderBrush="{StaticResource PrimaryColor}"
+                            BorderThickness="2"
+                            CornerRadius="10"
+                            IsVisible="{Binding SleepOptions.SleepModeActive}">
 
-							<Button.Flyout>
-								<Flyout Placement="TopEdgeAlignedRight">
-									<local:SleepTimerOptionsView DataContext="{Binding SleepOptions}" />
-								</Flyout>
-							</Button.Flyout>
-						</Button>
-					</DockPanel>
-				</StackPanel>
-			</StackPanel>
-		</DockPanel>
-	</Grid>
+                            <TextBlock Text="{Binding SleepOptions.RemainingSleepTime, FallbackValue='1 hour'}" />
+                        </Border>
+                        <Button
+                            Width="40"
+                            Height="40"
+                            HorizontalAlignment="Right"
+                            Classes="primary circle">
+                            <icon:Icon Value="fa fa-stopwatch" />
+
+                            <Button.Flyout>
+                                <Flyout Placement="TopEdgeAlignedRight">
+                                    <local:SleepTimerOptionsView DataContext="{Binding SleepOptions}" />
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </DockPanel>
+                </StackPanel>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
 
 </UserControl>
