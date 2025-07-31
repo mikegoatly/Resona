@@ -43,11 +43,11 @@ namespace Resona.UI.Views
 
             // Kind of hacky, but given we know: 
             // * 3 items are visible on a row
-            // * each item is 245px high
+            // * each item is 250px (245 + 5 padding) high
             // We can calculate the index of the first visible item
             if (sender is ScrollViewer scrollViewer)
             {
-                var index = (int)scrollViewer.Offset.Y / 245 * 3;
+                var index = (int)scrollViewer.Offset.Y / 250 * 3;
 
                 // Find the first visible item
                 if (this.ViewModel?.AudioContent?.Status == TaskStatus.RanToCompletion)
@@ -78,12 +78,12 @@ namespace Resona.UI.Views
                     this.ViewModel.CurrentQuickJump = quickJump;
 
                     var audioContent = this.ViewModel.AudioContent.Result;
-                    var index = audioContent.FindIndex(x => x.Name.Length > 0 && x.Name[0] >= quickJump.Match);
+                    var index = audioContent.FindIndex(x => x.Name.Length > 0 && char.ToUpper(x.Name[0]) >= quickJump.Match);
 
                     if (index >= 0)
                     {
                         this.respondingToJumpListPress = true;
-                        await this.libraryScrollViewer.AnimateOffsetAsync(new Point(0, index / 3 * 245), TimeSpan.FromMilliseconds(300), new CircularEaseOut());
+                        await this.libraryScrollViewer.AnimateOffsetAsync(new Point(0, index / 3 * 250), TimeSpan.FromMilliseconds(300), new CircularEaseOut());
                         this.respondingToJumpListPress = false;
                     }
                 }
@@ -105,12 +105,12 @@ namespace Resona.UI.Views
                     this.ViewModel.CurrentQuickJump = quickJump;
 
                     var audioContent = this.ViewModel.AudioContent.Result;
-                    var index = audioContent.FindIndex(x => x.Name.Length > 0 && x.Name[0] >= quickJump.Match);
+                    var index = audioContent.FindIndex(x => x.Name.Length > 0 && char.ToUpper(x.Name[0]) >= quickJump.Match);
 
                     if (index >= 0)
                     {
                         this.respondingToJumpListPress = true;
-                        await this.libraryScrollViewer.AnimateOffsetAsync(new Point(0, index / 3 * 245), TimeSpan.FromMilliseconds(300), new CircularEaseOut());
+                        await this.libraryScrollViewer.AnimateOffsetAsync(new Point(0, index / 3 * 250), TimeSpan.FromMilliseconds(300), new CircularEaseOut());
                         this.respondingToJumpListPress = false;
                     }
                 }

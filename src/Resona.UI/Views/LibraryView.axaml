@@ -73,7 +73,10 @@
             MaxWidth="800"
             Margin="20,20,80,20"
             ScrollChanged="ScrollViewer_ScrollChanged">
-            <ItemsControl Background="Transparent" ItemsSource="{Binding AudioContent^}">
+            <ItemsControl
+                Name="ItemsControl"
+                Background="Transparent"
+                ItemsSource="{Binding AudioContent^}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal" />
