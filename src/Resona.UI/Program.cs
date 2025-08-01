@@ -35,6 +35,8 @@ namespace Resona.UI
         [STAThread]
         public static async Task<int> Main(string[] args)
         {
+            SQLitePCL.Batteries.Init();
+
             RegisterServices();
 
             // Initialize the DB - this will perform any required migrations
