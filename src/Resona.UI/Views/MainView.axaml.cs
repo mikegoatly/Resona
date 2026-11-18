@@ -1,7 +1,10 @@
+using System;
+
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia.Reactive;
 
 using ReactiveUI;
+using ReactiveUI.Reactive;
 
 using Resona.UI.ViewModels;
 
@@ -17,11 +20,11 @@ namespace Resona.UI.Views
         {
             Log.Information("Main view starting");
 
-            this.WhenActivated(disposables => { });
+            this.WhenActivated((System.Action<System.IDisposable> _) => { });
 
             AvaloniaXamlLoader.Load(this);
             this.ViewModel = Locator.Current.GetService<MainWindowViewModel>();
-            this.ViewModel?.GoHome.Execute();
+            this.ViewModel?.GoHome.Execute().Subscribe();
         }
     }
 }

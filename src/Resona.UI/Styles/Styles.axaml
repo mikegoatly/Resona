@@ -1,5 +1,5 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-		xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	<Design.PreviewWith>
 
@@ -16,7 +16,7 @@
 					<TextBlock>Test</TextBlock>
 				</Button>
 				<Button Classes="warning">
-					<icon:Icon Value="fa fa-exclamation" />
+					<icon:Icon Value="fa-exclamation" />
 				</Button>
 
 				<Button Classes="warning circle" IsEnabled="False">
@@ -24,7 +24,7 @@
 				</Button>
 			</StackPanel>
 			<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-				<icon:Icon Value="fa fa-volume-high"
+				<icon:Icon Value="fa-volume-high"
 						   FontSize="30"/>
 				<Slider
 					Maximum="1"
@@ -32,7 +32,7 @@
 					Orientation="Vertical"
 					VerticalAlignment="Stretch"
 					Height="200" />
-				<icon:Icon Value="fa fa-volume-off"
+				<icon:Icon Value="fa-volume-off"
 						   FontSize="20"/>
 			</StackPanel>
 			<TabControl>

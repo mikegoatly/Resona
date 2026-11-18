@@ -9,14 +9,15 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Services.Audio;
 using Resona.Services.Libraries;
 
 namespace Resona.UI.ViewModels
 {
-    public class TrackListViewModel : RoutableViewModelBase, IDisposable
+    public partial class TrackListViewModel : RoutableViewModelBase, IDisposable
     {
         private Task<Bitmap>? cover;
         private readonly IAudioRepository audioProvider;
@@ -47,7 +48,7 @@ namespace Resona.UI.ViewModels
             this.playerService = playerService;
 
             this.playerService.PlayingTrackChanged
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(this.OnChapterPlaying);
         }
 
@@ -99,7 +100,7 @@ namespace Resona.UI.ViewModels
         public bool IsCurrentContent => this.Model?.Id == this.playerService.Current?.Content.Id;
 
         [Reactive]
-        public AudioTrackViewModel? CurrentTrack { get; set; }
+        public partial AudioTrackViewModel? CurrentTrack { get; set; }
 
         public IReadOnlyList<AudioTrackViewModel>? Tracks
         {

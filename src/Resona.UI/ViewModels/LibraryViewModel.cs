@@ -5,7 +5,9 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.Binding.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Services.Libraries;
 
@@ -13,7 +15,7 @@ using Splat;
 
 namespace Resona.UI.ViewModels
 {
-    public class LibraryViewModel : RoutableViewModelBase
+    public partial class LibraryViewModel : RoutableViewModelBase
     {
         private AudioKind kind;
         private Task<List<AudioContentViewModel>>? audioContent;
@@ -60,7 +62,7 @@ namespace Resona.UI.ViewModels
             Observable.FromEvent<AudioKind>(
                 x => librarySyncer.LibraryChanged += x,
                 x => librarySyncer.LibraryChanged -= x)
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(this.OnLibraryChanged);
 
             this.audioProvider = audioProvider;
@@ -72,7 +74,8 @@ namespace Resona.UI.ViewModels
                         var viewModel = Locator.Current.GetRequiredService<TrackListViewModel>();
                         await viewModel.SetAudioContentAsync(audioContent.Model.Id, default);
                         return this.Router.Navigate.Execute(viewModel);
-                    }));
+                    })
+                    .Concat());
         }
 
         private void OnLibraryChanged(AudioKind kind)
@@ -106,7 +109,7 @@ namespace Resona.UI.ViewModels
         }
 
         [Reactive]
-        public AudioContentViewModel? FirstVisibleItem { get; set; }
+        public partial AudioContentViewModel? FirstVisibleItem { get; set; }
 
         public Task<List<AudioContentViewModel>>? AudioContent
         {
@@ -152,6 +155,6 @@ namespace Resona.UI.ViewModels
             internal set => this.RaiseAndSetIfChanged(ref this.kind, value);
         }
 
-        public ReactiveCommand<AudioContentViewModel, IObservable<IRoutableViewModel>> AudioContentSelected { get; }
+        public ReactiveCommand<AudioContentViewModel, IRoutableViewModel> AudioContentSelected { get; }
     }
 }

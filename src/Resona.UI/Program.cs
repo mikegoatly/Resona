@@ -6,16 +6,18 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Avalonia;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia.Reactive;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.FontAwesome;
+using Optris.Icons.Avalonia;
+using Optris.Icons.Avalonia.FontAwesome;
 
 using ReactiveUI;
+using ReactiveUI.Reactive;
+using ReactiveUI.Reactive.Builder;
 
 using Resona.Persistence;
 using Resona.Services;
@@ -201,7 +203,7 @@ namespace Resona.UI
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToTrace()
-                .UseReactiveUI();
+                .UseReactiveUI(rx => rx.ConfigureViewLocator(locator => locator.CreateMappingBuilder().MapViews()));
         }
     }
 

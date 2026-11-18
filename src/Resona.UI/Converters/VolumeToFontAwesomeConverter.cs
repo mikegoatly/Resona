@@ -11,10 +11,10 @@ namespace Resona.UI.Converters
         {
             return value switch
             {
-                float x when x >= 0.6 => "fa fa-volume-high",
-                float x when x >= 0.3 => "fa fa-volume-low",
-                float x when x > 0.01 => "fa fa-volume-off",
-                _ => "fa fa-volume-xmark"
+                float x when x >= 0.6 => "fa-volume-high",
+                float x when x >= 0.3 => "fa-volume-low",
+                float x when x > 0.01 => "fa-volume-off",
+                _ => "fa-volume-xmark"
             };
         }
 

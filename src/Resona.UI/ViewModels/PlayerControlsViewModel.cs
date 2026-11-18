@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.Binding.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Services;
 using Resona.Services.Audio;
@@ -17,7 +19,7 @@ using Serilog;
 
 namespace Resona.UI.ViewModels
 {
-    public class PlayerControlsViewModel : RoutableViewModelBase
+    public partial class PlayerControlsViewModel : RoutableViewModelBase
     {
         private static readonly ILogger logger = Log.ForContext<PlayerControlsViewModel>();
 
@@ -65,11 +67,11 @@ namespace Resona.UI.ViewModels
                 this.WhenAnyValue(x => x.CanMoveNext, x => x == true));
 
             this.playerService.PlayingTrackChanged
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(this.UpdatePlayingTrack);
 
             this.playerService.PlaybackStateChanged
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(this.UpdatePlayerState);
 
             this.NavigateToPlaying = ReactiveCommand.CreateFromObservable(
@@ -87,7 +89,8 @@ namespace Resona.UI.ViewModels
                         }
 
                         return Observable.Empty<IRoutableViewModel>();
-                    }));
+                    })
+                    .Concat());
 
             logger.Verbose("Constructed player controls view model");
         }
@@ -164,19 +167,19 @@ namespace Resona.UI.ViewModels
         public ReactiveCommand<Unit, Unit>? MoveNextCommand { get; private set; }
 
         [Reactive]
-        public bool CanMoveNext { get; set; }
+        public partial bool CanMoveNext { get; set; }
 
         [Reactive]
-        public bool CanMovePrevious { get; set; }
+        public partial bool CanMovePrevious { get; set; }
 
         [Reactive]
-        public bool IsPlaying { get; set; }
+        public partial bool IsPlaying { get; set; }
 
         public bool CanPlay => this.audioTrack != null;
 
         // Command to play/pause the current track
         public ReactiveCommand<Unit, Unit>? PlayPauseCommand { get; private set; }
-        public ReactiveCommand<Unit, IObservable<IRoutableViewModel>>? NavigateToPlaying { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel>? NavigateToPlaying { get; }
         public SleepOptionsViewModel? SleepOptions { get; }
 
         private void LoadCover(AudioContent? audioContent)

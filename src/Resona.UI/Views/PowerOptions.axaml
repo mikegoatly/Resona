@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:Resona.UI.ViewModels"
              mc:Ignorable="d"
-			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
 			 d:DesignWidth="300" d:DesignHeight="300"
              x:Class="Resona.UI.Views.PowerOptions"
 			 x:CompileBindings="True"
@@ -37,14 +37,14 @@
 			<Button Command="{Binding ShutDownCommand}"
 					Classes="danger">
 				<StackPanel>
-					<icon:Icon Value="fa fa-power-off" />
+					<icon:Icon Value="fa-power-off" />
 					<TextBlock>Turn off</TextBlock>
 				</StackPanel>
 			</Button>
 			<Button Command="{Binding RestartCommand}"
 					Classes="warning">
 				<StackPanel>
-					<icon:Icon Value="fa fa-arrows-rotate" />
+					<icon:Icon Value="fa-arrows-rotate" />
 					<TextBlock>Restart</TextBlock>
 				</StackPanel>
 			</Button>

@@ -3,7 +3,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Services.Background;
 
@@ -13,7 +14,7 @@ using Splat;
 
 namespace Resona.UI.ViewModels
 {
-    public class MainWindowViewModel : ReactiveObject, IScreen
+    public partial class MainWindowViewModel : ReactiveObject, IScreen
     {
         private static readonly Serilog.ILogger logger = Log.ForContext<MainWindowViewModel>();
         private readonly ITimerManager timerManager;
@@ -45,10 +46,10 @@ namespace Resona.UI.ViewModels
             this.ScreenInteraction = ReactiveCommand.Create(this.timerManager.ResetInactivityTimers);
 
             this.timerManager.ScreenDimStateChanged
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(x => this.ScreenDimPercentage = x ? 0.8D : 0D);
 
-            this.NavigateToSettingsCommand = ReactiveCommand.Create(() => this.Router.Navigate.Execute(Locator.Current.GetService<SettingsViewModel>()!));
+            this.NavigateToSettingsCommand = ReactiveCommand.CreateFromObservable(() => this.Router.Navigate.Execute(Locator.Current.GetRequiredService<SettingsViewModel>()));
 
             this.Router.NavigateBack.CanExecute
                 .Throttle(TimeSpan.FromMilliseconds(100))
@@ -74,14 +75,14 @@ namespace Resona.UI.ViewModels
         public ReactiveCommand<Unit, IRoutableViewModel> GoBack => this.Router.NavigateBack;
 
         [Reactive]
-        public double ScreenDimPercentage { get; set; }
+        public partial double ScreenDimPercentage { get; set; }
 
         [Reactive]
-        public bool CanGoBack { get; set; }
+        public partial bool CanGoBack { get; set; }
 
         [Reactive]
-        public bool ShowSettingsButton { get; set; }
+        public partial bool ShowSettingsButton { get; set; }
 
-        public ReactiveCommand<Unit, IObservable<IRoutableViewModel>> NavigateToSettingsCommand { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> NavigateToSettingsCommand { get; }
     }
 }

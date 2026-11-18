@@ -5,7 +5,9 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.Binding.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Services.Bluetooth;
 
@@ -13,7 +15,7 @@ using Serilog;
 
 namespace Resona.UI.ViewModels
 {
-    public class BluetoothSettingsViewModel : ReactiveObject
+    public partial class BluetoothSettingsViewModel : ReactiveObject
     {
         private readonly IBluetoothService bluetoothService;
         private static readonly ILogger logger = Log.ForContext<BluetoothSettingsViewModel>();
@@ -39,15 +41,15 @@ namespace Resona.UI.ViewModels
 
 
             this.bluetoothService.ScanningStateChanged
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(this.ScanningStateChanged);
 
             this.bluetoothService.BluetoothDeviceDiscovered
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(this.BluetoothDeviceDiscovered);
 
             this.bluetoothService.BluetoothDeviceDisconnected
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(this.BluetoothDeviceDisconnected);
 
             this.ConnectDeviceCommand = ReactiveCommand.CreateFromTask<BluetoothDevice>(
@@ -83,7 +85,7 @@ namespace Resona.UI.ViewModels
         public ObservableCollection<BluetoothDevice> BluetoothDevices { get; } = new ObservableCollection<BluetoothDevice>();
 
         [Reactive]
-        public bool IsScanning { get; set; }
+        public partial bool IsScanning { get; set; }
         public ReactiveCommand<Unit, Unit> RefreshDeviceList { get; }
     }
 }

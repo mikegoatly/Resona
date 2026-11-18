@@ -1,6 +1,7 @@
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia.Reactive;
 
 using ReactiveUI;
+using ReactiveUI.Reactive;
 
 using Resona.UI.ViewModels;
 
@@ -10,7 +11,7 @@ namespace Resona.UI.Views.Settings
     {
         public SettingsView()
         {
-            this.WhenActivated(disposables => { });
+            this.WhenActivated((System.Action<System.IDisposable> _) => { });
             this.InitializeComponent();
         }
     }

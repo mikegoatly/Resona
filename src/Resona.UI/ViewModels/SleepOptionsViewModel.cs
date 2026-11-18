@@ -4,13 +4,15 @@ using System.Reactive.Linq;
 using System.Windows.Input;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.Binding.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Services.Background;
 
 namespace Resona.UI.ViewModels
 {
-    public class SleepOptionsViewModel : ReactiveObject
+    public partial class SleepOptionsViewModel : ReactiveObject
     {
         private readonly ITimerManager timerManager;
 
@@ -38,7 +40,7 @@ namespace Resona.UI.ViewModels
             };
 
             timerManager.SleepTimerUpdated
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(x =>
             {
                 this.SleepModeActive = x != null;
@@ -58,10 +60,10 @@ namespace Resona.UI.ViewModels
         }
 
         [Reactive]
-        public bool SleepModeActive { get; set; }
+        public partial bool SleepModeActive { get; set; }
 
         [Reactive]
-        public string? RemainingSleepTime { get; set; }
+        public partial string? RemainingSleepTime { get; set; }
 
         public IReadOnlyList<SleepOption> SleepCommands { get; }
 

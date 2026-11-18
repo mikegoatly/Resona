@@ -1,9 +1,10 @@
 ﻿using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.SourceGenerators;
 
 namespace Resona.UI.ViewModels
 {
-    public class QuickJumpViewModel : ReactiveObject
+    public partial class QuickJumpViewModel : ReactiveObject
     {
         private static int index = 0;
 
@@ -23,9 +24,9 @@ namespace Resona.UI.ViewModels
         public int Index { get; }
 
         [Reactive]
-        public bool IsCurrent { get; set; }
+        public partial bool IsCurrent { get; set; }
 
         [Reactive]
-        public bool IsAvailable { get; set; }
+        public partial bool IsAvailable { get; set; }
     }
 }

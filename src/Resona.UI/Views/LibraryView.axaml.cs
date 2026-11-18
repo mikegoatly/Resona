@@ -6,9 +6,10 @@ using Avalonia;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia.Reactive;
 
 using ReactiveUI;
+using ReactiveUI.Reactive;
 
 using Resona.UI.Behaviors;
 using Resona.UI.ViewModels;
@@ -23,7 +24,7 @@ namespace Resona.UI.Views
 
         public LibraryView()
         {
-            this.WhenActivated(disposables => { });
+            this.WhenActivated((System.Action<System.IDisposable> _) => { });
             AvaloniaXamlLoader.Load(this);
             var scrollViewer = this.FindControl<ScrollViewer>("ScrollViewer");
             if (scrollViewer == null)

@@ -9,7 +9,7 @@
 			 x:Name="Root"
 			 x:CompileBindings="True"
 			 x:DataType="vm:AudioSettingsViewModel"
-			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
              x:Class="Resona.UI.Views.Settings.AudioSettingsView">
 	<Design.DataContext>
 		<vm:AudioSettingsViewModel />
@@ -37,17 +37,17 @@
 							<Button.Styles>
 								<Style Selector="Button.audio-out">
 									<Style Selector="^ icon|Icon">
-										<Setter Property="Value" Value="fa fa-headphones" />
+										<Setter Property="Value" Value="fa-headphones" />
 									</Style>
 								</Style>
 								<Style Selector="Button.bluetooth">
 									<Style Selector="^ icon|Icon">
-										<Setter Property="Value" Value="fa fa-bluetooth" />
+										<Setter Property="Value" Value="fa-bluetooth" />
 									</Style>
 								</Style>
 								<Style Selector="Button.speaker">
 									<Style Selector="^ icon|Icon">
-										<Setter Property="Value" Value="fa fa-volume-off" />
+										<Setter Property="Value" Value="fa-volume-off" />
 									</Style>
 								</Style>
 								<Style Selector="Button.inactive">

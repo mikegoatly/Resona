@@ -39,33 +39,42 @@
                                                 ElementName=Root}"
                     CommandParameter="{Binding Kind}"
                     CornerRadius="200">
-                    <Image Source="{Binding Kind, Converter={StaticResource audioKindImageConverter}}">
-                        <Image.Transitions>
-                            <Transitions>
-                                <DoubleTransition Property="Width" Duration="0:0:0.1" />
-                                <DoubleTransition Property="Height" Duration="0:0:0.1" />
-                                <ThicknessTransition Property="Margin" Duration="0:0:0.1" />
-                            </Transitions>
-                        </Image.Transitions>
+                    <Image
+                        Width="280"
+                        Height="280"
+                        Margin="20"
+                        Source="{Binding Kind, Converter={StaticResource audioKindImageConverter}}">
+                        <!-- Scale via RenderTransform rather than animating Width/Height/Margin, which re-runs
+                             layout every frame. The transition eases both ways, so release springs back. -->
                         <Image.Styles>
                             <Style Selector="Button > Image">
-                                <Setter Property="Width" Value="280" />
-                                <Setter Property="Height" Value="280" />
-                                <Setter Property="Margin" Value="20" />
+                                <Setter Property="RenderTransform" Value="scale(1)" />
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" Easing="BackEaseOut" />
+                                    </Transitions>
+                                </Setter>
                             </Style>
                             <Style Selector="Button:pointerover > Image">
-                                <Setter Property="Width" Value="320" />
-                                <Setter Property="Height" Value="320" />
-                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="RenderTransform" Value="scale(1.1)" />
                             </Style>
                             <Style Selector="Button:pressed > Image">
-                                <Setter Property="Width" Value="180" />
-                                <Setter Property="Height" Value="180" />
-                                <Setter Property="Margin" Value="70" />
+                                <Setter Property="RenderTransform" Value="scale(0.9)" />
                             </Style>
                         </Image.Styles>
                     </Image>
                     <Button.Styles>
+                        <!-- Fluent's own pressed scale would shrink the circle too; keep the button still -->
+                        <Style Selector="Button:pressed">
+                            <Setter Property="RenderTransform" Value="none" />
+                        </Style>
+                        <Style Selector="Button /template/ ContentPresenter">
+                            <Setter Property="Transitions">
+                                <Transitions>
+                                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                                </Transitions>
+                            </Setter>
+                        </Style>
                         <Style Selector="Button:pointerover /template/ ContentPresenter">
                             <Setter Property="Background" Value="#4DDD" />
                         </Style>

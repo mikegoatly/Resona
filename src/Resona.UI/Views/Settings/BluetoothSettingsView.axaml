@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
 			 xmlns:vm="using:Resona.UI.ViewModels"
              x:Class="Resona.UI.Views.Settings.BluetoothSettingsView"
 			 xmlns:local="using:Resona.UI.Views.Settings"
@@ -46,7 +46,7 @@
 
 			<Style Selector="^.connected">
 				<Style Selector="^ icon|Icon">
-					<Setter Property="Value" Value="fa fa-check" />
+					<Setter Property="Value" Value="fa-check" />
 					<Setter Property="Foreground" Value="{StaticResource SuccessColor}" />
 				</Style>
 			</Style>
@@ -55,14 +55,14 @@
 					<Setter Property="Background" Value="Transparent"/>
 				</Style>
 				<Style Selector="^ icon|Icon">
-					<Setter Property="Value" Value="fa fa-headphones" />
+					<Setter Property="Value" Value="fa-headphones" />
 					<Setter Property="Foreground" Value="Transparent" />
 				</Style>
 			</Style>
 			<Style Selector="^.connecting">
 				<Style Selector="^ icon|Icon">
 					<Setter Property="Foreground" Value="{StaticResource PrimaryColor}" />
-					<Setter Property="Value" Value="fa fa-ellipsis" />
+					<Setter Property="Value" Value="fa-ellipsis" />
 				</Style>
 			</Style>
 		</Style>
@@ -79,7 +79,7 @@
 					HorizontalAlignment="Right">
 				<StackPanel Orientation="Horizontal" Spacing="10">
 					<TextBlock>Scan for more devices </TextBlock>
-					<icon:Icon Value="fa fa-arrows-rotate"/>
+					<icon:Icon Value="fa-arrows-rotate"/>
 				</StackPanel>
 			</Button>
 		</DockPanel>

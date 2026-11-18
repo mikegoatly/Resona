@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:Resona.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+    xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
     xmlns:local="using:Resona.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Resona.UI.ViewModels"
@@ -100,7 +100,7 @@
                     Height="{StaticResource SkipButtonSize}"
                     Classes="primary circle"
                     Command="{Binding MovePreviousCommand}">
-                    <icon:Icon Value="fa fa-backward" />
+                    <icon:Icon Value="fa-backward" />
                 </Button>
 
                 <Button
@@ -113,10 +113,10 @@
                         <Styles>
                             <Style Selector="icon|Icon">
                                 <Style Selector="^.playing">
-                                    <Setter Property="Value" Value="fa fa-pause" />
+                                    <Setter Property="Value" Value="fa-pause" />
                                 </Style>
                                 <Style Selector="^.paused">
-                                    <Setter Property="Value" Value="fa fa-play" />
+                                    <Setter Property="Value" Value="fa-play" />
                                 </Style>
                             </Style>
                         </Styles>
@@ -130,7 +130,7 @@
                     Height="{StaticResource SkipButtonSize}"
                     Classes="primary circle"
                     Command="{Binding MoveNextCommand}">
-                    <icon:Icon Value="fa fa-forward" />
+                    <icon:Icon Value="fa-forward" />
                 </Button>
 
                 <StackPanel VerticalAlignment="Center" Orientation="Vertical">
@@ -146,7 +146,7 @@
                         <Button.Flyout>
                             <Flyout Placement="TopEdgeAlignedRight">
                                 <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
-                                    <icon:Icon FontSize="30" Value="fa fa-volume-high" />
+                                    <icon:Icon FontSize="30" Value="fa-volume-high" />
                                     <Slider
                                         Height="200"
                                         Margin="0,5"
@@ -155,7 +155,7 @@
                                         Minimum="0"
                                         Orientation="Vertical"
                                         Value="{Binding Volume}" />
-                                    <icon:Icon FontSize="20" Value="fa fa-volume-off" />
+                                    <icon:Icon FontSize="20" Value="fa-volume-off" />
                                 </StackPanel>
                             </Flyout>
                         </Button.Flyout>
@@ -178,7 +178,7 @@
                             Height="40"
                             HorizontalAlignment="Right"
                             Classes="primary circle">
-                            <icon:Icon Value="fa fa-stopwatch" />
+                            <icon:Icon Value="fa-stopwatch" />
 
                             <Button.Flyout>
                                 <Flyout Placement="TopEdgeAlignedRight">

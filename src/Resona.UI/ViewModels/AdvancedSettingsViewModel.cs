@@ -5,7 +5,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Persistence;
 using Resona.Services;
@@ -16,7 +17,7 @@ using Serilog.Events;
 
 namespace Resona.UI.ViewModels
 {
-    public class AdvancedSettingsViewModel : ReactiveObject
+    public partial class AdvancedSettingsViewModel : ReactiveObject
     {
         private readonly ILogService logService;
         private IDisposable? refreshLogSizeSubscription;
@@ -83,14 +84,14 @@ namespace Resona.UI.ViewModels
         }
 
         [Reactive]
-        public float? LogSize { get; set; }
+        public partial float? LogSize { get; set; }
         public ReactiveCommand<Unit, Unit> RebuildLibraryDataCommand { get; }
 
         private void RefreshLogSize()
         {
             this.refreshLogSizeSubscription?.Dispose();
             this.refreshLogSizeSubscription = Observable.FromAsync(this.logService.GetLogSizeMbAsync)
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .Subscribe(x => this.LogSize = x);
         }
     }

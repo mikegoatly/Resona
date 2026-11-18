@@ -5,7 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="80" d:DesignHeight="12"
 			 xmlns:vm="using:Resona.UI.ViewModels"
 			 xmlns:converters="using:Resona.UI.Converters"
-			 xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+			 xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
              x:Class="Resona.UI.Views.BatteryView"
 			  x:DataType="vm:BatteryViewModel"
 			 x:CompileBindings="True">
@@ -19,7 +19,7 @@
 
 	<Grid IsVisible="{Binding HasBattery}" ColumnDefinitions="Auto,22">
 
-		<icon:Icon Value="fa fa-plug" FontSize="8" Margin="0,0,5,0" 
+		<icon:Icon Value="fa-plug" FontSize="8" Margin="0,0,5,0" 
 				   IsVisible="{Binding IsCharging}"/>
 
 		<Grid ColumnDefinitions="20,2" Height="12" Grid.Column="2">

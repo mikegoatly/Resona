@@ -4,7 +4,8 @@ using System.Reactive.Linq;
 using PiJuiceSharp;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Reactive;
+using ReactiveUI.SourceGenerators;
 
 using Resona.Services.Battery;
 
@@ -12,7 +13,7 @@ using Serilog;
 
 namespace Resona.UI.ViewModels
 {
-    public class BatteryViewModel : ReactiveObject
+    public partial class BatteryViewModel : ReactiveObject
     {
         private static readonly ILogger logger = Log.ForContext<BatteryViewModel>();
 
@@ -38,9 +39,9 @@ namespace Resona.UI.ViewModels
         public IObservable<int> BatteryLevel { get; }
 
         [Reactive]
-        public bool HasBattery { get; private set; }
+        public partial bool HasBattery { get; private set; }
 
         [Reactive]
-        public bool IsCharging { get; private set; }
+        public partial bool IsCharging { get; private set; }
     }
 }

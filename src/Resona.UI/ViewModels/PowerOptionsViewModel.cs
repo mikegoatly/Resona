@@ -1,6 +1,7 @@
 ﻿using System.Reactive;
 
 using ReactiveUI;
+using ReactiveUI.Reactive;
 
 using Resona.Services.OS;
 
