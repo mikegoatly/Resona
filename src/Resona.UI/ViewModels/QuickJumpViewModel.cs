@@ -1,5 +1,4 @@
-﻿using ReactiveUI;
-using ReactiveUI.Reactive;
+﻿using ReactiveUI.Reactive;
 using ReactiveUI.SourceGenerators;
 
 namespace Resona.UI.ViewModels

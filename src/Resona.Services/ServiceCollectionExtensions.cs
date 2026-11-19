@@ -13,8 +13,10 @@ namespace Resona.Services
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddResonaServices(this IServiceCollection services)
+        public static void AddResonaServices(this IServiceCollection services, ResonaOptions options)
         {
+            services.AddSingleton(options);
+
             // For Linux platforms register real services, for Windows register dev:
             if (OperatingSystem.IsLinux())
             {

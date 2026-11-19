@@ -109,9 +109,17 @@ namespace Resona.Services.Audio
             {
                 if (!this.initialized)
                 {
-                    if (Bass.Init())
+                    try
                     {
-                        this.initialized = true;
+                        if (Bass.Init())
+                        {
+                            this.initialized = true;
+                        }
+                    }
+                    catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException or EntryPointNotFoundException)
+                    {
+                        // The native BASS library isn't available on this platform; playback is a no-op
+                        logger.Error(ex, "BASS native library could not be loaded");
                     }
                 }
 

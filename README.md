@@ -116,6 +116,15 @@ And also upload new content:
 
 ![Web interface upload view](docs/web-upload.png)
 
+#### Web client development
+
+The web host lives in `src/Resona.Web`. It is a small `System.Net.HttpListener` based server (so it also works on Android, where ASP.NET Core isn't available)
+that serves the API under `/api` and the React/Vite client from `src/Resona.Web/ClientApp`, which is embedded in the assembly at build time.
+
+* The client is built by an MSBuild target (`npm install` + `npm run build`). Release builds always rebuild it; Debug builds only build it if `ClientApp/dist` doesn't exist yet. Pass `-p:NoSpaBuild=true` to skip it entirely (the `publish.ps1 -NoSpaBuild` switch does this).
+* For day-to-day client work, run the desktop app with the web client enabled (the API listens on `http://localhost:8080` when run on Windows, all interfaces elsewhere), then in `src/Resona.Web/ClientApp` run `npm run dev` and browse to `http://localhost:5002` - Vite hot reloads and proxies `/api` calls to port 8080.
+* Tests for the web host are in `src/Resona.Web.Tests` (`dotnet test`) and don't need Node.
+
 ### Additional configuration
 
 If you want to add a splash screen and get rid of all the scrolling boot up text the Pi shows, follow these steps:
@@ -177,5 +186,26 @@ Work on the core database structure is ongoing, so I'm just going to recreate th
 cd src\Resona.Persistence
 rm -r Migrations
 md Migrations
-dotnet ef migrations add InitialCreate --startup-project ..\Resona.UI -o Migrations
+dotnet ef migrations add InitialCreate --startup-project ..\Resona.Desktop -o Migrations
 ```
+
+## Android (experimental)
+
+`src/Resona.Android` hosts the shared Resona UI on Android (landscape, single view). Audio playback is not wired up
+yet (the native BASS library isn't bundled, so playback is a no-op), and Bluetooth/battery/audio-output use the dev stubs.
+
+Build and run on a connected device or emulator:
+
+```
+dotnet build src/Resona.Android -t:Run -f net11.0-android
+```
+
+The Android project is in `Resona.sln` but is deliberately excluded from the default solution build (so that
+`dotnet build`/`dotnet test` on the solution don't need the Android workload or a device); build it explicitly as above.
+
+Put your files in the app's external files folder, `/sdcard/Android/data/com.resona/files/{music,audiobooks,sleep}`
+(created on first start), e.g. with `adb push`. The library is rescanned a few seconds after the app starts.
+
+The web client is hosted by default on port 8080; the device addresses are written to logcat (tag `Resona`).
+Open `http://<device-ip>:8080/` from another device, or use `adb forward tcp:8080 tcp:8080` and browse to
+`http://localhost:8080/`. Files uploaded there land in the same folders.

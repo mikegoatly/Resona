@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Windows.Input;
 
-using ReactiveUI;
 using ReactiveUI.Reactive;
 using ReactiveUI.Binding.Reactive;
 using ReactiveUI.SourceGenerators;

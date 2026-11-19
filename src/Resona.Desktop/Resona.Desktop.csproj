@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net11.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<AssemblyName>Resona</AssemblyName>
+		<RootNamespace>Resona.Desktop</RootNamespace>
+		<LangVersion>latest</LangVersion>
+		<CETCompat>false</CETCompat>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<TrimmerRootDescriptor Include="Roots.xml" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+		<PackageReference Include="Avalonia.LinuxFramebuffer" Version="12.1.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Resona.Services\Resona.Services.csproj" />
+		<ProjectReference Include="..\Resona.UI\Resona.UI.csproj" />
+		<ProjectReference Include="..\Resona.Web\Resona.Web.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(RuntimeIdentifier)'=='linux-arm' or '$(RuntimeIdentifier)'==''">
+		<Content Include="Bass\linux_arm\**">
+			<Link>%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'==''">
+		<Content Include="Bass\win_x64\**">
+			<Link>%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+</Project>

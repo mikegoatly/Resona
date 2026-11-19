@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using ReactiveUI;
 using ReactiveUI.Binding.Reactive;
 using ReactiveUI.Reactive;
 

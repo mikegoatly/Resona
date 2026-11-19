@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 
-using ReactiveUI;
 using ReactiveUI.Reactive;
 using ReactiveUI.SourceGenerators;
 

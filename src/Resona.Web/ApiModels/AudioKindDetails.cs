@@ -1,6 +1,4 @@
-﻿using Resona.Services.Libraries;
-
-namespace Resona.UI.ApiModels
+﻿namespace Resona.Web.ApiModels
 {
     public record AudioKindDetails(string AudioKind, bool HasCustomLibraryIcon);
 }

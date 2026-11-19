@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "prestart": "node ./aspnetcore-https.cjs",
     "start": "vite",
     "dev": "vite",
     "build": "tsc && vite build",

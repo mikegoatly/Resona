@@ -20,10 +20,14 @@
     <Design.DataContext>
         <vm:AudioSelectionViewModel />
     </Design.DataContext>
-    <ItemsControl
+    <!-- DownOnly: content keeps its designed size (1024x600) and only shrinks when the space is smaller, e.g. a phone -->
+    <Viewbox
+        Margin="0,10"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
-        ItemsSource="{Binding AudioKinds}">
+        Stretch="Uniform"
+        StretchDirection="DownOnly">
+    <ItemsControl ItemsSource="{Binding AudioKinds}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal" />
@@ -86,4 +90,5 @@
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>
+    </Viewbox>
 </UserControl>

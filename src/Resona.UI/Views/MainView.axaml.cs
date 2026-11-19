@@ -1,9 +1,8 @@
 using System;
 
 using Avalonia.Markup.Xaml;
-using ReactiveUI.Avalonia.Reactive;
 
-using ReactiveUI;
+using ReactiveUI.Avalonia.Reactive;
 using ReactiveUI.Reactive;
 
 using Resona.UI.ViewModels;

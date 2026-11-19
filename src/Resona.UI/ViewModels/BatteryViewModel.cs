@@ -3,7 +3,6 @@ using System.Reactive.Linq;
 
 using PiJuiceSharp;
 
-using ReactiveUI;
 using ReactiveUI.Reactive;
 using ReactiveUI.SourceGenerators;
 

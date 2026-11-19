@@ -20,6 +20,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="Resona.Services.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="12.1.6" />
 		<PackageReference Include="ManagedBass" Version="4.0.2" />
 		<PackageReference Include="PiJuiceSharp" Version="0.3.0" />

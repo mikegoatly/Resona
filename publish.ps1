@@ -20,7 +20,7 @@ param (
 $ErrorActionPreference = "Stop"
 
 $Folder = "./publish"
-$Project = ".\src\Resona.UI\Resona.UI.csproj"
+$Project = ".\src\Resona.Desktop\Resona.Desktop.csproj"
 
 if (-not (Test-Path $Folder)) {
     New-Item $Folder -ItemType Directory

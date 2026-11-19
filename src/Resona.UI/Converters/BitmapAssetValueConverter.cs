@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 
 using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
@@ -49,7 +48,7 @@ namespace Resona.UI.Converters
     public class BitmapAssetValueConverter : IValueConverter
     {
         public static BitmapAssetValueConverter Instance = new();
-        private static readonly string assemblyName = Assembly.GetEntryAssembly()!.GetName().Name!;
+        private static readonly string assemblyName = typeof(App).Assembly.GetName().Name!;
 
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {

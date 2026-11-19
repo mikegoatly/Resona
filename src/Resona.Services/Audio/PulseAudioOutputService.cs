@@ -4,7 +4,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 using Resona.Services.Bluetooth;
 using Resona.Services.OS;

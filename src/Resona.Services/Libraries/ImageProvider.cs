@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-using Avalonia.Platform;
+﻿using Avalonia.Platform;
 
 using Resona.Persistence;
 
@@ -25,14 +23,20 @@ namespace Resona.Services.Libraries
 
     public class ImageProvider : IImageProvider
     {
-        private static readonly string entryPath = AppContext.BaseDirectory;
-        private static readonly string assemblyName = Assembly.GetEntryAssembly()!.GetName().Name!;
-        private static readonly Dictionary<AudioKind, (string physicalPath, string defaultResource)> imagePaths = new()
+        private static readonly string assemblyName = "Resona.UI";
+
+        private readonly Dictionary<AudioKind, (string physicalPath, string defaultResource)> imagePaths;
+
+        public ImageProvider(ResonaOptions options)
         {
-            { AudioKind.Audiobook, (Path.Combine(entryPath, "images/audiobooks.png"), $"avares://{assemblyName}/Images/audiobooks.png") },
-            { AudioKind.Music, (Path.Combine(entryPath, "images/music.png"), $"avares://{assemblyName}/Images/music.png") },
-            { AudioKind.Sleep, (Path.Combine(entryPath, "images/sleep.png"), $"avares://{assemblyName}/Images/sleep.png") }
-        };
+            var imageDirectory = options.CustomImageDirectory;
+            imagePaths = new()
+            {
+                { AudioKind.Audiobook, (Path.Combine(imageDirectory, "images/audiobooks.png"), $"avares://{assemblyName}/Images/audiobooks.png") },
+                { AudioKind.Music, (Path.Combine(imageDirectory, "images/music.png"), $"avares://{assemblyName}/Images/music.png") },
+                { AudioKind.Sleep, (Path.Combine(imageDirectory, "images/sleep.png"), $"avares://{assemblyName}/Images/sleep.png") }
+            };
+        }
 
         private static readonly ILogger logger = Log.ForContext<LibrarySyncer>();
 

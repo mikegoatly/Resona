@@ -1,0 +1,41 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/docs/">
+    <File Path="docs/audio-output-selection.png" />
+    <File Path="docs/bluetooth-devices.png" />
+    <File Path="docs/home.png" />
+    <File Path="docs/player.png" />
+    <File Path="docs/sleep-timer.png" />
+    <File Path="docs/track-selection.png" />
+  </Folder>
+  <Folder Name="/pi-scripts/">
+    <File Path="scripts/configure-auto-run.sh" />
+    <File Path="scripts/disable-auto-run.sh" />
+    <File Path="scripts/install-dependencies.sh" />
+    <File Path="scripts/reenable-auto-run.sh" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="copy-pi-scripts.ps1" />
+    <File Path="global.json" />
+    <File Path="publish.ps1" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Resona.Android/Resona.Android.csproj">
+      <Build Project="false" />
+    </Project>
+    <Project Path="src/Resona.Desktop/Resona.Desktop.csproj" />
+    <Project Path="src/Resona.Persistence/Resona.Persistence.csproj" />
+    <Project Path="src/Resona.Services/Resona.Services.csproj" />
+    <Project Path="src/Resona.Services.Tests/Resona.Services.Tests.csproj" />
+    <Project Path="src/Resona.UI/Resona.UI.csproj" />
+    <Project Path="src/Resona.Web.Tests/Resona.Web.Tests.csproj" />
+    <Project Path="src/Resona.Web/Resona.Web.csproj" />
+  </Folder>
+</Solution>

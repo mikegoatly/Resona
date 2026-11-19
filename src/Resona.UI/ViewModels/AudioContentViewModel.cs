@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 
 using Avalonia.Media.Imaging;
 
-using ReactiveUI;
 using ReactiveUI.Reactive;
 
 using Resona.Services.Libraries;

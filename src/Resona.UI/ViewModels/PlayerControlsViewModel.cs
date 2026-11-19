@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using Avalonia.Media.Imaging;
 
-using ReactiveUI;
 using ReactiveUI.Reactive;
 using ReactiveUI.Binding.Reactive;
 using ReactiveUI.SourceGenerators;

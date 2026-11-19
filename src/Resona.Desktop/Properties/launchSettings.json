@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Resona.UI": {
+    "Resona.Desktop": {
       "commandName": "Project"
     },
     "WSL": {

@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net11.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>Resona.Web</RootNamespace>
+		<IsTrimmable>true</IsTrimmable>
+		<IsAotCompatible>true</IsAotCompatible>
+
+		<SpaRoot>ClientApp\</SpaRoot>
+		<DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**;$(SpaRoot)dist\**</DefaultItemExcludes>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Resona.Services\Resona.Services.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Show the SPA source files in the project, but never treat them as content to publish -->
+		<None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**;$(SpaRoot)dist\**" />
+	</ItemGroup>
+
+	<!-- Debug: only build the SPA when there is no build output yet (use npm run dev for day-to-day work).
+	     Release: rebuild when the SPA sources are newer than dist/index.html, unless -p:NoSpaBuild=true is passed.
+	     npm install only runs when node_modules is missing. -->
+	<ItemGroup>
+		<SpaInput Include="$(SpaRoot)src\**;$(SpaRoot)index.html;$(SpaRoot)package.json;$(SpaRoot)package-lock.json;$(SpaRoot)vite.config.ts;$(SpaRoot)tsconfig.json" />
+	</ItemGroup>
+
+	<Target Name="BuildSpa" BeforeTargets="AssignTargetPaths" Inputs="@(SpaInput)" Outputs="$(SpaRoot)dist\index.html" Condition="'$(NoSpaBuild)' != 'true' And ('$(Configuration)' != 'Debug' Or !Exists('$(SpaRoot)dist\index.html'))">
+		<Exec Command="node --version" ContinueOnError="true">
+			<Output TaskParameter="ExitCode" PropertyName="NodeExitCode" />
+		</Exec>
+		<Error Condition="'$(NodeExitCode)' != '0'" Text="Node.js is required to build the web client. Install it from https://nodejs.org/ or build with -p:NoSpaBuild=true." />
+		<Message Importance="high" Text="Restoring web client dependencies using 'npm'. This may take several minutes..." Condition="!Exists('$(SpaRoot)node_modules')" />
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" Condition="!Exists('$(SpaRoot)node_modules')" />
+		<Message Importance="high" Text="Building web client..." />
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
+	</Target>
+
+	<!-- Embed whatever is in ClientApp/dist as wwwroot/<relative path> (forward slashes) -->
+	<Target Name="EmbedSpaDist" BeforeTargets="AssignTargetPaths" DependsOnTargets="BuildSpa">
+		<ItemGroup>
+			<SpaDistFile Include="$(SpaRoot)dist\**" />
+			<EmbeddedResource Include="@(SpaDistFile)" LogicalName="wwwroot/$([System.String]::Copy('%(SpaDistFile.RecursiveDir)').Replace('\','/'))%(SpaDistFile.Filename)%(SpaDistFile.Extension)" />
+		</ItemGroup>
+	</Target>
+
+</Project>

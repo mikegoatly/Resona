@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net11.0-android</TargetFramework>
+		<SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>Resona.Android</RootNamespace>
+		<AssemblyName>Resona.Android</AssemblyName>
+
+		<ApplicationId>com.resona</ApplicationId>
+		<ApplicationTitle>Resona</ApplicationTitle>
+		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+
+		<!--
+			Trimming is disabled: Entity Framework Core, TagLib, Splat/ReactiveUI view location and the Avalonia
+			reflection bindings used by the shared UI are not trim-safe, so trimming would break the app at runtime
+			(and produces hundreds of IL2xxx warnings that are errors under TreatWarningsAsErrors).
+		-->
+		<PublishTrimmed>false</PublishTrimmed>
+		<PublishReadyToRun>false</PublishReadyToRun>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia.Android" Version="12.1.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Resona.Services\Resona.Services.csproj" />
+		<ProjectReference Include="..\Resona.UI\Resona.UI.csproj" />
+		<ProjectReference Include="..\Resona.Web\Resona.Web.csproj" />
+	</ItemGroup>
+</Project>

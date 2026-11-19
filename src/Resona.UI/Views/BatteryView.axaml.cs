@@ -1,6 +1,4 @@
 using ReactiveUI.Avalonia.Reactive;
-
-using ReactiveUI;
 using ReactiveUI.Reactive;
 
 using Resona.UI.ViewModels;
