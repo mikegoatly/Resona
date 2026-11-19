@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { readFileSync } from 'fs'
-import { certFilePath, keyFilePath } from './aspnetcore-https'
+// To serve over HTTPS, uncomment these imports and the server.https block below
+//import { readFileSync } from 'fs'
+//import { certFilePath, keyFilePath } from './aspnetcore-https.cjs'
 
 // https://vitejs.dev/config/
 export default defineConfig({

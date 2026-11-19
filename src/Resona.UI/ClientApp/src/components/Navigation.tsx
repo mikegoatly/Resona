@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink as RouterLink } from 'react-router-dom';
+import { NavLink as RouterLink } from 'react-router';
 import logo from '../Resona.png';
 import './Navigation.scss';
 import AppBar from '@mui/material/AppBar';

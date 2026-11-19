@@ -9,7 +9,7 @@ interface AudioKindDetails {
 }
 
 const AudioKindManagementView = () => {
-    const { isLoading, data } = useQuery({
+    const { data } = useQuery({
         queryKey: [ "library" ],
         queryFn: () => fetch(`/api/library`).then(
             res => {

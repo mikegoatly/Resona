@@ -2,7 +2,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useRef, useState } from "react";
 import MP3Tag from "mp3tag.js";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import "./UploadView.scss"
 import { useUploadContext } from "../components/UploadQueue/UploadContext";
 import { Fab } from "@mui/material";

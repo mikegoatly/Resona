@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import Spinner from '../components/Spinner';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -22,7 +22,7 @@ const LibraryView = () => {
         navigate("/", { replace: true });
     }
 
-    const { isLoading, data } = useQuery({
+    const { isPending, data } = useQuery({
         queryKey: ['library', audioKind],
         queryFn: () => fetch(`/api/library/${audioKind}`).then(
             res => {
@@ -34,7 +34,7 @@ const LibraryView = () => {
             })
     });
 
-    if (isLoading) {
+    if (isPending) {
         return (<Spinner />)
     }
 
