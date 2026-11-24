@@ -4,7 +4,7 @@
     {
       "name": "web-client",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "src/Resona.UI/ClientApp", "run", "dev"],
+      "runtimeArgs": ["--prefix", "src/Resona.Web/ClientApp", "run", "dev"],
       "port": 5002
     }
   ]

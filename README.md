@@ -6,20 +6,8 @@ An audiobook/music/sleep tunes audio player designed to run on a Raspberry Pi.
 ## Motivation
 
 I wanted to have a single-use device for playing audio that my kids could safely use in their bedroom, without giving them a phone or tablet that also gave them other unhelpful distractions. 
-
-This is a rebuild of an old project which had an ASP.NET core backend with a Blazor client. This new
-version relies on [Avalonia UI](https://www.avaloniaui.net/). Having all the logic and UI combined in a single executable has proven to be much more efficient and development has been much quicker.
-This all came together as a spare time project over the course of a couple of weeks.
-
-You can clone and run this repo locally to try it out, and deploy it to a Raspberry Pi using the dev notes below. I might look to streamline the installation process at some point if there's
-demand for it - I'd also be happy to receive contributions.
-
-### Roadmap
-
-I've a couple of things I still want to do:
-
-* ~~Expose a web application from the device that parents can use to upload new content, rather than using `scp` 😊~~ In progress - see the experimental web host section below
-* ~~Allow for more configuration options to allow kids to personalize things a bit, including the main icons for the home screen.~~ Can be done using the web interface 😊
+Recent work has been on having a cheap second-hand Android device locked down in kiosk mode - that turns out to be
+much cheaper and effective than buying a new Raspberry PI, screen, battery pack, etc.
 
 # Features
 
@@ -191,8 +179,8 @@ dotnet ef migrations add InitialCreate --startup-project ..\Resona.Desktop -o Mi
 
 ## Android (experimental)
 
-`src/Resona.Android` hosts the shared Resona UI on Android (landscape, single view). Audio playback is not wired up
-yet (the native BASS library isn't bundled, so playback is a no-op), and Bluetooth/battery/audio-output use the dev stubs.
+`src/Resona.Android` hosts the shared Resona UI on Android (landscape, single view). Audio playback uses the bundled native BASS
+libraries (arm64-v8a and x86_64), and Bluetooth/battery/audio-output use the dev stubs.
 
 Build and run on a connected device or emulator:
 
@@ -209,3 +197,77 @@ Put your files in the app's external files folder, `/sdcard/Android/data/com.res
 The web client is hosted by default on port 8080; the device addresses are written to logcat (tag `Resona`).
 Open `http://<device-ip>:8080/` from another device, or use `adb forward tcp:8080 tcp:8080` and browse to
 `http://localhost:8080/`. Files uploaded there land in the same folders.
+
+### Android kiosk deployment
+
+`scripts/android/Resona.Android.ps1` (PowerShell 7) builds, deploys and controls the app as a locked-down kiosk
+(Device Owner + Lock Task: Resona is the only app, it is the HOME launcher, the status bar and keyguard are disabled).
+Parent control is adb-only; there is no way out of the app on the device itself.
+
+```
+./scripts/android/Resona.Android.ps1 -Action Build
+./scripts/android/Resona.Android.ps1 -Action Provision -Device <serial>   # first time
+./scripts/android/Resona.Android.ps1 -Action Deploy                       # updates
+./scripts/android/Resona.Android.ps1 -Action Status
+./scripts/android/Resona.Android.ps1 -Action KioskOff   # temporarily back to a normal phone
+./scripts/android/Resona.Android.ps1 -Action KioskOn
+./scripts/android/Resona.Android.ps1 -Action Release    # removes device owner entirely (-Force skips the prompt)
+./scripts/android/Resona.Android.ps1 -Action Logs
+```
+
+`-Device` is optional when exactly one device is attached; `ip:port` values trigger `adb connect` first.
+
+**First-time provisioning** (device owner can only be set on a device with no accounts and a single user):
+
+1. Remove every account: Settings -> Accounts (Google etc). On Xiaomi also sign out of / remove the Mi Account
+   (and any "Second space"/work profile).
+2. Enable Developer options (tap the build number 7 times), turn on USB debugging. On Xiaomi/MIUI/HyperOS also turn on
+   "Install via USB" and "USB debugging (Security settings)" (needs a Mi account/SIM in some versions - sign in, enable them,
+   then remove the Mi account again); otherwise installs fail with `INSTALL_FAILED_USER_RESTRICTED`.
+3. Connect over USB and run `-Action Provision`. It checks the prerequisites, installs the signed APK, runs
+   `dpm set-device-owner com.resona/com.resona.ResonaDeviceAdminReceiver`, launches the app and prints a PASS/WARN status.
+
+**Updates**: `-Action Deploy` rebuilds, installs over the existing app (`adb install -r`) and relaunches.
+On Xiaomi/MIUI the USB-install confirmation screen cannot appear while lock task is active (the install would be cancelled
+with `INSTALL_FAILED_USER_RESTRICTED`), so when the app is the device owner and the kiosk is locked, `Deploy` (and `Provision`'s
+install step) automatically runs `KioskOff`, installs, then `KioskOn` (always re-enabled, even if the install fails).
+It also works over Wi-Fi with wireless debugging: `-Device IPADDRESS:37123`. Updates pulled from the NAS feed (below)
+install silently inside the app, so they need no USB and no kiosk pause.
+
+**LAN self-update** (no USB needed after the first install): the app can pull new builds from any plain web server on your LAN.
+
+1. One time: install an update-capable build over USB with `-Action Deploy` (or `Provision`).
+2. One time per device: `./scripts/android/Resona.Android.ps1 -Action SetUpdateSource -Url http://IPADDRESS:8000/`
+   (`-Url ""` disables updates).
+3. Routine release: `./scripts/android/Resona.Android.ps1 -Action Publish -PublishDir \\nas\web\resona`
+   (or set `RESONA_PUBLISH_DIR` and omit the parameter; `-NoBuild` re-publishes the last build). This builds the signed APK,
+   copies it as `resona-<versionCode>.apk`, atomically writes `resona-update.json` next to it
+   (`{ "versionCode", "versionName", "apk", "sha256", "publishedUtc" }`) and deletes older APKs except the previous one.
+4. `-Action CheckUpdate` triggers an immediate check; `-Action Status` shows the update source, last check time/result and
+   the installed versionCode.
+
+Serve the publish folder over HTTP (HTTP/1.1 is recommended), e.g. a NAS web share, IIS, or
+`python -m http.server 8000 --protocol HTTP/1.1 --directory <dir>`. Cleartext HTTP is allowed by the app's network security
+config because this is a LAN-only appliance.
+
+The app checks about 30 seconds after start, then every 6 hours, and on `CheckUpdate`, but only while it is the device owner
+and an update URL is set. If the manifest `versionCode` is higher than the installed one it downloads the APK to its cache,
+verifies the SHA-256, then waits until nothing is playing (polling every minute) and installs silently with `PackageInstaller`
+(no prompt, because it is device owner). The app is restarted by the system and the kiosk/lock task re-engages. Failures
+(network, bad manifest, hash mismatch) are logged with tag `Resona`, recorded for `Status`, and retried next cycle.
+
+Version rule: Android only installs an APK with a higher `versionCode`. The script sets `versionCode` to the number of minutes
+since 2024-01-01 UTC on every `Build`/`Publish`/`Deploy`, so each build is newer than the last.
+
+Security model: Android refuses to update an app with an APK signed by a different key, so only builds signed with your
+`resona-release.keystore` can ever be installed, even if someone tampers with the web share; the SHA-256 in the manifest is
+an additional integrity check, not the trust anchor. Keep the keystore safe.
+
+**Parent control** (all via adb; the receiver is protected by the `DUMP` permission which only the adb shell holds):
+`KioskOff` ends lock task and restores the normal launcher/status bar, `KioskOn` re-engages it, `Release` also removes the
+device owner so the phone can be returned to normal use without a factory reset.
+
+**Signing keystore**: release builds are signed with `~/.resona/resona-release.keystore` (password in
+`~/.resona/resona-release.keystore.password`), created on the first `Build`. **Back both files up** - without the same key,
+updates cannot be installed over the device-owner app and you would have to `Release`/reset the device. They live outside
+the repository and must never be committed.

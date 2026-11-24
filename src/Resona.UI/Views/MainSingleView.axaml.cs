@@ -27,6 +27,13 @@ namespace Resona.UI.Views
         public MainSingleView()
         {
             AvaloniaXamlLoader.Load(this);
+
+            // The safe-area padding (display cutout) would otherwise show the TopLevel's own background there.
+            // Scoped to Android so the Pi/desktop look is unchanged.
+            if (OperatingSystem.IsAndroid())
+            {
+                this.Background = Brushes.Black;
+            }
         }
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -64,6 +71,13 @@ namespace Resona.UI.Views
             this.topLevel = TopLevel.GetTopLevel(this);
             if (this.topLevel?.InsetsManager is { } insets)
             {
+                // Draw under the cutout/system bars ourselves (black, via Background) and pad content by the safe
+                // area; otherwise the platform leaves that strip to the native window, which shows white.
+                if (OperatingSystem.IsAndroid())
+                {
+                    insets.DisplayEdgeToEdgePreference = true;
+                }
+
                 insets.SafeAreaChanged += this.OnSafeAreaChanged;
                 this.Padding = insets.SafeAreaPadding;
             }

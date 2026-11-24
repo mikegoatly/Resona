@@ -16,6 +16,9 @@
 
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
 
+		<!-- BASS is only bundled for these ABIs: arm64 devices and the x86_64 emulator -->
+		<RuntimeIdentifiers>android-arm64;android-x64</RuntimeIdentifiers>
+
 		<!--
 			Trimming is disabled: Entity Framework Core, TagLib, Splat/ReactiveUI view location and the Avalonia
 			reflection bindings used by the shared UI are not trim-safe, so trimming would break the app at runtime
@@ -32,6 +35,12 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
+
+	<!-- Native BASS (un4seen) libraries; see src/Resona.Desktop/Bass/bass-license.txt for the licence terms -->
+	<ItemGroup>
+		<AndroidNativeLibrary Include="Bass/arm64-v8a/libbass.so" Abi="arm64-v8a" Condition="'$(RuntimeIdentifier)' == 'android-arm64'" />
+		<AndroidNativeLibrary Include="Bass/x86_64/libbass.so" Abi="x86_64" Condition="'$(RuntimeIdentifier)' == 'android-x64'" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Avalonia.Android" Version="12.1.6" />

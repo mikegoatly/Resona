@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kiosk policies are applied programmatically (see KioskPolicy); force-lock lets "shut down" turn the screen off via LockNow. -->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-policies>
+    <force-lock />
+  </uses-policies>
+</device-admin>

@@ -24,7 +24,9 @@ namespace Resona.Desktop
             ResonaBootstrapper.Initialize(new ResonaOptions
             {
                 WebBindHost = OperatingSystem.IsWindows() ? "localhost" : "*"
-            });
+            },
+            // The Pi gets the real hardware services; anything else (Windows dev) gets the fakes
+            services => _ = OperatingSystem.IsLinux() ? services.AddLinuxPlatformServices() : services.AddDevPlatformServices());
 
             var applicationExitCancellationTokenSource = new CancellationTokenSource();
 

@@ -34,7 +34,12 @@ namespace Resona.UI
         /// <summary>
         /// Applies the platform options, initializes SQLite, registers all services/view models/views and prepares the database.
         /// </summary>
-        public static void Initialize(ResonaOptions options)
+        /// <param name="options">The platform options.</param>
+        /// <param name="addPlatformServices">
+        /// Registers the head's platform-specific services (Bluetooth, audio output, battery, logs, OS commands);
+        /// e.g. <c>services => services.AddLinuxPlatformServices()</c>.
+        /// </param>
+        public static void Initialize(ResonaOptions options, Action<IServiceCollection> addPlatformServices)
         {
             // Must come before anything touches Settings.Default
             Settings.Configure(options);
@@ -49,7 +54,7 @@ namespace Resona.UI
 
             SQLitePCL.Batteries.Init();
 
-            RegisterServices(options);
+            RegisterServices(options, addPlatformServices);
 
             // Initialize the DB - this will perform any required migrations
             if (ResonaDb.Initialize() == false)
@@ -103,10 +108,11 @@ namespace Resona.UI
                 }
             }, CancellationToken.None);
 
-        private static void RegisterServices(ResonaOptions options)
+        private static void RegisterServices(ResonaOptions options, Action<IServiceCollection> addPlatformServices)
         {
             var services = new ServiceCollection();
             services.AddResonaServices(options);
+            addPlatformServices(services);
             services.AddViewModels();
             services.AddViews();
 

@@ -1,13 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using PiJuiceSharp;
+using Microsoft.Extensions.DependencyInjection;
 
 using Resona.Services.Audio;
 using Resona.Services.Background;
-using Resona.Services.Battery;
-using Resona.Services.Bluetooth;
 using Resona.Services.Libraries;
-using Resona.Services.OS;
 
 namespace Resona.Services
 {
@@ -17,25 +12,6 @@ namespace Resona.Services
         {
             services.AddSingleton(options);
 
-            // For Linux platforms register real services, for Windows register dev:
-            if (OperatingSystem.IsLinux())
-            {
-                services.AddSingleton<IBluetoothService, LinuxBluetoothService>();
-                services.AddSingleton<IAudioOutputService, PulseAudioOutputService>();
-                services.AddSingleton<ILogService>(new LinuxLogService());
-
-                services.AddSingleton<IPiJuiceStatus>(PiJuiceStatus.Create());
-                services.AddSingleton<IBatteryStateProvider, BatteryStateProvider>();
-            }
-            else
-            {
-                services.AddSingleton<IBluetoothService, DevBluetoothService>();
-                services.AddSingleton<IAudioOutputService, DevAudioOutputService>();
-                services.AddSingleton<ILogService>(new DevLogService());
-
-                services.AddSingleton<IBatteryStateProvider, FakeBatteryStateProvider>();
-            }
-
             services.AddScoped<IAudioRepository, AudioRepository>();
 
             services.AddSingleton<IPlayerService, PlayerService>();
@@ -43,7 +19,6 @@ namespace Resona.Services
             services.AddSingleton<ILibrarySyncer, LibrarySyncer>();
             services.AddSingleton<ILibraryFileManager, LibraryFileManager>();
             services.AddSingleton<ILibraryFileWatcher, LibraryFileWatcher>();
-            services.AddSingleton<IOsCommandExecutor, OsCommandExecutor>();
             services.AddSingleton<ITimerManager, TimerManager>();
         }
     }

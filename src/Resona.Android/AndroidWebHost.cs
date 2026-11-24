@@ -9,11 +9,10 @@ namespace Resona.Android;
 
 internal static class AndroidWebHost
 {
-    private const string LogTag = "Resona";
 
     public static void Start(int port)
     {
-        Log.Info(LogTag, $"Starting web application on port {port}; open {DescribeUrls(port)}");
+        Log.Info(AndroidLog.Tag, $"Starting web application on port {port}; open {DescribeUrls(port)}");
 
         // Binds all interfaces so other devices on the network can reach it
         _ = ResonaBootstrapper.StartWebHost(port, CancellationToken.None);

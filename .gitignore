@@ -350,3 +350,8 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Android signing material (should live outside the repo)
+*.keystore
+*.jks
+*.keystore.password

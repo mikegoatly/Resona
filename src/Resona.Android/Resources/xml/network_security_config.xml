@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cleartext HTTP is permitted so the kiosk can fetch self-updates from a plain-HTTP web server on the LAN (NAS share,
+  IIS, python -m http.server). This is acceptable for a LAN-only appliance: update APKs are additionally verified by
+  SHA-256 and Android refuses any APK not signed with the installed app's key.
+-->
+<network-security-config>
+  <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

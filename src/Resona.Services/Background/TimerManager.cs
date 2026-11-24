@@ -152,6 +152,10 @@ namespace Resona.Services.Background
                 logger.Information("Current time {Now} exceeded shutdown time {ShutDownTime}", now, this.shutDownTime);
 
                 this.osCommandExecutor.Shutdown();
+
+                // Some platforms (Android) only turn the screen off rather than ending the process, so restart the
+                // countdown; otherwise this would fire again on every tick while the screen is on.
+                this.ResetInactivityTimers();
             }
         }
 
