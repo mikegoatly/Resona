@@ -41,6 +41,10 @@ param(
     # SetUpdateSource: base URL holding resona-update.json, e.g. http://nas/resona/ (empty string disables updates).
     [string] $Url,
 
+    # Build/Deploy/Provision/Publish: create a new signing keystore if none exists. Without it a missing keystore is an
+    # error, because a new key can't update existing devices and changes the SHA1 registered with Spotify.
+    [switch] $NewKeystore,
+
     [string] $KeystorePath = (Join-Path $HOME '.resona/resona-release.keystore'),
     [string] $KeyAlias = 'resona'
 )
@@ -146,6 +150,14 @@ function Invoke-Shell {
 function Ensure-Keystore {
     if ((Test-Path $KeystorePath) -and (Test-Path $PasswordPath)) { return }
     if (Test-Path $KeystorePath) { throw "Keystore $KeystorePath exists but $PasswordPath is missing." }
+    if (-not $NewKeystore) {
+        throw (@(
+            "Signing keystore not found: $KeystorePath (and $PasswordPath).",
+            'If you are building on another machine, copy both files there from the machine that built the installed app.',
+            'A new key cannot update devices already running Resona, and changes the Android SHA1 registered in the Spotify',
+            'developer dashboard. Only for a brand new setup, rerun with -NewKeystore to create one.'
+        ) -join [Environment]::NewLine)
+    }
 
     $keytool = Find-Keytool
     New-Item -ItemType Directory -Force (Split-Path $KeystorePath) | Out-Null
@@ -448,6 +460,16 @@ function Show-Status {
     }
     else {
         Add-Row 'App installed' 'not installed' $false
+    }
+
+    # Spotify app (driven through the Spotify App Remote SDK). The kiosk's HideOtherApps leaves it visible.
+    $spotifyPkg = 'com.spotify.music'
+    if ((Invoke-Shell "pm list packages $spotifyPkg") -match "package:$([regex]::Escape($spotifyPkg))") {
+        $spotifyHidden = (Invoke-Shell "dumpsys package $spotifyPkg | grep -E 'hidden=|suspended='") -match 'hidden=true'
+        Add-Row 'Spotify app' ($spotifyHidden ? 'installed but hidden' : 'installed') (-not $spotifyHidden)
+    }
+    else {
+        Add-Row 'Spotify app' 'not installed (only needed for Spotify playback)' $false
     }
 
     $owner = Get-DeviceOwner

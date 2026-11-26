@@ -33,7 +33,7 @@
             Margin="131,-15,0,0"
             VerticalAlignment="Top"
             ClipToBounds="False"
-            IsEnabled="{Binding CanPlay}"
+            IsEnabled="{Binding CanSeek}"
             Maximum="1"
             Minimum="0"
             Value="{Binding Position, Mode=TwoWay}" />

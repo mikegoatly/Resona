@@ -1,0 +1,103 @@
+<UserControl
+    x:Class="Resona.UI.Views.SpotifyTrackListView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:Resona.UI.Behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:Resona.UI.Views"
+    xmlns:vm="using:Resona.UI.ViewModels"
+    x:Name="Root"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:CompileBindings="True"
+    x:DataType="vm:SpotifyTrackListViewModel"
+    Classes="pagehost"
+    mc:Ignorable="d">
+    <Design.DataContext>
+        <vm:SpotifyTrackListViewModel />
+    </Design.DataContext>
+
+    <Grid>
+        <Image
+            Opacity="0.3"
+            Source="{Binding Cover^}"
+            Stretch="UniformToFill" />
+
+        <Grid.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="FontSize" Value="28" />
+                <Setter Property="Margin" Value="0,0,0,5" />
+
+                <Style Selector="^.playing">
+                    <Setter Property="Foreground" Value="Yellow" />
+                </Style>
+
+                <Style Selector="^.unplayable">
+                    <Setter Property="Opacity" Value="0.4" />
+                </Style>
+            </Style>
+        </Grid.Styles>
+
+        <ScrollViewer Margin="80,20">
+            <ItemsControl ItemsSource="{Binding Tracks}">
+                <Interaction.Behaviors>
+                    <behaviors:AutoScrollToIndexBehavior
+                        CurrentIndex="{Binding CurrentTrack.Index}"
+                        Easing="QuinticEaseOut"
+                        ScrollDuration="0:0:1.0" />
+                </Interaction.Behaviors>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SpotifyTrackViewModel">
+                        <StackPanel Background="Transparent">
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="Tapped">
+                                    <InvokeCommandAction Command="{ReflectionBinding ViewModel.PlayTrack, ElementName=Root}" CommandParameter="{Binding}" />
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Classes.playing="{Binding IsPlaying}"
+                                Classes.unplayable="{Binding !IsPlayable}"
+                                Text="{Binding Title}"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsVisible="{Binding IsLoading}"
+            Opacity="0.7"
+            Text="Loading songs..." />
+
+        <!-- Spotify won't list this playlist's songs (or they couldn't be fetched): offer to play it all instead -->
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsVisible="{Binding SongsUnavailable}"
+            Spacing="20">
+            <Button
+                Padding="40,20"
+                HorizontalAlignment="Center"
+                Command="{Binding PlayAll}"
+                FontSize="32">
+                <TextBlock Margin="0" Text="{Binding Name, StringFormat='Play {0}'}" />
+            </Button>
+            <TextBlock
+                MaxWidth="600"
+                FontSize="18"
+                Opacity="0.7"
+                Text="Spotify only shares the songs in playlists you made. Save a copy of this playlist in Spotify to see them here."
+                TextAlignment="Center"
+                TextWrapping="Wrap" />
+        </StackPanel>
+
+        <views:SpotifyMessageView DataContext="{Binding Messages}" />
+    </Grid>
+</UserControl>

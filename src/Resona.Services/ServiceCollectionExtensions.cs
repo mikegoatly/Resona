@@ -1,8 +1,10 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using Resona.Services.Audio;
 using Resona.Services.Background;
 using Resona.Services.Libraries;
+using Resona.Services.Spotify;
 
 namespace Resona.Services
 {
@@ -20,6 +22,13 @@ namespace Resona.Services
             services.AddSingleton<ILibraryFileManager, LibraryFileManager>();
             services.AddSingleton<ILibraryFileWatcher, LibraryFileWatcher>();
             services.AddSingleton<ITimerManager, TimerManager>();
+
+            services.TryAddSingleton(TimeProvider.System);
+            services.AddSingleton<ISpotifySettings, DefaultSpotifySettings>();
+            services.AddSingleton<ISpotifyAuthService, SpotifyAuthService>();
+            services.AddSingleton<ISpotifyWebApiClient, SpotifyWebApiClient>();
+            services.AddSingleton<ISpotifyLibraryStore, SpotifyLibraryStore>();
+            services.AddSingleton<IPlaybackCoordinator, PlaybackCoordinator>();
         }
     }
 }

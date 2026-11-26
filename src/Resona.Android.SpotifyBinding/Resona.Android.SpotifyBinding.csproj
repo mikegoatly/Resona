@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net11.0-android</TargetFramework>
+		<SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+		<!-- Generated bindings from an unannotated SDK produce nullability mismatches in internal classes -->
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<RootNamespace>Resona.Android.SpotifyBinding</RootNamespace>
+		<AssemblyName>Resona.Android.SpotifyBinding</AssemblyName>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<!-- Generated binding code from the (obfuscated) Spotify AAR is noisy; these are not actionable. -->
+		<NoWarn>$(NoWarn);CS0618;CS0108;CS0114;CS8981;CS1591;CA1416;XA4218;BG8605;BG8606;BG8800</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<AndroidLibrary Include="Jars\spotify-app-remote-release-0.8.0.aar" />
+		<PackageReference Include="GoogleGson" Version="2.15.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<TransformFile Include="Transforms\Metadata.xml" />
+	</ItemGroup>
+</Project>

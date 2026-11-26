@@ -1,0 +1,9 @@
+<metadata>
+	<!-- Public fields whose names collide with their enclosing class (CS0542) -->
+	<attr path="/api/package[@name='com.spotify.protocol.types']/class[@name='Message']/field[@name='message']" name="managedName">Text</attr>
+	<attr path="/api/package[@name='com.spotify.protocol.types']/class[@name='Shuffle']/field[@name='shuffle']" name="managedName">IsShuffling</attr>
+	<attr path="/api/package[@name='com.spotify.protocol.types']/class[@name='Repeat']/field[@name='repeat']" name="managedName">Mode</attr>
+	<attr path="/api/package[@name='com.spotify.protocol.types']/class[@name='Uris']/field[@name='uris']" name="managedName">Values</attr>
+	<attr path="/api/package[@name='com.spotify.protocol.types']/class[@name='Uri']/field[@name='uri']" name="managedName">Value</attr>
+	<attr path="/api/package[@name='com.spotify.protocol.types']/class[@name='PlaybackSpeed']/field[@name='playbackSpeed']" name="managedName">Speed</attr>
+</metadata>

@@ -28,8 +28,16 @@ namespace Resona.Web.Http
 
         public static ApiResult NotFound() => new(HttpStatusCode.NotFound);
 
-        public static ApiResult Json<T>(T value, JsonTypeInfo<T> typeInfo)
-            => new(HttpStatusCode.OK, "application/json; charset=utf-8", JsonSerializer.SerializeToUtf8Bytes(value, typeInfo));
+        public static ApiResult NoContent() => new(HttpStatusCode.NoContent);
+
+        public static ApiResult Json<T>(T value, JsonTypeInfo<T> typeInfo, HttpStatusCode statusCode = HttpStatusCode.OK)
+            => new(statusCode, "application/json; charset=utf-8", JsonSerializer.SerializeToUtf8Bytes(value, typeInfo));
+
+        /// <summary>An error status with a <c>{"error": message}</c> JSON body.</summary>
+        public static ApiResult Error(HttpStatusCode statusCode, string message)
+            => Json(new Resona.Web.ApiModels.ApiError(message), Resona.Web.Api.ApiJsonContext.Default.ApiError, statusCode);
+
+        public static ApiResult BadRequest(string message) => Error(HttpStatusCode.BadRequest, message);
 
         /// <summary>Streams the content as a response body; the stream is disposed with the result.</summary>
         public static ApiResult FromStream(Stream stream, string contentType = ContentTypes.OctetStream)

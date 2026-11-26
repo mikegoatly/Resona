@@ -6,6 +6,8 @@ using Resona.Services.Audio;
 using Resona.Services.Battery;
 using Resona.Services.Bluetooth;
 using Resona.Services.OS;
+using Resona.Services.Spotify;
+using Resona.Services.Tests.Support;
 
 namespace Resona.Services.Tests;
 
@@ -19,6 +21,7 @@ public sealed class PlatformServiceRegistrationTests
         typeof(ILogService),
         typeof(IBatteryStateProvider),
         typeof(IOsCommandExecutor),
+        typeof(ISpotifyPlaybackService),
     };
 
     [Theory]
@@ -50,5 +53,36 @@ public sealed class PlatformServiceRegistrationTests
 
         Assert.Single(services, d => d.ServiceType == serviceType);
         Assert.Single(services, d => d.ServiceType == typeof(IPiJuiceStatus));
+    }
+
+    public static TheoryData<Type> SharedSpotifyServices => new()
+    {
+        typeof(IPlaybackCoordinator),
+        typeof(ISpotifyAuthService),
+        typeof(ISpotifyWebApiClient),
+        typeof(ISpotifyLibraryStore),
+    };
+
+    [Theory]
+    [MemberData(nameof(SharedSpotifyServices))]
+    public void AddResonaServices_RegistersSpotifyServices(Type serviceType)
+    {
+        var services = new ServiceCollection();
+
+        services.AddResonaServices(new ResonaOptions());
+
+        Assert.Single(services, d => d.ServiceType == serviceType);
+    }
+
+    [Fact]
+    public void AddResonaServices_SpotifyAuthAndLibrary_Resolve()
+    {
+        using var dir = new TempSettingsDirectory();
+        var services = new ServiceCollection();
+        services.AddResonaServices(dir.Options());
+        using var provider = services.BuildServiceProvider();
+
+        Assert.IsType<SpotifyAuthService>(provider.GetRequiredService<ISpotifyAuthService>());
+        Assert.IsType<SpotifyLibraryStore>(provider.GetRequiredService<ISpotifyLibraryStore>());
     }
 }

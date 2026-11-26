@@ -9,6 +9,15 @@ namespace Resona.Web.Api
     [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
     [JsonSerializable(typeof(AudioKindDetails[]))]
     [JsonSerializable(typeof(IReadOnlyList<AudioContentSummary>))]
+    [JsonSerializable(typeof(ApiError))]
+    [JsonSerializable(typeof(SpotifyStatus))]
+    [JsonSerializable(typeof(SpotifySettingsRequest))]
+    [JsonSerializable(typeof(SpotifyAuthStart))]
+    [JsonSerializable(typeof(SpotifyAuthCompleteRequest))]
+    [JsonSerializable(typeof(SpotifyAddItemRequest))]
+    [JsonSerializable(typeof(SpotifyReorderRequest))]
+    [JsonSerializable(typeof(SpotifyItemDto))]
+    [JsonSerializable(typeof(SpotifyItemDto[]))]
     internal sealed partial class ApiJsonContext : JsonSerializerContext
     {
     }

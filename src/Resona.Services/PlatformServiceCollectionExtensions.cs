@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using PiJuiceSharp;
 
@@ -6,6 +6,7 @@ using Resona.Services.Audio;
 using Resona.Services.Battery;
 using Resona.Services.Bluetooth;
 using Resona.Services.OS;
+using Resona.Services.Spotify;
 
 namespace Resona.Services
 {
@@ -25,6 +26,7 @@ namespace Resona.Services
             services.AddSingleton<IPiJuiceStatus>(PiJuiceStatus.Create());
             services.AddSingleton<IBatteryStateProvider, BatteryStateProvider>();
             services.AddSingleton<IOsCommandExecutor, LinuxOsCommandExecutor>();
+            services.AddSingleton<ISpotifyPlaybackService, WebApiSpotifyPlaybackService>();
             return services;
         }
 
@@ -36,6 +38,9 @@ namespace Resona.Services
             services.AddSingleton<ILogService>(new DevLogService());
             services.AddSingleton<IBatteryStateProvider, FakeBatteryStateProvider>();
             services.AddSingleton<IOsCommandExecutor, DevOsCommandExecutor>();
+
+            // On a dev machine this targets the Spotify desktop app, found by device name
+            services.AddSingleton<ISpotifyPlaybackService, WebApiSpotifyPlaybackService>();
             return services;
         }
     }

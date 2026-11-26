@@ -1,6 +1,7 @@
 using System.Net;
 
 using Resona.Services.Libraries;
+using Resona.Services.Spotify;
 using Resona.Web.Api;
 using Resona.Web.Http;
 using Resona.Web.Static;
@@ -29,11 +30,16 @@ namespace Resona.Web
             IAudioRepository audioRepository,
             IImageProvider imageProvider,
             ILibraryFileManager libraryFileManager,
+            ISpotifyAuthService spotifyAuth,
+            ISpotifyLibraryStore spotifyLibrary,
+            ISpotifyWebApiClient spotifyClient,
+            ISpotifyWebSettings spotifySettings,
             string bindHost,
             IStaticContentSource? staticContent = null)
         {
             this.bindHost = bindHost;
             router = LibraryRoutes.Map(new Router(), new LibraryApi(audioRepository, imageProvider, libraryFileManager));
+            router = SpotifyRoutes.Map(router, new SpotifyApi(spotifyAuth, spotifyLibrary, spotifyClient, spotifySettings));
             this.staticContent = staticContent ?? new EmbeddedStaticContentSource(typeof(ResonaWebHost).Assembly);
         }
 

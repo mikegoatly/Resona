@@ -36,6 +36,10 @@ namespace Resona.Services.Audio
         {
         }
 
+        public void Pause()
+        {
+        }
+
         public void Previous()
         {
         }

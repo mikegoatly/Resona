@@ -20,7 +20,7 @@ public class HostLifetimeTests
     public async Task RunAsync_PortInUse_Faults()
     {
         await using var first = await new WebHostTestBuilder().StartAsync();
-        var second = new ResonaWebHost(first.Audio, first.Images, first.Files, "localhost", first.Static);
+        var second = new ResonaWebHost(first.Audio, first.Images, first.Files, first.SpotifyAuth, first.SpotifyLibrary, first.SpotifyClient, first.SpotifySettings, "localhost", first.Static);
 
         await Assert.ThrowsAnyAsync<Exception>(() => second.RunAsync(first.Port, CancellationToken.None));
     }

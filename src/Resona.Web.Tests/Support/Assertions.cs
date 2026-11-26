@@ -28,4 +28,14 @@ public static class Assertions
         AssertStatus(HttpStatusCode.OK, response);
         Assert.Equal(expected, await response.Content.ReadAsByteArrayAsync());
     }
+
+    public static async Task<JsonNode> ReadJsonAsync(HttpResponseMessage response)
+        => JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
+
+    /// <summary>Asserts the status and that the body is a <c>{"error": "..."}</c> JSON document.</summary>
+    public static async Task AssertErrorAsync(HttpStatusCode expected, HttpResponseMessage response)
+    {
+        AssertStatus(expected, response);
+        Assert.False(string.IsNullOrEmpty((string?)(await ReadJsonAsync(response))["error"]));
+    }
 }

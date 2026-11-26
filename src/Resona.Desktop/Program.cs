@@ -43,7 +43,7 @@ namespace Resona.Desktop
         private static void StartWebApp(CancellationTokenSource applicationExitCancellationTokenSource)
         {
             // Signal to the main UI task that the web app has exited and the application should shut down
-            _ = ResonaBootstrapper.StartWebHost(8080, applicationExitCancellationTokenSource.Token)
+            _ = ResonaBootstrapper.StartWebHost(ResonaBootstrapper.WebPort, applicationExitCancellationTokenSource.Token)
                 .ContinueWith(_ => applicationExitCancellationTokenSource.Cancel(), TaskScheduler.Default);
         }
 

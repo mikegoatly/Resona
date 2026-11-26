@@ -50,5 +50,6 @@
 		<ProjectReference Include="..\Resona.Services\Resona.Services.csproj" />
 		<ProjectReference Include="..\Resona.UI\Resona.UI.csproj" />
 		<ProjectReference Include="..\Resona.Web\Resona.Web.csproj" />
+		<ProjectReference Include="..\Resona.Android.SpotifyBinding\Resona.Android.SpotifyBinding.csproj" />
 	</ItemGroup>
 </Project>

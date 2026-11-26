@@ -17,12 +17,13 @@ using Resona.Persistence;
 using Resona.Services.Libraries;
 using Resona.Services;
 using Resona.UI.ViewModels;
+using Resona.Services.Spotify;
 using Resona.Web;
+using Resona.Web.Api;
 
 using Serilog;
 
 using Splat;
-using Splat.Microsoft.Extensions.DependencyInjection;
 
 namespace Resona.UI
 {
@@ -31,6 +32,9 @@ namespace Resona.UI
     /// </summary>
     public static class ResonaBootstrapper
     {
+        /// <summary>The port the web client is served on.</summary>
+        public const int WebPort = 8080;
+
         /// <summary>
         /// Applies the platform options, initializes SQLite, registers all services/view models/views and prepares the database.
         /// </summary>
@@ -90,6 +94,10 @@ namespace Resona.UI
                         Locator.Current.GetRequiredService<IAudioRepository>(),
                         Locator.Current.GetRequiredService<IImageProvider>(),
                         Locator.Current.GetRequiredService<ILibraryFileManager>(),
+                        Locator.Current.GetRequiredService<ISpotifyAuthService>(),
+                        Locator.Current.GetRequiredService<ISpotifyLibraryStore>(),
+                        Locator.Current.GetRequiredService<ISpotifyWebApiClient>(),
+                        new DefaultSpotifyWebSettings(Locator.Current.GetRequiredService<ISpotifyPlaybackService>().UsesConnectDevice),
                         Settings.Default.Options.WebBindHost);
 
                     Log.Debug("Starting web application");
@@ -118,7 +126,7 @@ namespace Resona.UI
 
             services.AddSingleton((s) => new RoutingState());
 
-            services.UseMicrosoftDependencyResolver();
+            SplatServiceBridge.Register(services, services.BuildServiceProvider(), Locator.CurrentMutable);
         }
     }
 }

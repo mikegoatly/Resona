@@ -17,6 +17,8 @@ namespace Resona.UI.ViewModels
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<PlayerControlsViewModel>();
             services.AddSingleton<LibraryViewModel>();
+            services.AddSingleton<SpotifyLibraryViewModel>();
+            services.AddSingleton<SpotifyTrackListViewModel>();
             services.AddSingleton<TrackListViewModel>();
             services.AddSingleton<PowerOptionsViewModel>();
             services.AddSingleton<SleepOptionsViewModel>();
@@ -33,6 +35,8 @@ namespace Resona.UI.ViewModels
             services.AddScoped<IViewFor<PlayerControlsViewModel>, PlayerControlsView>();
             services.AddScoped<IViewFor<AudioSelectionViewModel>, AudioSelectionView>();
             services.AddScoped<IViewFor<LibraryViewModel>, LibraryView>();
+            services.AddScoped<IViewFor<SpotifyLibraryViewModel>, SpotifyLibraryView>();
+            services.AddScoped<IViewFor<SpotifyTrackListViewModel>, SpotifyTrackListView>();
             services.AddScoped<IViewFor<TrackListViewModel>, TrackListView>();
             services.AddScoped<IViewFor<SettingsViewModel>, SettingsView>();
         }
@@ -46,6 +50,8 @@ namespace Resona.UI.ViewModels
             views.MapFromServiceLocator<PlayerControlsViewModel, IViewFor<PlayerControlsViewModel>>();
             views.MapFromServiceLocator<AudioSelectionViewModel, IViewFor<AudioSelectionViewModel>>();
             views.MapFromServiceLocator<LibraryViewModel, IViewFor<LibraryViewModel>>();
+            views.MapFromServiceLocator<SpotifyLibraryViewModel, IViewFor<SpotifyLibraryViewModel>>();
+            views.MapFromServiceLocator<SpotifyTrackListViewModel, IViewFor<SpotifyTrackListViewModel>>();
             views.MapFromServiceLocator<TrackListViewModel, IViewFor<TrackListViewModel>>();
             views.MapFromServiceLocator<SettingsViewModel, IViewFor<SettingsViewModel>>();
         }

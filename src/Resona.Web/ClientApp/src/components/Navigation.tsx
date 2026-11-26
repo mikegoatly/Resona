@@ -37,6 +37,11 @@ const Navigation = () => {
                                 Sleep
                             </Typography>
                         </Button>
+                        <Button component={RouterLink} to="/spotify" >
+                            <Typography variant="button">
+                                Spotify
+                            </Typography>
+                        </Button>
                     </div>
                     <Box className="upload-queue">
                         <UploadQueue />

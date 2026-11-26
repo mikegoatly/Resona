@@ -30,6 +30,9 @@
     <Project Path="src/Resona.Android/Resona.Android.csproj">
       <Build Project="false" />
     </Project>
+    <Project Path="src/Resona.Android.SpotifyBinding/Resona.Android.SpotifyBinding.csproj">
+      <Build Project="false" />
+    </Project>
     <Project Path="src/Resona.Desktop/Resona.Desktop.csproj" />
     <Project Path="src/Resona.Persistence/Resona.Persistence.csproj" />
     <Project Path="src/Resona.Services/Resona.Services.csproj" />

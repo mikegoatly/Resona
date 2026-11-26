@@ -9,7 +9,10 @@ namespace Resona.Services
         LogEventLevel? LogEventLevel = null,
         TimeSpan? ScreenDimTimeout = null,
         TimeSpan? InactivityShutdownTimeout = null,
-        bool? HostWebClient = null);
+        bool? HostWebClient = null,
+        bool? SpotifyEnabled = null,
+        string? SpotifyClientId = null,
+        string? SpotifyDeviceName = null);
 
     [JsonSerializable(typeof(SettingsData))]
     internal partial class SettingsSerializationContext : JsonSerializerContext { }
@@ -17,6 +20,8 @@ namespace Resona.Services
     public sealed class Settings
     {
         private const string SettingsFileName = "Resona.settings";
+
+        private static readonly string DefaultSpotifyDeviceName = "Resona-" + Environment.MachineName;
 
         private static readonly Lock defaultLock = new();
         private static ResonaOptions? configuredOptions;
@@ -53,6 +58,9 @@ namespace Resona.Services
             settings.ScreenDimTimeout = settingsData?.ScreenDimTimeout ?? TimeSpan.FromSeconds(30);
             settings.InactivityShutdownTimeout = settingsData?.InactivityShutdownTimeout ?? TimeSpan.FromHours(2);
             settings.HostWebClient = settingsData?.HostWebClient ?? options.HostWebClientDefault;
+            settings.SpotifyEnabled = settingsData?.SpotifyEnabled ?? false;
+            settings.SpotifyClientId = settingsData?.SpotifyClientId;
+            settings.SpotifyDeviceName = settingsData?.SpotifyDeviceName ?? DefaultSpotifyDeviceName;
             return settings;
         }
 
@@ -116,13 +124,22 @@ namespace Resona.Services
 
         public bool HostWebClient { get; set; } = false;
 
+        public bool SpotifyEnabled { get; set; } = false;
+
+        public string? SpotifyClientId { get; set; }
+
+        public string SpotifyDeviceName { get; set; } = DefaultSpotifyDeviceName;
+
         public void Save()
         {
             var settingsData = new SettingsData(
                 this.LogLevel,
                 ScreenDimTimeout: this.ScreenDimTimeout,
                 InactivityShutdownTimeout: this.InactivityShutdownTimeout,
-                HostWebClient: this.HostWebClient);
+                HostWebClient: this.HostWebClient,
+                SpotifyEnabled: this.SpotifyEnabled,
+                SpotifyClientId: this.SpotifyClientId,
+                SpotifyDeviceName: this.SpotifyDeviceName);
 
             var jsonString = JsonSerializer.Serialize(
                 settingsData,
@@ -130,6 +147,7 @@ namespace Resona.Services
 
             Directory.CreateDirectory(Options.SettingsDirectory);
             File.WriteAllText(settingsFilePath, jsonString);
+            this.SettingsChanged?.Invoke();
         }
     }
 }

@@ -40,6 +40,9 @@ namespace Resona.UI.ViewModels
 
             this.RefreshLogSize();
 
+            this.RefreshWebClientAddressesCommand = ReactiveCommand.Create(this.RefreshWebClientAddresses);
+            this.RefreshWebClientAddresses();
+
             this.RebuildLibraryDataCommand = ReactiveCommand.Create(() =>
             {
                 ResonaDb.Reset();
@@ -80,9 +83,25 @@ namespace Resona.UI.ViewModels
             }
         }
 
+        public int WebPort => ResonaBootstrapper.WebPort;
+
+        /// <summary>The URL(s) other devices on the network can use to open the web client, one per line.</summary>
+        [Reactive]
+        public partial string WebClientAddresses { get; private set; } = string.Empty;
+
+        public ReactiveCommand<Unit, Unit> RefreshWebClientAddressesCommand { get; }
+
         [Reactive]
         public partial float? LogSize { get; set; }
         public ReactiveCommand<Unit, Unit> RebuildLibraryDataCommand { get; }
+
+        private void RefreshWebClientAddresses()
+        {
+            var urls = NetworkAddresses.GetWebClientUrls(this.WebPort);
+            this.WebClientAddresses = urls.Count > 0
+                ? string.Join(Environment.NewLine, urls)
+                : "No network connection";
+        }
 
         private void RefreshLogSize()
         {

@@ -6,6 +6,7 @@ using Resona.Services.Audio;
 using Resona.Services.Battery;
 using Resona.Services.Bluetooth;
 using Resona.Services.OS;
+using Resona.Services.Spotify;
 
 namespace Resona.Android.Platform;
 
@@ -15,9 +16,12 @@ internal static class AndroidPlatformServiceCollectionExtensions
     {
         services.AddSingleton<IBluetoothService>(_ => new AndroidBluetoothService(context));
         services.AddSingleton<IAudioOutputService>(_ => new AndroidAudioOutputService(context));
-        services.AddSingleton<ILogService>(_ => new AndroidLogService());
+        // Created now, not lazily: constructing it is what configures Serilog, and until then every log is dropped
+        // (matching the Linux/dev registrations)
+        services.AddSingleton<ILogService>(new AndroidLogService());
         services.AddSingleton<IBatteryStateProvider>(_ => new AndroidBatteryStateProvider(context));
         services.AddSingleton<IOsCommandExecutor>(_ => new AndroidOsCommandExecutor(context));
+        services.AddSingleton<ISpotifyPlaybackService>(sp => new AppRemoteSpotifyPlaybackService(context, sp.GetRequiredService<ISpotifySettings>(), sp.GetRequiredService<TimeProvider>()));
         return services;
     }
 }

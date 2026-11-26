@@ -1,0 +1,38 @@
+.spotify-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding-bottom: 2em;
+
+    .setup-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        margin: 1em 0;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+        gap: .5em;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .spotify-entry {
+        display: flex;
+        flex-direction: row;
+        margin: .5em 0;
+        padding: 0.2em;
+        align-items: center;
+        gap: 1em;
+
+        img {
+            object-fit: cover;
+        }
+
+        .details {
+            flex-grow: 1;
+        }
+    }
+}

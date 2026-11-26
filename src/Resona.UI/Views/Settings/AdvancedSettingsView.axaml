@@ -69,10 +69,20 @@
 			<TextBlock Classes="header">Experimental</TextBlock>
 
 			<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-				<Label Target="WebHostEnabled">Web client (served on port 8080):</Label>
+				<Label Target="WebHostEnabled">
+					<TextBlock Text="{Binding WebPort, StringFormat='Web client (served on port {0}):'}" />
+				</Label>
 				<ToggleSwitch x:Name="WebHostEnabled" IsChecked="{Binding WebHostEnabled}">
 				</ToggleSwitch>
 				<TextBlock FontSize="16" Margin="10,0,0,0">(Changing requires restart)</TextBlock>
+			</StackPanel>
+
+			<StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+				<Label>Web client address:</Label>
+				<TextBlock Text="{Binding WebClientAddresses}" />
+				<Button Command="{Binding RefreshWebClientAddressesCommand}" Margin="5,0,0,0" Classes="secondary">
+					<icon:Icon Value="fa-arrows-rotate" />
+				</Button>
 			</StackPanel>
 		</StackPanel>
 	</ScrollViewer>

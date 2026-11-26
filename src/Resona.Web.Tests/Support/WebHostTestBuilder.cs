@@ -21,6 +21,14 @@ public sealed class WebHostTestBuilder : IAsyncDisposable
 
     public FakeLibraryFileManager Files { get; } = new();
 
+    public FakeSpotifyAuthService SpotifyAuth { get; } = new();
+
+    public FakeSpotifyLibraryStore SpotifyLibrary { get; } = new();
+
+    public FakeSpotifyWebApiClient SpotifyClient { get; } = new();
+
+    public FakeSpotifyWebSettings SpotifySettings { get; } = new();
+
     public InMemoryStaticContentSource Static { get; } = new InMemoryStaticContentSource()
         .Add("index.html", IndexHtml)
         .Add("assets/app.js", "console.log('hi');")
@@ -35,7 +43,7 @@ public sealed class WebHostTestBuilder : IAsyncDisposable
     public async Task<WebHostTestBuilder> StartAsync()
     {
         Port = GetFreePort();
-        var host = new ResonaWebHost(Audio, Images, Files, "localhost", Static);
+        var host = new ResonaWebHost(Audio, Images, Files, SpotifyAuth, SpotifyLibrary, SpotifyClient, SpotifySettings, "localhost", Static);
         hostTask = host.RunAsync(Port, cts.Token);
 
         // Wait until listening (or fail fast if the host faulted)

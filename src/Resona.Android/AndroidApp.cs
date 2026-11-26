@@ -29,7 +29,6 @@ namespace Resona.Android;
 [Application(NetworkSecurityConfig = "@xml/network_security_config")]
 public class AndroidApp : AvaloniaAndroidApplication<App>
 {
-    private const int WebPort = 8080;
 
     protected AndroidApp(IntPtr javaReference, JniHandleOwnership transfer)
         : base(javaReference, transfer)
@@ -38,6 +37,7 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
 
     protected override AppBuilder CreateAppBuilder()
     {
+        ForegroundActivity.Register(this);
         this.InitializeResona();
         return ResonaBootstrapper.ConfigureAppBuilder(base.CreateAppBuilder());
     }
@@ -61,7 +61,7 @@ public class AndroidApp : AvaloniaAndroidApplication<App>
 
         if (Settings.Default.HostWebClient)
         {
-            AndroidWebHost.Start(WebPort);
+            AndroidWebHost.Start(ResonaBootstrapper.WebPort);
         }
 
         UpdateService.Start(this);

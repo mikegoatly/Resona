@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- Android 11+ package visibility: lets Resona see the Spotify app that the Spotify App Remote SDK talks to -->
+	<queries>
+		<package android:name="com.spotify.music" />
+	</queries>
+</manifest>

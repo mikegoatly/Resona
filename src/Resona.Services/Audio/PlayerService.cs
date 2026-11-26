@@ -36,6 +36,7 @@ namespace Resona.Services.Audio
         float Volume { get; set; }
 
         void Next();
+        void Pause();
         void Play(AudioContent audiobook, AudioTrack? chapter, double position, bool forceUnpause = false);
         void Previous();
         void TogglePause();
@@ -227,6 +228,14 @@ namespace Resona.Services.Audio
         }
 
         public PlayingTrack? Current { get; private set; }
+
+        public void Pause()
+        {
+            if (!this.Paused && this.currentStream != 0)
+            {
+                this.TogglePause();
+            }
+        }
 
         public void TogglePause()
         {

@@ -55,6 +55,44 @@ public sealed class SettingsTests : IDisposable
     }
 
     [Fact]
+    public void Load_NoFile_SpotifyDefaults()
+    {
+        var settings = Settings.Load(dir.Options());
+
+        Assert.False(settings.SpotifyEnabled);
+        Assert.Null(settings.SpotifyClientId);
+        Assert.Equal("Resona-" + Environment.MachineName, settings.SpotifyDeviceName);
+    }
+
+    [Fact]
+    public void Save_ThenLoad_RoundTripsSpotifySettings()
+    {
+        var options = dir.Options();
+        var settings = Settings.Load(options);
+        settings.SpotifyEnabled = true;
+        settings.SpotifyClientId = "client-abc";
+        settings.SpotifyDeviceName = "Kitchen";
+
+        settings.Save();
+
+        var reloaded = Settings.Load(options);
+        Assert.True(reloaded.SpotifyEnabled);
+        Assert.Equal("client-abc", reloaded.SpotifyClientId);
+        Assert.Equal("Kitchen", reloaded.SpotifyDeviceName);
+    }
+
+    [Fact]
+    public void Load_FileWithoutSpotifyFields_UsesSpotifyDefaults()
+    {
+        dir.WriteSettingsFile("""{ "HostWebClient": true }""");
+
+        var settings = Settings.Load(dir.Options());
+
+        Assert.False(settings.SpotifyEnabled);
+        Assert.Null(settings.SpotifyClientId);
+    }
+
+    [Fact]
     public void Load_ExposesOptions()
     {
         var options = dir.Options();

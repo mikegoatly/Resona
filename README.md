@@ -166,6 +166,61 @@ sudo sed -i 's/dtoverlay=vc4-kms-v3d/dtoverlay=vc4-fkms-v3d/g' /boot/firmware/co
 
 #### 
 
+## Spotify (experimental)
+
+Resona can play parent-curated Spotify playlists/albums by controlling a Spotify Connect device through the Spotify Web API.
+On the Pi that device is [librespot](https://github.com/librespot-org/librespot) (installed from the
+[raspotify](https://github.com/dtcooper/raspotify) package by `install-dependencies.sh`), running as a user service and
+playing through PulseAudio, so the normal audio output / Bluetooth selection still applies.
+
+Requirements:
+
+* A Spotify **Premium** account.
+* A Spotify developer app (https://developer.spotify.com/dashboard), left in development mode:
+  * Add the Spotify account(s) that will be used to the app's user allowlist (*User Management*).
+  * Add the redirect URI `http://127.0.0.1:8888/callback`.
+
+### Pi
+
+1. From your Pi, run `./configure-spotify.sh` (or `./configure-spotify.sh <DeviceName>`). This creates and starts the
+   `resona-spotify.service` user service, advertising a Spotify Connect device called `Resona-<hostname>` by default.
+   Logs: `journalctl --user -u resona-spotify.service -f`.
+1. One-time login: from the Spotify app on a phone on the same Wi-Fi, cast to the `Resona-<hostname>` device. The
+   credentials are cached in `~/.cache/resona-spotify`, so this only needs doing once. Alternatively, over SSH, stop the
+   service and run `librespot --enable-oauth --cache ~/.cache/resona-spotify` once, then start the service again.
+1. The device name must match the one configured on the Spotify page of Resona's web UI.
+
+librespot is an unofficial client and may stop working when Spotify changes its protocol - updating the raspotify
+package (`sudo apt update && sudo apt upgrade`) is usually the fix.
+
+### Android
+
+On Android, Resona does not use the Web API for playback. It drives the **Spotify app** on the device (`com.spotify.music`)
+through the official Spotify App Remote SDK (bound by `src/Resona.Android.SpotifyBinding`), which can wake the Spotify
+app on demand even while Resona is locked in kiosk mode. Album art is loaded from `https://i.scdn.co/image/<id>`
+(derived from the SDK's `spotify:image:<id>` URIs). Volume is the Android media volume.
+
+1. **Install and sign in to Spotify** (Premium) on the device. Installing from the Play Store needs a Google account, but
+   device-owner provisioning requires there to be no accounts on the device, so either install Spotify *before* removing
+   the Google account (then provision), or sideload the Spotify APK. Signing in to Spotify itself does not add an Android
+   account, so it doesn't interfere with provisioning. When the device is already a kiosk, use
+   `./scripts/android/Resona.Android.ps1 -Action KioskOff` to get a normal phone back for this.
+1. **Register Resona in the Spotify developer dashboard** (Edit settings -> *Android Packages*): package name `com.resona`
+   and the SHA1 fingerprint of the key the APK is signed with. For the release keystore used by the script:
+
+   ```powershell
+   keytool -list -v -keystore $HOME/.resona/resona-release.keystore -alias resona | findstr SHA1
+   ```
+
+   (A Debug build is signed with a different key and needs its own fingerprint registered.) The redirect URI
+   `http://127.0.0.1:8888/callback` registered above is also used by the App Remote SDK.
+1. **First connect**: the first time Resona plays something, Spotify may show its own "allow Resona to control Spotify"
+   screen, which can't be displayed under lock task. Do this once with `-Action KioskOff`, tap a Spotify tile in Resona and
+   accept, then switch back with `-Action KioskOn`.
+1. `com.spotify.music` is excluded from the kiosk's app hiding so it stays installed and runnable, but it is not a lock task
+   package. `./scripts/android/Resona.Android.ps1 -Action Status` shows whether it is installed.
+1. Set the Spotify client id on the Spotify page of Resona's web UI (the device name setting is not used on Android).
+
 ## Database
 
 Work on the core database structure is ongoing, so I'm just going to recreate the initial database structure every time I make a change using:
@@ -205,7 +260,7 @@ Open `http://<device-ip>:8080/` from another device, or use `adb forward tcp:808
 Parent control is adb-only; there is no way out of the app on the device itself.
 
 ```
-./scripts/android/Resona.Android.ps1 -Action Build
+./scripts/android/Resona.Android.ps1 -Action Build                        # very first build on a new setup: add -NewKeystore
 ./scripts/android/Resona.Android.ps1 -Action Provision -Device <serial>   # first time
 ./scripts/android/Resona.Android.ps1 -Action Deploy                       # updates
 ./scripts/android/Resona.Android.ps1 -Action Status
@@ -268,6 +323,12 @@ an additional integrity check, not the trust anchor. Keep the keystore safe.
 device owner so the phone can be returned to normal use without a factory reset.
 
 **Signing keystore**: release builds are signed with `~/.resona/resona-release.keystore` (password in
-`~/.resona/resona-release.keystore.password`), created on the first `Build`. **Back both files up** - without the same key,
+`~/.resona/resona-release.keystore.password`), created by the first `Build` run with `-NewKeystore`. **Back both files up** - without the same key,
 updates cannot be installed over the device-owner app and you would have to `Release`/reset the device. They live outside
 the repository and must never be committed.
+
+To build on another machine, copy both files to the same place under that user's profile first. If they are missing, the
+script stops with an error rather than creating a new key, because a new key can't update existing devices and changes the
+Android SHA1 fingerprint registered in the Spotify dashboard (see Spotify > Android above), so Spotify playback would stop
+until the new fingerprint is registered. The fingerprint depends only on the keystore, not on the machine that builds. Pass
+`-NewKeystore` only when setting up from scratch.

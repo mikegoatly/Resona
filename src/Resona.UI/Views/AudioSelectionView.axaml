@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:con="using:Resona.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
     xmlns:local="using:Resona.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:Resona.UI.ViewModels"
@@ -27,6 +28,7 @@
         VerticalAlignment="Center"
         Stretch="Uniform"
         StretchDirection="DownOnly">
+    <StackPanel Orientation="Horizontal">
     <ItemsControl ItemsSource="{Binding AudioKinds}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
@@ -90,5 +92,56 @@
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>
+        <!-- Spotify tile: only visible when Spotify is enabled and connected. Same look as the tiles above, with Spotify's logo (in Spotify green) instead of an image. -->
+        <Button
+            Margin="0,0,5,0"
+            Background="#4999"
+            Command="{Binding SpotifySelected}"
+            CornerRadius="200"
+            IsVisible="{Binding IsSpotifyTileVisible}">
+            <icon:Icon
+                Width="280"
+                Height="280"
+                Margin="20"
+                FontSize="150"
+                Foreground="#1ED760"
+                Value="fa-spotify">
+                <icon:Icon.Styles>
+                    <Style Selector="Button > icon|Icon">
+                        <Setter Property="RenderTransform" Value="scale(1)" />
+                        <Setter Property="Transitions">
+                            <Transitions>
+                                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" Easing="BackEaseOut" />
+                            </Transitions>
+                        </Setter>
+                    </Style>
+                    <Style Selector="Button:pointerover > icon|Icon">
+                        <Setter Property="RenderTransform" Value="scale(1.1)" />
+                    </Style>
+                    <Style Selector="Button:pressed > icon|Icon">
+                        <Setter Property="RenderTransform" Value="scale(0.9)" />
+                    </Style>
+                </icon:Icon.Styles>
+            </icon:Icon>
+            <Button.Styles>
+                <Style Selector="Button:pressed">
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+                <Style Selector="Button /template/ ContentPresenter">
+                    <Setter Property="Transitions">
+                        <Transitions>
+                            <BrushTransition Property="Background" Duration="0:0:0.15" />
+                        </Transitions>
+                    </Setter>
+                </Style>
+                <Style Selector="Button:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="#4DDD" />
+                </Style>
+                <Style Selector="Button:pressed /template/ ContentPresenter">
+                    <Setter Property="Background" Value="#4DDD" />
+                </Style>
+            </Button.Styles>
+        </Button>
+    </StackPanel>
     </Viewbox>
 </UserControl>

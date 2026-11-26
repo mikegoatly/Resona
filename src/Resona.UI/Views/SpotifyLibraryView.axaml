@@ -1,0 +1,83 @@
+<UserControl
+    x:Class="Resona.UI.Views.SpotifyLibraryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:Resona.UI.Views"
+    xmlns:vm="using:Resona.UI.ViewModels"
+    x:Name="Root"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:CompileBindings="True"
+    x:DataType="vm:SpotifyLibraryViewModel"
+    Classes="pagehost"
+    mc:Ignorable="d">
+    <Design.DataContext>
+        <vm:SpotifyLibraryViewModel />
+    </Design.DataContext>
+
+    <Grid>
+        <ScrollViewer MaxWidth="800" Margin="20,20,20,20">
+            <ItemsControl Background="Transparent" ItemsSource="{Binding Items}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SpotifyItemViewModel">
+                        <ListBoxItem
+                            Width="245"
+                            Margin="0,0,5,5"
+                            Padding="0">
+                            <ListBoxItem.Styles>
+                                <Style Selector="ListBoxItem">
+                                    <Setter Property="RenderTransform" Value="scale(1)" />
+                                    <Setter Property="Transitions">
+                                        <Transitions>
+                                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" Easing="BackEaseOut" />
+                                        </Transitions>
+                                    </Setter>
+                                </Style>
+                                <Style Selector="ListBoxItem:pressed">
+                                    <Setter Property="RenderTransform" Value="scale(0.93)" />
+                                </Style>
+                            </ListBoxItem.Styles>
+
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="Tapped">
+                                    <InvokeCommandAction Command="{ReflectionBinding ViewModel.ItemSelected, ElementName=Root}" CommandParameter="{Binding}" />
+                                </EventTriggerBehavior>
+                            </Interaction.Behaviors>
+
+                            <Grid>
+                                <Image
+                                    Width="245"
+                                    Height="245"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Top"
+                                    Opacity="0.7"
+                                    Source="{Binding Cover^}"
+                                    Stretch="UniformToFill" />
+                                <Border
+                                    Padding="5,0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Bottom"
+                                    Background="#BFFF">
+                                    <TextBlock
+                                        Foreground="Black"
+                                        Text="{Binding Name}"
+                                        TextAlignment="Center"
+                                        TextWrapping="Wrap" />
+                                </Border>
+                            </Grid>
+                        </ListBoxItem>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <views:SpotifyMessageView DataContext="{Binding Messages}" />
+    </Grid>
+</UserControl>

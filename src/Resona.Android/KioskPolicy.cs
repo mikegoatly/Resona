@@ -7,6 +7,8 @@ using Android.Provider;
 using Android.Util;
 using Android.Views.InputMethods;
 
+using Resona.Services.OS;
+
 namespace Resona.Android;
 
 /// <summary>
@@ -45,6 +47,13 @@ internal static class KioskPolicy
         "com.android.permissioncontroller",        // Permission controller: runtime permission dialogs
         "com.google.android.permissioncontroller", // Permission controller (Google builds)
         "com.miui.packageinstaller",               // MIUI package installer
+        // Spotify app: the Spotify App Remote SDK plays through it, so it must stay installed and runnable. It is deliberately
+        // NOT a lock task package (it never needs the foreground). First-run auth/consent screens belong to Spotify and can
+        // not be shown under lock task, so do the first connect with `-Action KioskOff`, then `-Action KioskOn`.
+        "com.spotify.music",
+        // Play Store: keeps Spotify (and other kept apps) auto-updating, and lets a parent install Spotify on a new device
+        // with the kiosk off. Not a lock task package, so it can't be opened while the kiosk is on.
+        "com.android.vending",
     };
 
     /// <summary>Packages hidden even if they have no launcher activity: search/assistant/voice apps that can pop floating windows.</summary>
@@ -175,27 +184,37 @@ internal static class KioskPolicy
         }
 
         var hidden = GetHidden(context);
-        var newlyHidden = 0;
-        foreach (var package in candidates)
-        {
-            if (keep.Contains(package))
-            {
-                continue;
-            }
 
+        // Already-hidden candidates are skipped: either ours from a previous run, or hidden independently of us (left
+        // alone, so Disable never unhides them). Always checked, because an OTA/system-app update or `pm unhide` can
+        // make one of ours visible again and it must be re-hidden.
+        var plan = KioskHidePlan.Compute(candidates, keep, hidden, package => IsHiddenSafe(dpm, admin, package));
+        var changed = false;
+        var newlyHidden = 0;
+
+        foreach (var package in plan.ToUnhide)
+        {
             try
             {
-                // Still hidden: either ours from a previous run, or hidden independently of us (left alone, so
-                // Disable never unhides it). Always checked, because an OTA/system-app update or `pm unhide` can
-                // make one of ours visible again and it must be re-hidden.
-                if (dpm.IsApplicationHidden(admin, package))
-                {
-                    continue;
-                }
+                dpm.SetApplicationHidden(admin, package, false);
+                hidden.Remove(package);
+                changed = true;
+                Log.Info(AndroidLog.Tag, $"Kiosk: unhid {package} (it is now on the never-hide list)");
+            }
+            catch (Exception ex)
+            {
+                Log.Warn(AndroidLog.Tag, $"Kiosk: could not unhide {package}: {ex.Message}");
+            }
+        }
 
+        foreach (var package in plan.ToHide)
+        {
+            try
+            {
                 // Returns false if the package is not installed (e.g. an AlwaysHide entry)
                 if (dpm.SetApplicationHidden(admin, package, true))
                 {
+                    changed = true;
                     if (hidden.Add(package))
                     {
                         newlyHidden++;
@@ -212,13 +231,27 @@ internal static class KioskPolicy
             }
         }
 
-        if (newlyHidden > 0)
+        if (changed)
         {
             SaveHidden(context, hidden);
         }
 
 
         Log.Info(AndroidLog.Tag, $"Kiosk: hid {hidden.Count} apps ({newlyHidden} new)");
+    }
+
+    private static bool IsHiddenSafe(DevicePolicyManager dpm, ComponentName admin, string package)
+    {
+        try
+        {
+            return dpm.IsApplicationHidden(admin, package);
+        }
+        catch (Exception ex)
+        {
+            // Treat as hidden so we don't try to hide something we can't inspect
+            Log.Warn(AndroidLog.Tag, $"Kiosk: could not check {package}: {ex.Message}");
+            return true;
+        }
     }
 
     private static void UnhideApps(Context context, DevicePolicyManager dpm, ComponentName admin)

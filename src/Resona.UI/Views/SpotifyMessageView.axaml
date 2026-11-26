@@ -1,0 +1,31 @@
+<UserControl
+    x:Class="Resona.UI.Views.SpotifyMessageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:Resona.UI.ViewModels"
+    x:CompileBindings="True"
+    x:DataType="vm:SpotifyMessageViewModel">
+
+    <!-- Non-blocking, dismissible message; auto-dismisses after a few seconds -->
+    <Border
+        Margin="40,0,40,20"
+        Padding="20,12"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Bottom"
+        Background="#E0301020"
+        BorderBrush="{StaticResource PrimaryColor}"
+        BorderThickness="2"
+        CornerRadius="20"
+        IsVisible="{Binding IsVisible}">
+        <Interaction.Behaviors>
+            <EventTriggerBehavior EventName="Tapped">
+                <InvokeCommandAction Command="{Binding Dismiss}" />
+            </EventTriggerBehavior>
+        </Interaction.Behaviors>
+        <TextBlock
+            FontSize="24"
+            Text="{Binding Message}"
+            TextAlignment="Center"
+            TextWrapping="Wrap" />
+    </Border>
+</UserControl>
